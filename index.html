@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小分子药物设计全流程平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #8892b0;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        
+        /* 干湿实验图例 */
+        .experiment-legend {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        
+        .exp-type {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1em;
+        }
+        
+        .exp-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .dry-lab {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: #fff;
+        }
+        
+        .wet-lab {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: #fff;
+        }
+        
+        .hybrid-lab {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: #fff;
+        }
+        
+        .workflow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        
+        .phase {
+            display: flex;
+            align-items: stretch;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .phase-header {
+            width: 180px;
+            min-width: 180px;
+            padding: 20px;
+            border-radius: 15px 0 0 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            position: relative;
+        }
+        
+        .phase-header::after {
+            content: '';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 15px solid transparent;
+            border-left: 15px solid;
+        }
+        
+        .phase-content {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border-radius: 0 15px 15px 0;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: stretch;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .step {
+            border-radius: 10px;
+            padding: 15px 15px;
+            width: 220px;
+            min-height: 280px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        
+        /* 干实验样式 - 蓝色系 */
+        .step.dry {
+            background: linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(0,153,204,0.15) 100%);
+            border: 2px solid rgba(0,212,255,0.5);
+            box-shadow: 0 4px 15px rgba(0,212,255,0.2);
+        }
+        
+        .step.dry:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,212,255,0.4);
+            border-color: #00d4ff;
+        }
+        
+        /* 湿实验样式 - 红色系 */
+        .step.wet {
+            background: linear-gradient(135deg, rgba(255,107,107,0.15) 0%, rgba(238,90,90,0.15) 100%);
+            border: 2px solid rgba(255,107,107,0.5);
+            box-shadow: 0 4px 15px rgba(255,107,107,0.2);
+        }
+        
+        .step.wet:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255,107,107,0.4);
+            border-color: #ff6b6b;
+        }
+        
+        /* 干湿混合样式 - 紫色系 */
+        .step.hybrid {
+            background: linear-gradient(135deg, rgba(155,89,182,0.15) 0%, rgba(142,68,173,0.15) 100%);
+            border: 2px solid rgba(155,89,182,0.5);
+            box-shadow: 0 4px 15px rgba(155,89,182,0.2);
+        }
+        
+        .step.hybrid:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(155,89,182,0.4);
+            border-color: #9b59b6;
+        }
+        
+        .exp-label {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            font-size: 0.65em;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .exp-label.dry {
+            background: #00d4ff;
+            color: #000;
+        }
+        
+        .exp-label.wet {
+            background: #ff6b6b;
+            color: #fff;
+        }
+        
+        .exp-label.hybrid {
+            background: #9b59b6;
+            color: #fff;
+        }
+        
+        .step-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+            margin-top: 5px;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+        
+        .step-desc {
+            font-size: 0.8em;
+            color: #8892b0;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .tools-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            margin-top: 5px;
+        }
+        
+        .step.dry .tools-badge {
+            color: #00d4ff;
+        }
+        
+        .step.wet .tools-badge {
+            color: #ff9999;
+        }
+        
+        .step.hybrid .tools-badge {
+            color: #d8a8e8;
+        }
+        
+        /* DrugCLIP 按钮样式 */
+        .drugclip-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, rgba(0,212,255,0.3) 0%, rgba(155,89,182,0.3) 100%);
+            border: 1px solid rgba(0,212,255,0.5);
+            border-radius: 20px;
+            color: #00d4ff;
+            font-size: 0.75em;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .drugclip-badge:hover {
+            background: linear-gradient(135deg, rgba(0,212,255,0.5) 0%, rgba(155,89,182,0.5) 100%);
+            border-color: #00d4ff;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0,212,255,0.4);
+        }
+        
+        .arrow-down {
+            text-align: center;
+            font-size: 2em;
+            color: #00d4ff;
+            margin: -10px 0;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+        
+        /* Phase colors */
+        .phase-1 .phase-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .phase-1 .phase-header::after {
+            border-left-color: #764ba2;
+        }
+        
+        .phase-2 .phase-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .phase-2 .phase-header::after {
+            border-left-color: #f5576c;
+        }
+        
+        .phase-3 .phase-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .phase-3 .phase-header::after {
+            border-left-color: #00f2fe;
+        }
+        
+        .phase-4 .phase-header {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        .phase-4 .phase-header::after {
+            border-left-color: #38f9d7;
+        }
+        
+        .phase-5 .phase-header {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        .phase-5 .phase-header::after {
+            border-left-color: #fee140;
+        }
+        
+        .phase-6 .phase-header {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+        .phase-6 .phase-header::after {
+            border-left-color: #fed6e3;
+        }
+        
+        .phase-number {
+            font-size: 2.5em;
+            opacity: 0.3;
+            position: absolute;
+            top: 10px;
+            left: 15px;
+        }
+        
+        /* 网站链接样式 */
+        .website-links {
+            margin-top: auto;
+            padding-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .website-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .step.dry .website-link {
+            border: 1px solid rgba(0,212,255,0.3);
+        }
+        
+        .step.dry .website-link:hover {
+            background: rgba(0,212,255,0.3);
+            transform: scale(1.05);
+        }
+        
+        .step.wet .website-link {
+            border: 1px solid rgba(255,107,107,0.3);
+        }
+        
+        .step.wet .website-link:hover {
+            background: rgba(255,107,107,0.3);
+            transform: scale(1.05);
+        }
+        
+        .link-icon {
+            font-size: 0.9em;
+        }
+        
+        /* 悬停提示框 */
+        .tooltip {
+            position: fixed;
+            background: rgba(0,0,0,0.9);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            max-width: 280px;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            line-height: 1.5;
+        }
+        
+        .tooltip.visible {
+            opacity: 1;
+        }
+        
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: rgba(0,0,0,0.9);
+        }
+        
+        /* 实验列表样式 */
+        .experiment-list {
+            margin-top: auto;
+            padding-top: 10px;
+            text-align: left;
+        }
+        
+        .experiment-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .experiment-list li {
+            font-size: 0.75em;
+            color: #ff9999;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255,107,107,0.2);
+        }
+        
+        .experiment-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .phase {
+                flex-direction: column;
+            }
+            .phase-header {
+                width: 100%;
+                border-radius: 15px 15px 0 0;
+            }
+            .phase-header::after {
+                display: none;
+            }
+            .phase-content {
+                border-radius: 0 0 15px 15px;
+            }
+            .experiment-legend {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .step {
+                width: 100%;
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧬 小分子药物设计全流程平台</h1>
+        <p class="subtitle">Small Molecule Drug Design Platform - Complete Workflow</p>
+        
+        <!-- 全局提示框 -->
+        <div class="tooltip" id="global-tooltip"></div>
+        
+        <!-- 干湿实验图例 -->
+        <div class="experiment-legend">
+            <div class="exp-type">
+                <span class="exp-badge dry-lab">干实验</span>
+                <span>计算机模拟 / 数据分析</span>
+            </div>
+            <div class="exp-type">
+                <span class="exp-badge wet-lab">湿实验</span>
+                <span>实验室生物学实验</span>
+            </div>
+            <div class="exp-type">
+                <span class="exp-badge hybrid-lab">干湿结合</span>
+                <span>计算与实验结合</span>
+            </div>
+        </div>
+        
+        <div class="workflow">
+            <!-- Phase 1: Target Identification -->
+            <div class="phase phase-1">
+                <div class="phase-header">
+                    <span class="phase-number">01</span>
+                    <div>🎯</div>
+                    <div>靶点发现与验证</div>
+                    <div style="font-size:0.8em;opacity:0.8;margin-top:5px;">Target Discovery</div>
+                </div>
+                <div class="phase-content">
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">🧬</div>
+                        <div class="step-title">靶点筛选 - 正向分析</div>
+                        <div class="step-desc">输入: 基因+癌种<br>输出: 该基因的生存分析结果(OS/DFS)</div>
+                        <span class="tools-badge">生存分析</span>
+                        <div class="website-links">
+                            <a href="http://gepia2.cancer-pku.cn/" class="website-link" target="_blank" data-tooltip="GEPIA2: 输入基因+癌种，分析OS、DFS，可设置表达cutoff，输出最显著生存相关基因。支持多基因联合分析，基于TCGA数据">
+                                <span class="link-icon">🔗</span> GEPIA2
+                            </a>
+                            <a href="https://ualcan.path.uab.edu/" class="website-link" target="_blank" data-tooltip="UALCAN: 访问TCGA、MET500、CPTAC、CBTTC数据，识别生物标志物，生存分析，基因表达与临床特征关联">
+                                <span class="link-icon">🔗</span> UALCAN
+                            </a>
+                            <a href="https://kmplot.com/" class="website-link" target="_blank" data-tooltip="KM Plotter: 最成熟的在线生存分析工具，实时计算，支持多种癌种，可设置cutoff值">
+                                <span class="link-icon">🔗</span> KM Plotter
+                            </a>
+                            <a href="https://www.cbioportal.org/" class="website-link" target="_blank" data-tooltip="cBioPortal: 大规模癌症基因组数据，生存分析比较，共表达网络分析，可发现新靶点">
+                                <span class="link-icon">🔗</span> cBioPortal
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">📊</div>
+                        <div class="step-title">靶点筛选 - 反向分析</div>
+                        <div class="step-desc">输入: 癌种、OS/PFS、cutoff<br>输出: 与该生存特征相关的基因/靶点列表</div>
+                        <span class="tools-badge">关联分析</span>
+                        <div class="website-links">
+                            <a href="https://github.com/easygsea/cSurvival" class="website-link" target="_blank" data-tooltip="cSurvival: 识别预后生物标志物和遗传脆弱性，支持基因集、基因、位点和药物依赖性联合分析，可探索与生存相关的基因交互作用">
+                                <span class="link-icon">🔗</span> cSurvival
+                            </a>
+                            <a href="https://dosurvive.lab.nycu.edu.tw/" class="website-link" target="_blank" data-tooltip="DoSurvive: 以癌症预后生物标志物为中心的数据库，支持多变量生存分析，可自定义基因/患者列表，覆盖33种癌症类型">
+                                <span class="link-icon">🔗</span> DoSurvive
+                            </a>
+                            <a href="http://www.oncolnc.org/" class="website-link" target="_blank" data-tooltip="OncoLnc: 将TCGA生存数据与mRNA、miRNA、lncRNA表达关联，可探索哪些RNA与生存相关，可从生存数据反向查找相关基因">
+                                <span class="link-icon">🔗</span> OncoLnc
+                            </a>
+                            <a href="https://dna00.bio.kyutech.ac.jp/PrognoScan/PrognoScan.html" class="website-link" target="_blank" data-tooltip="PrognoScan: 大规模癌症微阵列数据集荟萃分析，分析基因表达与患者预后(OS、DFS)关系，可基于生存特征筛选相关基因">
+                                <span class="link-icon">🔗</span> PrognoScan
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step wet">
+                        <span class="exp-label wet">湿实验</span>
+                        <div class="step-icon">✅</div>
+                        <div class="step-title">靶点验证</div>
+                        <div class="step-desc">Target Validation<br>验证靶点的功能相关性</div>
+                        <span class="tools-badge">功能验证</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• 组织芯片 IHC</li>
+                                <li>• 敲低/过表达</li>
+                                <li>• 细胞增殖/凋亡检测</li>
+                                <li>• animal experiment</li>
+                                <li>• ...</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="arrow-down">⬇</div>
+            
+            <!-- Phase 2: Hit Discovery -->
+            <div class="phase phase-2">
+                <div class="phase-header">
+                    <span class="phase-number">02</span>
+                    <div>💊</div>
+                    <div>苗头化合物发现</div>
+                    <div style="font-size:0.8em;opacity:0.8;margin-top:5px;">Hit Discovery</div>
+                    <div style="margin-top:12px;"></div>
+                    <a href="https://www.drugclip.com" target="_blank" class="drugclip-badge" data-tooltip="DrugCLIP: AI驱动超高通量虚拟药物筛选平台，支持全基因组范围筛选">
+                        🤖 DrugCLIP
+                    </a>
+                </div>
+                <div class="phase-content">
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">🧬</div>
+                        <div class="step-title">靶点蛋白准备</div>
+                        <div class="step-desc">Target Preparation<br>结构获取与优化</div>
+                        <span class="tools-badge">结构生物学</span>
+                        <div class="website-links">
+                            <a href="https://www.rcsb.org/" class="website-link" target="_blank" data-tooltip="PDB: 蛋白质结构数据库，获取实验解析的靶点结构">
+                                <span class="link-icon">🔗</span> PDB
+                            </a>
+                            <a href="https://alphafold.ebi.ac.uk/" class="website-link" target="_blank" data-tooltip="AlphaFold Database: AI预测的蛋白质结构数据库">
+                                <span class="link-icon">🔗</span> AlphaFold Database
+                            </a>
+                            <a href="https://alphafoldserver.com/" class="website-link" target="_blank" data-tooltip="AlphaFold3 Server: 在线蛋白质结构预测服务器">
+                                <span class="link-icon">🔗</span> AlphaFold3 Server
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">📦</div>
+                        <div class="step-title">小分子库准备</div>
+                        <div class="step-desc">Ligand Preparation<br>化合物库构建与处理</div>
+                        <span class="tools-badge">化学信息学</span>
+                        <div class="website-links">
+                            <a href="https://zinc.docking.org/" class="website-link" target="_blank" data-tooltip="ZINC: 可购买化合物数据库，超过10亿个分子">
+                                <span class="link-icon">🔗</span> ZINC
+                            </a>
+                            <a href="https://enamine.net/compound-collections/real-compounds" class="website-link" target="_blank" data-tooltip="Enamine REAL: 全球最大的可购买化合物库，超过380亿个分子">
+                                <span class="link-icon">🔗</span> Enamine REAL
+                            </a>
+                            <a href="https://www.chemdiv.com/" class="website-link" target="_blank" data-tooltip="ChemDiv: 药物化学化合物库供应商，超过150万种化合物">
+                                <span class="link-icon">🔗</span> ChemDiv
+                            </a>
+                            <a href="#" class="website-link" target="_blank" data-tooltip="其他商业化合物库供应商">
+                                <span class="link-icon">🔗</span> 其他
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">🎯</div>
+                        <div class="step-title">结合口袋识别</div>
+                        <div class="step-desc">Binding Site Detection<br>活性位点分析与定义</div>
+                        <span class="tools-badge">结构分析</span>
+                        <div class="website-links">
+                            <a href="https://github.com/Discngine/fpocket" class="website-link" target="_blank" data-tooltip="FPocket: 基于几何学的蛋白质口袋检测工具，开源免费">
+                                <span class="link-icon">🔗</span> FPocket
+                            </a>
+                            <a href="https://www.schrodinger.com/" class="website-link" target="_blank" data-tooltip="SiteMap: 薛定谔公司的结合位点识别与可药性评估工具">
+                                <span class="link-icon">🔗</span> SiteMap
+                            </a>
+                            <a href="https://playmolecule.org/deepsite/" class="website-link" target="_blank" data-tooltip="DeepSite: 基于深度学习的结合口袋预测工具">
+                                <span class="link-icon">🔗</span> DeepSite
+                            </a>
+                            <a href="https://github.com/rdk/p2rank" class="website-link" target="_blank" data-tooltip="P2Rank: 基于机器学习的配体结合位点预测工具">
+                                <span class="link-icon">🔗</span> P2Rank
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">⚡</div>
+                        <div class="step-title">高通量虚拟筛选</div>
+                        <div class="step-desc">HTVS / Docking<br>大规模分子对接</div>
+                        <span class="tools-badge">虚拟筛选</span>
+                        <div class="website-links">
+                            <a href="https://vina.scripps.edu/" class="website-link" target="_blank" data-tooltip="AutoDock Vina: 快速准确的分子对接，开源免费">
+                                <span class="link-icon">🔗</span> AutoDock Vina
+                            </a>
+                            <a href="https://www.schrodinger.com/glide" class="website-link" target="_blank" data-tooltip="Glide: 高精度分子对接，HTVS/SP/XP三种模式">
+                                <span class="link-icon">🔗</span> Glide (Schrödinger)
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">📊</div>
+                        <div class="step-title">打分排序与过滤</div>
+                        <div class="step-desc">Scoring & Ranking<br>结合亲和力评估</div>
+                        <span class="tools-badge">评分函数</span>
+                        <div class="website-links">
+                            <a href="https://github.com/oddt/oddt" class="website-link" target="_blank" data-tooltip="ODDT: 分子对接打分函数集成与评估">
+                                <span class="link-icon">🔗</span> ODDT
+                            </a>
+                            <a href="https://www.schrodinger.com/mm-gbsa" class="website-link" target="_blank" data-tooltip="MM-GBSA: 基于力场的结合自由能计算">
+                                <span class="link-icon">🔗</span> MM-GBSA
+                            </a>
+                            <a href="https://github.com/oddt/rfscore-vs" class="website-link" target="_blank" data-tooltip="RF-Score: 基于随机森林的机器学习打分">
+                                <span class="link-icon">🔗</span> RF-Score
+                            </a>
+                            <a href="https://github.com/DeepRank/deeprank" class="website-link" target="_blank" data-tooltip="DeepRank: 基于CNN的深度学习打分">
+                                <span class="link-icon">🔗</span> DeepRank
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step wet">
+                        <span class="exp-label wet">湿实验</span>
+                        <div class="step-icon">🧪</div>
+                        <div class="step-title">高通量筛选</div>
+                        <div class="step-desc">HTS<br>大规模化合物活性测试</div>
+                        <span class="tools-badge">实验筛选</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• 化合物库准备</li>
+                                <li>• 酶活性检测</li>
+                                <li>• 细胞水平筛选</li>
+                                <li>• hits 确认实验</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">🤖</div>
+                        <div class="step-title">AI 生成模型</div>
+                        <div class="step-desc">De Novo Design<br>从头设计新分子</div>
+                        <span class="tools-badge">深度学习</span>
+                        <div class="website-links">
+                            <a href="https://github.com/aspuru-guzik-group/chemical_vae" class="website-link" target="_blank" data-tooltip="Chemical VAE: 变分自编码器用于分子生成">
+                                <span class="link-icon">🔗</span> Chemical VAE
+                            </a>
+                            <a href="https://github.com/microsoft/molskill" class="website-link" target="_blank" data-tooltip="基于RNN/GAN的分子生成工具">
+                                <span class="link-icon">🔗</span> MolSkill
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="arrow-down">⬇</div>
+            
+            <!-- Phase 3: Lead Optimization -->
+            <div class="phase phase-3">
+                <div class="phase-header">
+                    <span class="phase-number">03</span>
+                    <div>⚗️</div>
+                    <div>先导化合物优化</div>
+                    <div style="font-size:0.8em;opacity:0.8;margin-top:5px;">Lead Optimization</div>
+                </div>
+                <div class="phase-content">
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">🔍</div>
+                        <div class="step-title">SAR 分析</div>
+                        <div class="step-desc">Structure-Activity Relationship<br>构效关系研究</div>
+                        <span class="tools-badge">数据分析</span>
+                        <div class="website-links">
+                            <a href="https://www.chemaxon.com/" class="website-link" target="_blank" data-tooltip="ChemAxon: 化学信息学工具套件">
+                                <span class="link-icon">🔗</span> ChemAxon
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">🎨</div>
+                        <div class="step-title">骨架跃迁</div>
+                        <div class="step-desc">Scaffold Hopping<br>保持活性改变骨架</div>
+                        <span class="tools-badge">分子设计</span>
+                        <div class="website-links">
+                            <a href="https://www.shape-it.be/" class="website-link" target="_blank" data-tooltip="Shape-based 骨架跃迁工具">
+                                <span class="link-icon">🔗</span> Shape-IT
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">⚡</div>
+                        <div class="step-title">ADMET 预测</div>
+                        <div class="step-desc">ADMET Prediction<br>药代动力学性质预测</div>
+                        <span class="tools-badge">成药性预测</span>
+                        <div class="website-links">
+                            <a href="http://biosig.unimelb.edu.au/pkcsm/" class="website-link" target="_blank" data-tooltip="pkCSM: 药代动力学和毒性预测工具">
+                                <span class="link-icon">🔗</span> pkCSM
+                            </a>
+                            <a href="https://admetlab3.scbdd.com/" class="website-link" target="_blank" data-tooltip="ADMETLab: ADMET性质预测平台">
+                                <span class="link-icon">🔗</span> ADMETLab
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">🔗</div>
+                        <div class="step-title">分子对接</div>
+                        <div class="step-desc">Molecular Docking<br>结合模式预测</div>
+                        <span class="tools-badge">结构分析</span>
+                        <div class="website-links">
+                            <a href="https://vina.scripps.edu/" class="website-link" target="_blank" data-tooltip="AutoDock Vina: 快速准确的分子对接">
+                                <span class="link-icon">🔗</span> AutoDock Vina
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">🌊</div>
+                        <div class="step-title">分子动力学</div>
+                        <div class="step-desc">MD Simulation<br>动态行为模拟</div>
+                        <span class="tools-badge">模拟计算</span>
+                        <div class="website-links">
+                            <a href="https://www.gromacs.org/" class="website-link" target="_blank" data-tooltip="GROMACS: 高性能分子动力学模拟软件">
+                                <span class="link-icon">🔗</span> GROMACS
+                            </a>
+                            <a href="https://ambermd.org/" class="website-link" target="_blank" data-tooltip="AMBER: 分子动力学和能量计算软件">
+                                <span class="link-icon">🔗</span> AMBER
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step dry">
+                        <span class="exp-label dry">干实验</span>
+                        <div class="step-icon">📐</div>
+                        <div class="step-title">自由能计算</div>
+                        <div class="step-desc">FEP/MM-GBSA<br>结合亲和力计算</div>
+                        <span class="tools-badge">精确计算</span>
+                        <div class="website-links">
+                            <a href="https://www.schrodinger.com/" class="website-link" target="_blank" data-tooltip="Schrödinger: 药物发现计算平台，含FEP+">
+                                <span class="link-icon">🔗</span> Schrödinger
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step hybrid">
+                        <span class="exp-label hybrid">干湿结合</span>
+                        <div class="step-icon">🧬</div>
+                        <div class="step-title">结合模式分析</div>
+                        <div class="step-desc">Binding Analysis<br>相互作用可视化</div>
+                        <span class="tools-badge">结构生物学</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• X-ray 晶体学</li>
+                                <li>• Cryo-EM 结构解析</li>
+                                <li>• PyMOL 可视化</li>
+                                <li>• PLIP 相互作用分析</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="arrow-down">⬇</div>
+            
+            <!-- Phase 4: Preclinical -->
+            <div class="phase phase-4">
+                <div class="phase-header">
+                    <span class="phase-number">04</span>
+                    <div>🐭</div>
+                    <div>临床前研究</div>
+                    <div style="font-size:0.8em;opacity:0.8;margin-top:5px;">Preclinical</div>
+                </div>
+                <div class="phase-content">
+                    <div class="step wet">
+                        <span class="exp-label wet">湿实验</span>
+                        <div class="step-icon">🎯</div>
+                        <div class="step-title">靶向性测试</div>
+                        <div class="step-desc">Target Engagement<br>靶点结合验证</div>
+                        <span class="tools-badge">靶点验证</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• SPR 表面等离子共振</li>
+                                <li>• DARTS 药物亲和反应靶标稳定性</li>
+                                <li>• CETSA 细胞热迁移实验</li>
+                                <li>• ITC 等温滴定量热</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="step wet">
+                        <span class="exp-label wet">湿实验</span>
+                        <div class="step-icon">🧫</div>
+                        <div class="step-title">体外活性测试</div>
+                        <div class="step-desc">In Vitro Assays<br>细胞和酶水平活性</div>
+                        <span class="tools-badge">生化实验</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• IC50/EC50 测定</li>
+                                <li>• 酶抑制动力学</li>
+                                <li>• 细胞增殖抑制</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="step wet">
+                        <span class="exp-label wet">湿实验</span>
+                        <div class="step-icon">🧬</div>
+                        <div class="step-title">类器官药效验证</div>
+                        <div class="step-desc">Organoid Platform<br>3D培养模型验证</div>
+                        <span class="tools-badge">类器官</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• 肿瘤类器官构建</li>
+                                <li>• 药物敏感性测试</li>
+                                <li>• 个体化药效预测</li>
+                            </ul>
+                        </div>
+                        <div class="website-links">
+                            <a href="https://organovai.com/AI.html" class="website-link" target="_blank" data-tooltip="OrganoVAI: AI驱动的类器官平台，用于药物筛选和药效验证">
+                                <span class="link-icon">🔗</span> OrganoVAI
+                            </a>
+                        </div>
+                    </div>
+                    <div class="step wet">
+                        <span class="exp-label wet">湿实验</span>
+                        <div class="step-icon">🐀</div>
+                        <div class="step-title">体内药效评价</div>
+                        <div class="step-desc">In Vivo Efficacy<br>动物模型验证</div>
+                        <span class="tools-badge">动物实验</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• 肿瘤异种移植模型建立</li>
+                                <li>• 肿瘤生长曲线</li>
+                                <li>• KM 生存分析</li>
+                                <li>• IHC 免疫组化分析</li>
+                                <li>• 药效学(PD)研究</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="step wet">
+                        <span class="exp-label wet">湿实验</span>
+                        <div class="step-icon">⚠️</div>
+                        <div class="step-title">毒理学评估</div>
+                        <div class="step-desc">Toxicology<br>安全性评价</div>
+                        <span class="tools-badge">安全评价</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• hERG 心脏毒性</li>
+                                <li>• Ames 致突变性</li>
+                                <li>• 细胞毒性测试</li>
+                                <li>• 急性/慢性毒性</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="step wet">
+                        <span class="exp-label wet">湿实验</span>
+                        <div class="step-icon">💉</div>
+                        <div class="step-title">药代动力学</div>
+                        <div class="step-desc">PK Studies<br>体内过程研究</div>
+                        <span class="tools-badge">DMPK</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• Cmax/Tmax 测定</li>
+                                <li>• 半衰期 T1/2</li>
+                                <li>• 生物利用度 F%</li>
+                                <li>• 组织分布研究</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="arrow-down">⬇</div>
+            
+            <!-- Phase 5: Clinical -->
+            <div class="phase phase-5">
+                <div class="phase-header">
+                    <span class="phase-number">05</span>
+                    <div>🏥</div>
+                    <div>临床研究</div>
+                    <div style="font-size:0.8em;opacity:0.8;margin-top:5px;color:#666;">Clinical Trials</div>
+                </div>
+                <div class="phase-content">
+                    <div class="step wet">
+                        <span class="exp-label wet">湿实验</span>
+                        <div class="step-icon">👤</div>
+                        <div class="step-title">I 期临床</div>
+                        <div class="step-desc">Phase I<br>安全性与耐受性</div>
+                        <span class="tools-badge">健康志愿者</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• 剂量递增研究</li>
+                                <li>• 最大耐受剂量</li>
+                                <li>• 人体药代动力学</li>
+                                <li>• 食物效应研究</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="step wet">
+                        <span class="exp-label wet">湿实验</span>
+                        <div class="step-icon">👥</div>
+                        <div class="step-title">II 期临床</div>
+                        <div class="step-desc">Phase II<br>初步疗效评价</div>
+                        <span class="tools-badge">患者群体</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• 有效性终点评估</li>
+                                <li>• 推荐剂量确定</li>
+                                <li>• 患者亚组分析</li>
+                                <li>• 生物标志物探索</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="step wet">
+                        <span class="exp-label wet">湿实验</span>
+                        <div class="step-icon">🌍</div>
+                        <div class="step-title">III 期临床</div>
+                        <div class="step-desc">Phase III<br>确证性研究</div>
+                        <span class="tools-badge">多中心</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• 大规模随机对照</li>
+                                <li>• 与标准治疗对比</li>
+                                <li>• 长期安全性监测</li>
+                                <li>• 生活质量评估</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="step hybrid">
+                        <span class="exp-label hybrid">干湿结合</span>
+                        <div class="step-icon">📋</div>
+                        <div class="step-title">NDA 申报</div>
+                        <div class="step-desc">Regulatory<br>监管审批</div>
+                        <span class="tools-badge">FDA/NMPA</span>
+                        <div class="experiment-list">
+                            <ul>
+                                <li>• 申报资料整理</li>
+                                <li>• 统计分析报告</li>
+                                <li>• CMC 资料</li>
+                                <li>• 临床试验总结</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                <span>靶点研究</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+                <span>苗头发现</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+                <span>先导优化</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"></div>
+                <span>临床前</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);"></div>
+                <span>临床阶段</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 全局提示框
+        const tooltip = document.getElementById('global-tooltip');
+        
+        // 为所有带 data-tooltip 的元素添加悬停事件
+        document.querySelectorAll('[data-tooltip]').forEach(el => {
+            el.addEventListener('mouseenter', function(e) {
+                const text = this.getAttribute('data-tooltip');
+                tooltip.textContent = text;
+                tooltip.classList.add('visible');
+                updateTooltipPosition(e);
+            });
+            
+            el.addEventListener('mousemove', updateTooltipPosition);
+            
+            el.addEventListener('mouseleave', function() {
+                tooltip.classList.remove('visible');
+            });
+        });
+        
+        function updateTooltipPosition(e) {
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            // 计算提示框位置（在鼠标上方）
+            let top = y - tooltip.offsetHeight - 10;
+            let left = x - tooltip.offsetWidth / 2;
+            
+            // 边界检查
+            if (left < 10) left = 10;
+            if (left + tooltip.offsetWidth > window.innerWidth - 10) {
+                left = window.innerWidth - tooltip.offsetWidth - 10;
+            }
+            if (top < 10) top = y + 20; // 如果上方空间不够，显示在下方
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+        
+        // Add interactive hover effects
+        document.querySelectorAll('.step').forEach(step => {
+            step.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+        
+        // Animate phases on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.phase').forEach(phase => {
+            phase.style.opacity = '0';
+            phase.style.transform = 'translateY(30px)';
+            phase.style.transition = 'all 0.6s ease';
+            observer.observe(phase);
+        });
+    </script>
+</body>
+</html>
