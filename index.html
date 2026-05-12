@@ -142,8 +142,18 @@
             overflow: visible;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            min-height: 100%;
+            height: 100%;
+        }
+        
+        .step-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .step-bottom {
+            margin-top: auto;
+            padding-top: 10px;
         }
         
         /* 干实验样式 - 蓝色系 */
@@ -185,8 +195,6 @@
             border-color: #9b59b6;
         }
         
-        /* 删除实验类型标签 - 只用颜色区分 */
-        
         .step-icon {
             font-size: 2em;
             margin-bottom: 8px;
@@ -227,27 +235,6 @@
             color: #d8a8e8;
         }
         
-        /* DrugCLIP 按钮样式 */
-        .drugclip-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            background: linear-gradient(135deg, rgba(0,212,255,0.3) 0%, rgba(155,89,182,0.3) 100%);
-            border: 1px solid rgba(0,212,255,0.5);
-            border-radius: 20px;
-            color: #00d4ff;
-            font-size: 0.75em;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .drugclip-badge:hover {
-            background: linear-gradient(135deg, rgba(0,212,255,0.5) 0%, rgba(155,89,182,0.5) 100%);
-            border-color: #00d4ff;
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(0,212,255,0.4);
-        }
-        
         .arrow-down {
             text-align: center;
             font-size: 2em;
@@ -276,21 +263,12 @@
             border-left-color: #f5576c;
         }
         
-        .phase-3 .phase-header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-        .phase-3 .phase-header::after {
-            border-left-color: #00f2fe;
-        }
-        
         .phase-4 .phase-header {
             background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
         }
         .phase-4 .phase-header::after {
             border-left-color: #38f9d7;
         }
-        
-
         
         .phase-number {
             font-size: 2.5em;
@@ -302,7 +280,6 @@
         
         /* 网站链接样式 */
         .website-links {
-            padding-top: 10px;
             display: flex;
             flex-direction: column;
             gap: 4px;
@@ -379,7 +356,6 @@
         
         /* 实验列表样式 */
         .experiment-list {
-            padding-top: 10px;
             text-align: left;
         }
         
@@ -480,89 +456,105 @@
                 </div>
                 <div class="phase-content">
                     <div class="step dry">
-                        <div class="step-icon">🧬</div>
-                        <div class="step-title">靶点筛选 - 正向分析</div>
-                        <div class="step-desc">输入: 基因+癌种<br>输出: 该基因的生存分析结果(OS/DFS)</div>
-                        <span class="tools-badge">生存分析</span>
-                        <div class="website-links">
-                            <a href="http://gepia2.cancer-pku.cn/" class="website-link" target="_blank" data-tooltip="GEPIA2: 输入基因+癌种，分析OS、DFS，可设置表达cutoff，输出最显著生存相关基因。支持多基因联合分析，基于TCGA数据">
-                                <span class="link-icon">🔗</span> GEPIA2
-                            </a>
-                            <a href="https://ualcan.path.uab.edu/" class="website-link" target="_blank" data-tooltip="UALCAN: 访问TCGA、MET500、CPTAC、CBTTC数据，识别生物标志物，生存分析，基因表达与临床特征关联">
-                                <span class="link-icon">🔗</span> UALCAN
-                            </a>
-                            <a href="https://kmplot.com/" class="website-link" target="_blank" data-tooltip="KM Plotter: 最成熟的在线生存分析工具，实时计算，支持多种癌种，可设置cutoff值">
-                                <span class="link-icon">🔗</span> KM Plotter
-                            </a>
-                            <a href="https://www.cbioportal.org/" class="website-link" target="_blank" data-tooltip="cBioPortal: 大规模癌症基因组数据，生存分析比较，共表达网络分析，可发现新靶点">
-                                <span class="link-icon">🔗</span> cBioPortal
-                            </a>
+                        <div class="step-content">
+                            <div class="step-icon">🧬</div>
+                            <div class="step-title">靶点筛选 - 正向分析</div>
+                            <div class="step-desc">输入: 基因+癌种<br>输出: 该基因的生存分析结果(OS/DFS)</div>
+                            <span class="tools-badge">生存分析</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="website-links">
+                                <a href="http://gepia2.cancer-pku.cn/" class="website-link" target="_blank" data-tooltip="GEPIA2: 输入基因+癌种，分析OS、DFS，可设置表达cutoff，输出最显著生存相关基因。支持多基因联合分析，基于TCGA数据">
+                                    <span class="link-icon">🔗</span> GEPIA2
+                                </a>
+                                <a href="https://ualcan.path.uab.edu/" class="website-link" target="_blank" data-tooltip="UALCAN: 访问TCGA、MET500、CPTAC、CBTTC数据，识别生物标志物，生存分析，基因表达与临床特征关联">
+                                    <span class="link-icon">🔗</span> UALCAN
+                                </a>
+                                <a href="https://kmplot.com/" class="website-link" target="_blank" data-tooltip="KM Plotter: 最成熟的在线生存分析工具，实时计算，支持多种癌种，可设置cutoff值">
+                                    <span class="link-icon">🔗</span> KM Plotter
+                                </a>
+                                <a href="https://www.cbioportal.org/" class="website-link" target="_blank" data-tooltip="cBioPortal: 大规模癌症基因组数据，生存分析比较，共表达网络分析，可发现新靶点">
+                                    <span class="link-icon">🔗</span> cBioPortal
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="step dry">
-                        <div class="step-icon">📊</div>
-                        <div class="step-title">靶点筛选 - 反向分析</div>
-                        <div class="step-desc">输入: 癌种、OS/PFS、cutoff<br>输出: 与该生存特征相关的基因/靶点列表</div>
-                        <span class="tools-badge">关联分析</span>
-                        <div class="website-links">
-                            <a href="https://github.com/easygsea/cSurvival" class="website-link" target="_blank" data-tooltip="cSurvival: 识别预后生物标志物和遗传脆弱性，支持基因集、基因、位点和药物依赖性联合分析，可探索与生存相关的基因交互作用">
-                                <span class="link-icon">🔗</span> cSurvival
-                            </a>
-                            <a href="https://dosurvive.lab.nycu.edu.tw/" class="website-link" target="_blank" data-tooltip="DoSurvive: 以癌症预后生物标志物为中心的数据库，支持多变量生存分析，可自定义基因/患者列表，覆盖33种癌症类型">
-                                <span class="link-icon">🔗</span> DoSurvive
-                            </a>
-                            <a href="http://www.oncolnc.org/" class="website-link" target="_blank" data-tooltip="OncoLnc: 将TCGA生存数据与mRNA、miRNA、lncRNA表达关联，可探索哪些RNA与生存相关，可从生存数据反向查找相关基因">
-                                <span class="link-icon">🔗</span> OncoLnc
-                            </a>
-                            <a href="https://dna00.bio.kyutech.ac.jp/PrognoScan/PrognoScan.html" class="website-link" target="_blank" data-tooltip="PrognoScan: 大规模癌症微阵列数据集荟萃分析，分析基因表达与患者预后(OS、DFS)关系，可基于生存特征筛选相关基因">
-                                <span class="link-icon">🔗</span> PrognoScan
-                            </a>
+                        <div class="step-content">
+                            <div class="step-icon">📊</div>
+                            <div class="step-title">靶点筛选 - 反向分析</div>
+                            <div class="step-desc">输入: 癌种、OS/PFS、cutoff<br>输出: 与该生存特征相关的基因/靶点列表</div>
+                            <span class="tools-badge">关联分析</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="website-links">
+                                <a href="https://github.com/easygsea/cSurvival" class="website-link" target="_blank" data-tooltip="cSurvival: 识别预后生物标志物和遗传脆弱性，支持基因集、基因、位点和药物依赖性联合分析，可探索与生存相关的基因交互作用">
+                                    <span class="link-icon">🔗</span> cSurvival
+                                </a>
+                                <a href="https://dosurvive.lab.nycu.edu.tw/" class="website-link" target="_blank" data-tooltip="DoSurvive: 以癌症预后生物标志物为中心的数据库，支持多变量生存分析，可自定义基因/患者列表，覆盖33种癌症类型">
+                                    <span class="link-icon">🔗</span> DoSurvive
+                                </a>
+                                <a href="http://www.oncolnc.org/" class="website-link" target="_blank" data-tooltip="OncoLnc: 将TCGA生存数据与mRNA、miRNA、lncRNA表达关联，可探索哪些RNA与生存相关，可从生存数据反向查找相关基因">
+                                    <span class="link-icon">🔗</span> OncoLnc
+                                </a>
+                                <a href="https://dna00.bio.kyutech.ac.jp/PrognoScan/PrognoScan.html" class="website-link" target="_blank" data-tooltip="PrognoScan: 大规模癌症微阵列数据集荟萃分析，分析基因表达与患者预后(OS、DFS)关系，可基于生存特征筛选相关基因">
+                                    <span class="link-icon">🔗</span> PrognoScan
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="step dry">
-                        <div class="step-icon">🧬</div>
-                        <div class="step-title">虚拟验证</div>
-                        <div class="step-desc">In Silico Validation<br>基于计算方法的靶点功能验证</div>
-                        <span class="tools-badge">计算预测</span>
-                        <div class="website-links">
-                            <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">虚拟敲除</div>
-                            <a href="https://depmap.org/portal/" class="website-link" target="_blank" data-tooltip="DepMap: 癌症依赖性图谱，提供CRISPR基因敲除筛选数据，可查询基因在特定细胞系中的必需性">
-                                <span class="link-icon">🔗</span> DepMap
-                            </a>
-                            <a href="https://score.depmap.sanger.ac.uk/" class="website-link" target="_blank" data-tooltip="Sanger DepMap (Project Score): 大规模CRISPR-Cas9基因敲除筛选数据，评估基因对癌细胞存活的影响">
-                                <span class="link-icon">🔗</span> Project Score
-                            </a>
-                            <a href="https://www.broadinstitute.org/depmap" class="website-link" target="_blank" data-tooltip="Broad DepMap: 整合多种癌症模型的基因依赖性数据，支持基因必需性分析">
-                                <span class="link-icon">🔗</span> Broad DepMap
-                            </a>
-                            <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">虚拟扰动</div>
-                            <a href="https://www.nature.com/articles/s41592-022-01548-5" class="website-link" target="_blank" data-tooltip="Perturb-seq: 单细胞CRISPR筛选技术，分析基因扰动后的转录组变化">
-                                <span class="link-icon">🔗</span> Perturb-seq
-                            </a>
-                            <a href="https://github.com/snap-stanford/GEARS" class="website-link" target="_blank" data-tooltip="GEARS: 基于深度学习的基因扰动效应预测模型，预测单/多基因敲除后的转录组响应">
-                                <span class="link-icon">🔗</span> GEARS
-                            </a>
-                            <a href="https://github.com/bowang-lab/scFormer" class="website-link" target="_blank" data-tooltip="scFormer: 基于Transformer的单细胞基因扰动预测模型">
-                                <span class="link-icon">🔗</span> scFormer
-                            </a>
-                            <a href="https://github.com/morris-lab/CellOracle" class="website-link" target="_blank" data-tooltip="CellOracle: 基因调控网络分析工具，预测转录因子扰动对细胞状态的影响">
-                                <span class="link-icon">🔗</span> CellOracle
-                            </a>
+                        <div class="step-content">
+                            <div class="step-icon">🧬</div>
+                            <div class="step-title">虚拟验证</div>
+                            <div class="step-desc">In Silico Validation<br>基于计算方法的靶点功能验证</div>
+                            <span class="tools-badge">计算预测</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="website-links">
+                                <div style="font-size: 0.7em; color: #00d4ff; margin: 0 0 4px 0; text-align: left; padding-left: 5px;">虚拟敲除</div>
+                                <a href="https://depmap.org/portal/" class="website-link" target="_blank" data-tooltip="DepMap: 癌症依赖性图谱，提供CRISPR基因敲除筛选数据，可查询基因在特定细胞系中的必需性">
+                                    <span class="link-icon">🔗</span> DepMap
+                                </a>
+                                <a href="https://score.depmap.sanger.ac.uk/" class="website-link" target="_blank" data-tooltip="Sanger DepMap (Project Score): 大规模CRISPR-Cas9基因敲除筛选数据，评估基因对癌细胞存活的影响">
+                                    <span class="link-icon">🔗</span> Project Score
+                                </a>
+                                <a href="https://www.broadinstitute.org/depmap" class="website-link" target="_blank" data-tooltip="Broad DepMap: 整合多种癌症模型的基因依赖性数据，支持基因必需性分析">
+                                    <span class="link-icon">🔗</span> Broad DepMap
+                                </a>
+                                <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">虚拟扰动</div>
+                                <a href="https://www.nature.com/articles/s41592-022-01548-5" class="website-link" target="_blank" data-tooltip="Perturb-seq: 单细胞CRISPR筛选技术，分析基因扰动后的转录组变化">
+                                    <span class="link-icon">🔗</span> Perturb-seq
+                                </a>
+                                <a href="https://github.com/snap-stanford/GEARS" class="website-link" target="_blank" data-tooltip="GEARS: 基于深度学习的基因扰动效应预测模型，预测单/多基因敲除后的转录组响应">
+                                    <span class="link-icon">🔗</span> GEARS
+                                </a>
+                                <a href="https://github.com/bowang-lab/scFormer" class="website-link" target="_blank" data-tooltip="scFormer: 基于Transformer的单细胞基因扰动预测模型">
+                                    <span class="link-icon">🔗</span> scFormer
+                                </a>
+                                <a href="https://github.com/morris-lab/CellOracle" class="website-link" target="_blank" data-tooltip="CellOracle: 基因调控网络分析工具，预测转录因子扰动对细胞状态的影响">
+                                    <span class="link-icon">🔗</span> CellOracle
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="step wet">
-                        <div class="step-icon">✅</div>
-                        <div class="step-title">靶点验证</div>
-                        <div class="step-desc">Target Validation<br>验证靶点的功能相关性</div>
-                        <span class="tools-badge">功能验证</span>
-                        <div class="experiment-list">
-                            <ul>
-                                <li>• 组织芯片 IHC</li>
-                                <li>• 敲低/过表达</li>
-                                <li>• 细胞增殖/凋亡检测</li>
-                                <li>• animal experiment</li>
-                                <li>• ...</li>
-                            </ul>
+                        <div class="step-content">
+                            <div class="step-icon">✅</div>
+                            <div class="step-title">靶点验证</div>
+                            <div class="step-desc">Target Validation<br>验证靶点的功能相关性</div>
+                            <span class="tools-badge">功能验证</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="experiment-list">
+                                <ul>
+                                    <li>• 组织芯片 IHC</li>
+                                    <li>• 敲低/过表达</li>
+                                    <li>• 细胞增殖/凋亡检测</li>
+                                    <li>• animal experiment</li>
+                                    <li>• ...</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -580,132 +572,153 @@
                 </div>
                 <div class="phase-content">
                     <div class="step dry">
-                        <div class="step-icon">🧬</div>
-                        <div class="step-title">靶点蛋白准备</div>
-                        <div class="step-desc">Target Preparation<br>结构获取与优化</div>
-                        <span class="tools-badge">结构生物学</span>
-                        <div class="website-links">
-                            <a href="https://www.rcsb.org/" class="website-link" target="_blank" data-tooltip="PDB: 蛋白质结构数据库，获取实验解析的靶点结构">
-                                <span class="link-icon">🔗</span> PDB
-                            </a>
-                            <a href="https://alphafold.ebi.ac.uk/" class="website-link" target="_blank" data-tooltip="AlphaFold Database: AI预测的蛋白质结构数据库">
-                                <span class="link-icon">🔗</span> AlphaFold Database
-                            </a>
-                            <a href="https://alphafoldserver.com/" class="website-link" target="_blank" data-tooltip="AlphaFold3 Server: 在线蛋白质结构预测服务器">
-                                <span class="link-icon">🔗</span> AlphaFold3 Server
-                            </a>
+                        <div class="step-content">
+                            <div class="step-icon">🧬</div>
+                            <div class="step-title">靶点蛋白准备</div>
+                            <div class="step-desc">Target Preparation<br>结构获取与优化</div>
+                            <span class="tools-badge">结构生物学</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="website-links">
+                                <a href="https://www.rcsb.org/" class="website-link" target="_blank" data-tooltip="PDB: 蛋白质结构数据库，获取实验解析的靶点结构">
+                                    <span class="link-icon">🔗</span> PDB
+                                </a>
+                                <a href="https://alphafold.ebi.ac.uk/" class="website-link" target="_blank" data-tooltip="AlphaFold Database: AI预测的蛋白质结构数据库">
+                                    <span class="link-icon">🔗</span> AlphaFold Database
+                                </a>
+                                <a href="https://alphafoldserver.com/" class="website-link" target="_blank" data-tooltip="AlphaFold3 Server: 在线蛋白质结构预测服务器">
+                                    <span class="link-icon">🔗</span> AlphaFold3 Server
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="step dry">
-                        <div class="step-icon">📦</div>
-                        <div class="step-title">小分子库准备</div>
-                        <div class="step-desc">Ligand Preparation<br>化合物库构建与处理</div>
-                        <span class="tools-badge">化学信息学</span>
-                        <div class="website-links">
-                            <a href="https://zinc.docking.org/" class="website-link" target="_blank" data-tooltip="ZINC: 可购买化合物数据库，超过10亿个分子">
-                                <span class="link-icon">🔗</span> ZINC
-                            </a>
-                            <a href="https://enamine.net/compound-collections/real-compounds" class="website-link" target="_blank" data-tooltip="Enamine REAL: 全球最大的可购买化合物库，超过380亿个分子">
-                                <span class="link-icon">🔗</span> Enamine REAL
-                            </a>
-                            <a href="https://www.chemdiv.com/" class="website-link" target="_blank" data-tooltip="ChemDiv: 药物化学化合物库供应商，超过150万种化合物">
-                                <span class="link-icon">🔗</span> ChemDiv
-                            </a>
-                            <a href="#" class="website-link" target="_blank" data-tooltip="其他商业化合物库供应商">
-                                <span class="link-icon">🔗</span> 其他
-                            </a>
+                        <div class="step-content">
+                            <div class="step-icon">📦</div>
+                            <div class="step-title">小分子库准备</div>
+                            <div class="step-desc">Ligand Preparation<br>化合物库构建与处理</div>
+                            <span class="tools-badge">化学信息学</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="website-links">
+                                <a href="https://zinc.docking.org/" class="website-link" target="_blank" data-tooltip="ZINC: 可购买化合物数据库，超过10亿个分子">
+                                    <span class="link-icon">🔗</span> ZINC
+                                </a>
+                                <a href="https://enamine.net/compound-collections/real-compounds" class="website-link" target="_blank" data-tooltip="Enamine REAL: 全球最大的可购买化合物库，超过380亿个分子">
+                                    <span class="link-icon">🔗</span> Enamine REAL
+                                </a>
+                                <a href="https://www.chemdiv.com/" class="website-link" target="_blank" data-tooltip="ChemDiv: 药物化学化合物库供应商，超过150万种化合物">
+                                    <span class="link-icon">🔗</span> ChemDiv
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="step dry">
-                        <div class="step-icon">🎯</div>
-                        <div class="step-title">结合口袋识别</div>
-                        <div class="step-desc">Binding Site Detection<br>活性位点分析与定义</div>
-                        <span class="tools-badge">结构分析</span>
-                        <div class="website-links">
-                            <a href="https://github.com/Discngine/fpocket" class="website-link" target="_blank" data-tooltip="FPocket: 基于几何学的蛋白质口袋检测工具，开源免费">
-                                <span class="link-icon">🔗</span> FPocket
-                            </a>
-                            <a href="https://www.schrodinger.com/" class="website-link" target="_blank" data-tooltip="SiteMap: 薛定谔公司的结合位点识别与可药性评估工具">
-                                <span class="link-icon">🔗</span> SiteMap
-                            </a>
-                            <a href="https://playmolecule.org/deepsite/" class="website-link" target="_blank" data-tooltip="DeepSite: 基于深度学习的结合口袋预测工具">
-                                <span class="link-icon">🔗</span> DeepSite
-                            </a>
-                            <a href="https://github.com/rdk/p2rank" class="website-link" target="_blank" data-tooltip="P2Rank: 基于机器学习的配体结合位点预测工具">
-                                <span class="link-icon">🔗</span> P2Rank
-                            </a>
+                        <div class="step-content">
+                            <div class="step-icon">🎯</div>
+                            <div class="step-title">结合口袋识别</div>
+                            <div class="step-desc">Binding Site Detection<br>活性位点分析与定义</div>
+                            <span class="tools-badge">结构分析</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="website-links">
+                                <a href="https://github.com/Discngine/fpocket" class="website-link" target="_blank" data-tooltip="FPocket: 基于几何学的蛋白质口袋检测工具，开源免费">
+                                    <span class="link-icon">🔗</span> FPocket
+                                </a>
+                                <a href="https://www.schrodinger.com/" class="website-link" target="_blank" data-tooltip="SiteMap: 薛定谔公司的结合位点识别与可药性评估工具">
+                                    <span class="link-icon">🔗</span> SiteMap
+                                </a>
+                                <a href="https://playmolecule.org/deepsite/" class="website-link" target="_blank" data-tooltip="DeepSite: 基于深度学习的结合口袋预测工具">
+                                    <span class="link-icon">🔗</span> DeepSite
+                                </a>
+                                <a href="https://github.com/rdk/p2rank" class="website-link" target="_blank" data-tooltip="P2Rank: 基于机器学习的配体结合位点预测工具">
+                                    <span class="link-icon">🔗</span> P2Rank
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="step dry">
-                        <div class="step-icon">⚡</div>
-                        <div class="step-title">高通量虚拟筛选</div>
-                        <div class="step-desc">HTVS / Docking<br>大规模分子对接</div>
-                        <span class="tools-badge">虚拟筛选</span>
-                        <div class="website-links">
-                            <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">国内AI平台</div>
-                            <a href="https://www.drugclip.com" class="website-link" target="_blank" data-tooltip="DrugCLIP: 清华出品，向量化检索（最快），免费学术，全基因组覆盖">
-                                <span class="link-icon">🔗</span> DrugCLIP
-                            </a>
-                            <a href="https://github.com/DrugReflector/DrugReflector" class="website-link" target="_blank" data-tooltip="DrugReflector: 基于单细胞转录组学数据，通过主动强化深度学习模型预测能调控疾病相关细胞表型的小分子化合物">
-                                <span class="link-icon">🔗</span> DrugReflector
-                            </a>
-                            <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">国际AI平台</div>
-                            <a href="https://www.eyesopen.com/orion" class="website-link" target="_blank" data-tooltip="Orion (OpenEye): 云端3D超快速筛选，秒级搜十亿级分子库，工业级精度">
-                                <span class="link-icon">🔗</span> Orion (OpenEye)
-                            </a>
-                            <a href="https://www.insilicomedicine.com/" class="website-link" target="_blank" data-tooltip="Insilico Medicine: 靶点发现+筛选+分子生成全流程，AI驱动，免费学术通道">
-                                <span class="link-icon">🔗</span> Insilico Medicine
-                            </a>
-                            <a href="https://www.molport.com/" class="website-link" target="_blank" data-tooltip="MolPort AI: AI+传统对接混合筛选，内置百万级可购买分子库，免费初筛">
-                                <span class="link-icon">🔗</span> MolPort AI
-                            </a>
-                            <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">经典对接工具</div>
-                            <a href="https://vina.scripps.edu/" class="website-link" target="_blank" data-tooltip="AutoDock Vina: 快速准确的分子对接，开源免费">
-                                <span class="link-icon">🔗</span> AutoDock Vina
-                            </a>
-                            <a href="https://www.schrodinger.com/glide" class="website-link" target="_blank" data-tooltip="Glide: 高精度分子对接，HTVS/SP/XP三种模式">
-                                <span class="link-icon">🔗</span> Glide (Schrödinger)
-                            </a>
-                            <a href="https://pyrx.sourceforge.io/" class="website-link" target="_blank" data-tooltip="PyRx: AutoDock/Vina+AI重打分，免费开源，支持自定义库，适合学术初筛">
-                                <span class="link-icon">🔗</span> PyRx
-                            </a>
-                            <a href="https://www.swissdock.ch/" class="website-link" target="_blank" data-tooltip="SwissDock: 高精度对接+AI优化，免费网页版，支持蛋白-配体柔性对接">
-                                <span class="link-icon">🔗</span> SwissDock
-                            </a>
+                        <div class="step-content">
+                            <div class="step-icon">⚡</div>
+                            <div class="step-title">高通量虚拟筛选</div>
+                            <div class="step-desc">HTVS / Docking<br>大规模分子对接</div>
+                            <span class="tools-badge">虚拟筛选</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="website-links">
+                                <div style="font-size: 0.7em; color: #00d4ff; margin: 0 0 4px 0; text-align: left; padding-left: 5px;">国内AI平台</div>
+                                <a href="https://www.drugclip.com" class="website-link" target="_blank" data-tooltip="DrugCLIP: 清华出品，向量化检索（最快），免费学术，全基因组覆盖">
+                                    <span class="link-icon">🔗</span> DrugCLIP
+                                </a>
+                                <a href="https://github.com/DrugReflector/DrugReflector" class="website-link" target="_blank" data-tooltip="DrugReflector: 基于单细胞转录组学数据，通过主动强化深度学习模型预测能调控疾病相关细胞表型的小分子化合物">
+                                    <span class="link-icon">🔗</span> DrugReflector
+                                </a>
+                                <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">国际AI平台</div>
+                                <a href="https://www.eyesopen.com/orion" class="website-link" target="_blank" data-tooltip="Orion (OpenEye): 云端3D超快速筛选，秒级搜十亿级分子库，工业级精度">
+                                    <span class="link-icon">🔗</span> Orion (OpenEye)
+                                </a>
+                                <a href="https://www.insilicomedicine.com/" class="website-link" target="_blank" data-tooltip="Insilico Medicine: 靶点发现+筛选+分子生成全流程，AI驱动，免费学术通道">
+                                    <span class="link-icon">🔗</span> Insilico Medicine
+                                </a>
+                                <a href="https://www.molport.com/" class="website-link" target="_blank" data-tooltip="MolPort AI: AI+传统对接混合筛选，内置百万级可购买分子库，免费初筛">
+                                    <span class="link-icon">🔗</span> MolPort AI
+                                </a>
+                                <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">经典对接工具</div>
+                                <a href="https://vina.scripps.edu/" class="website-link" target="_blank" data-tooltip="AutoDock Vina: 快速准确的分子对接，开源免费">
+                                    <span class="link-icon">🔗</span> AutoDock Vina
+                                </a>
+                                <a href="https://www.schrodinger.com/glide" class="website-link" target="_blank" data-tooltip="Glide: 高精度分子对接，HTVS/SP/XP三种模式">
+                                    <span class="link-icon">🔗</span> Glide (Schrödinger)
+                                </a>
+                                <a href="https://pyrx.sourceforge.io/" class="website-link" target="_blank" data-tooltip="PyRx: AutoDock/Vina+AI重打分，免费开源，支持自定义库，适合学术初筛">
+                                    <span class="link-icon">🔗</span> PyRx
+                                </a>
+                                <a href="https://www.swissdock.ch/" class="website-link" target="_blank" data-tooltip="SwissDock: 高精度对接+AI优化，免费网页版，支持蛋白-配体柔性对接">
+                                    <span class="link-icon">🔗</span> SwissDock
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="step dry">
-                        <div class="step-icon">📊</div>
-                        <div class="step-title">打分排序与过滤</div>
-                        <div class="step-desc">Scoring & Ranking<br>结合亲和力评估</div>
-                        <span class="tools-badge">评分函数</span>
-                        <div class="website-links">
-                            <a href="https://github.com/oddt/oddt" class="website-link" target="_blank" data-tooltip="ODDT: 分子对接打分函数集成与评估">
-                                <span class="link-icon">🔗</span> ODDT
-                            </a>
-                            <a href="https://www.schrodinger.com/mm-gbsa" class="website-link" target="_blank" data-tooltip="MM-GBSA: 基于力场的结合自由能计算">
-                                <span class="link-icon">🔗</span> MM-GBSA
-                            </a>
-                            <a href="https://github.com/oddt/rfscore-vs" class="website-link" target="_blank" data-tooltip="RF-Score: 基于随机森林的机器学习打分">
-                                <span class="link-icon">🔗</span> RF-Score
-                            </a>
-                            <a href="https://github.com/DeepRank/deeprank" class="website-link" target="_blank" data-tooltip="DeepRank: 基于CNN的深度学习打分">
-                                <span class="link-icon">🔗</span> DeepRank
-                            </a>
+                        <div class="step-content">
+                            <div class="step-icon">📊</div>
+                            <div class="step-title">打分排序与过滤</div>
+                            <div class="step-desc">Scoring & Ranking<br>结合亲和力评估</div>
+                            <span class="tools-badge">评分函数</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="website-links">
+                                <a href="https://github.com/oddt/oddt" class="website-link" target="_blank" data-tooltip="ODDT: 分子对接打分函数集成与评估">
+                                    <span class="link-icon">🔗</span> ODDT
+                                </a>
+                                <a href="https://www.schrodinger.com/mm-gbsa" class="website-link" target="_blank" data-tooltip="MM-GBSA: 基于力场的结合自由能计算">
+                                    <span class="link-icon">🔗</span> MM-GBSA
+                                </a>
+                                <a href="https://github.com/oddt/rfscore-vs" class="website-link" target="_blank" data-tooltip="RF-Score: 基于随机森林的机器学习打分">
+                                    <span class="link-icon">🔗</span> RF-Score
+                                </a>
+                                <a href="https://github.com/DeepRank/deeprank" class="website-link" target="_blank" data-tooltip="DeepRank: 基于CNN的深度学习打分">
+                                    <span class="link-icon">🔗</span> DeepRank
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="step wet">
-                        <div class="step-icon">🧪</div>
-                        <div class="step-title">高通量筛选</div>
-                        <div class="step-desc">HTS<br>大规模化合物活性测试</div>
-                        <span class="tools-badge">实验筛选</span>
-                        <div class="experiment-list">
-                            <ul>
-                                <li>• 化合物库准备</li>
-                                <li>• 酶活性检测</li>
-                                <li>• 细胞水平筛选</li>
-                                <li>• hits 确认实验</li>
-                            </ul>
+                        <div class="step-content">
+                            <div class="step-icon">🧪</div>
+                            <div class="step-title">高通量筛选</div>
+                            <div class="step-desc">HTS<br>大规模化合物活性测试</div>
+                            <span class="tools-badge">实验筛选</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="experiment-list">
+                                <ul>
+                                    <li>• 化合物库准备</li>
+                                    <li>• 酶活性检测</li>
+                                    <li>• 细胞水平筛选</li>
+                                    <li>• hits 确认实验</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -723,94 +736,116 @@
                 </div>
                 <div class="phase-content">
                     <div class="step wet">
-                        <div class="step-icon">🎯</div>
-                        <div class="step-title">靶向性测试</div>
-                        <div class="step-desc">Target Engagement<br>靶点结合验证</div>
-                        <span class="tools-badge">靶点验证</span>
-                        <div class="experiment-list">
-                            <ul>
-                                <li>• SPR 表面等离子共振</li>
-                                <li>• DARTS 药物亲和反应靶标稳定性</li>
-                                <li>• CETSA 细胞热迁移实验</li>
-                                <li>• ITC 等温滴定量热</li>
-                            </ul>
+                        <div class="step-content">
+                            <div class="step-icon">🎯</div>
+                            <div class="step-title">靶向性测试</div>
+                            <div class="step-desc">Target Engagement<br>靶点结合验证</div>
+                            <span class="tools-badge">靶点验证</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="experiment-list">
+                                <ul>
+                                    <li>• SPR 表面等离子共振</li>
+                                    <li>• DARTS 药物亲和反应靶标稳定性</li>
+                                    <li>• CETSA 细胞热迁移实验</li>
+                                    <li>• ITC 等温滴定量热</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                     <div class="step wet">
-                        <div class="step-icon">🧫</div>
-                        <div class="step-title">体外活性测试</div>
-                        <div class="step-desc">In Vitro Assays<br>细胞和酶水平活性</div>
-                        <span class="tools-badge">生化实验</span>
-                        <div class="experiment-list">
-                            <ul>
-                                <li>• IC50/EC50 测定</li>
-                                <li>• 酶抑制动力学</li>
-                            </ul>
+                        <div class="step-content">
+                            <div class="step-icon">🧫</div>
+                            <div class="step-title">体外活性测试</div>
+                            <div class="step-desc">In Vitro Assays<br>细胞和酶水平活性</div>
+                            <span class="tools-badge">生化实验</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="experiment-list">
+                                <ul>
+                                    <li>• IC50/EC50 测定</li>
+                                    <li>• 酶抑制动力学</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                     <div class="step wet">
-                        <div class="step-icon">🧬</div>
-                        <div class="step-title">类器官药效验证</div>
-                        <div class="step-desc">Organoid Platform<br>3D培养模型验证</div>
-                        <span class="tools-badge">类器官</span>
-                        <div class="experiment-list">
-                            <ul>
-                                <li>• 肿瘤类器官构建</li>
-                                <li>• 药物敏感性测试</li>
-                            </ul>
+                        <div class="step-content">
+                            <div class="step-icon">🧬</div>
+                            <div class="step-title">类器官药效验证</div>
+                            <div class="step-desc">Organoid Platform<br>3D培养模型验证</div>
+                            <span class="tools-badge">类器官</span>
                         </div>
-                        <div class="website-links">
-                            <a href="https://organovai.com/AI.html" class="website-link" target="_blank" data-tooltip="OrganoVAI: AI驱动的类器官平台，用于药物筛选和药效验证">
-                                <span class="link-icon">🔗</span> OrganoVAI
-                            </a>
-                        </div>
-                    </div>
-                    <div class="step wet">
-                        <div class="step-icon">🐀</div>
-                        <div class="step-title">体内药效评价</div>
-                        <div class="step-desc">In Vivo Efficacy<br>动物模型验证</div>
-                        <span class="tools-badge">动物实验</span>
-                        <div class="experiment-list">
-                            <ul>
-                                <li>• 肿瘤异种移植模型建立</li>
-                                <li>• 肿瘤生长曲线</li>
-                                <li>• KM 生存分析</li>
-                                <li>• IHC 免疫组化分析</li>
-                            </ul>
+                        <div class="step-bottom">
+                            <div class="experiment-list">
+                                <ul>
+                                    <li>• 肿瘤类器官构建</li>
+                                    <li>• 药物敏感性测试</li>
+                                </ul>
+                            </div>
+                            <div class="website-links" style="margin-top: 8px;">
+                                <a href="https://organovai.com/AI.html" class="website-link" target="_blank" data-tooltip="OrganoVAI: AI驱动的类器官平台，用于药物筛选和药效验证">
+                                    <span class="link-icon">🔗</span> OrganoVAI
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="step wet">
-                        <div class="step-icon">⚠️</div>
-                        <div class="step-title">毒理学评估</div>
-                        <div class="step-desc">Toxicology<br>安全性评价</div>
-                        <span class="tools-badge">安全评价</span>
-                        <div class="experiment-list">
-                            <ul>
-                                <li>• hERG 心脏毒性</li>
-                                <li>• Ames 致突变性</li>
-                                <li>• 细胞毒性测试</li>
-                                <li>• 急性/慢性毒性</li>
-                            </ul>
+                        <div class="step-content">
+                            <div class="step-icon">🐀</div>
+                            <div class="step-title">体内药效评价</div>
+                            <div class="step-desc">In Vivo Efficacy<br>动物模型验证</div>
+                            <span class="tools-badge">动物实验</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="experiment-list">
+                                <ul>
+                                    <li>• 肿瘤异种移植模型建立</li>
+                                    <li>• 肿瘤生长曲线</li>
+                                    <li>• KM 生存分析</li>
+                                    <li>• IHC 免疫组化分析</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                     <div class="step wet">
-                        <div class="step-icon">💉</div>
-                        <div class="step-title">药代动力学</div>
-                        <div class="step-desc">PK Studies<br>体内过程研究</div>
-                        <span class="tools-badge">DMPK</span>
-                        <div class="experiment-list">
-                            <ul>
-                                <li>• Cmax/Tmax 测定</li>
-                                <li>• 半衰期 T1/2</li>
-                                <li>• 生物利用度 F%</li>
-                                <li>• 组织分布研究</li>
-                            </ul>
+                        <div class="step-content">
+                            <div class="step-icon">⚠️</div>
+                            <div class="step-title">毒理学评估</div>
+                            <div class="step-desc">Toxicology<br>安全性评价</div>
+                            <span class="tools-badge">安全评价</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="experiment-list">
+                                <ul>
+                                    <li>• hERG 心脏毒性</li>
+                                    <li>• Ames 致突变性</li>
+                                    <li>• 细胞毒性测试</li>
+                                    <li>• 急性/慢性毒性</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step wet">
+                        <div class="step-content">
+                            <div class="step-icon">💉</div>
+                            <div class="step-title">药代动力学</div>
+                            <div class="step-desc">PK Studies<br>体内过程研究</div>
+                            <span class="tools-badge">DMPK</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="experiment-list">
+                                <ul>
+                                    <li>• Cmax/Tmax 测定</li>
+                                    <li>• 半衰期 T1/2</li>
+                                    <li>• 生物利用度 F%</li>
+                                    <li>• 组织分布研究</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-
         </div>
         
         <div class="legend">
