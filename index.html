@@ -362,7 +362,6 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 100%;
         }
         
         .experiment-list ul {
@@ -519,24 +518,21 @@
                         <div class="step-bottom">
                             <div class="website-links">
                                 <div style="font-size: 0.7em; color: #00d4ff; margin: 0 0 4px 0; text-align: left; padding-left: 5px;">虚拟敲除</div>
+                                <a href="https://github.com/cailab-tamu/scTenifoldKnk" class="website-link" target="_blank" data-tooltip="scTenifoldKnk: 基于单细胞RNA-seq的虚拟敲除工具，通过张量分解预测基因敲除效应">
+                                    <span class="link-icon">🔗</span> scTenifoldKnk
+                                </a>
                                 <a href="https://depmap.org/portal/" class="website-link" target="_blank" data-tooltip="DepMap: 癌症依赖性图谱，提供CRISPR基因敲除筛选数据，可查询基因在特定细胞系中的必需性">
                                     <span class="link-icon">🔗</span> DepMap
                                 </a>
                                 <a href="https://score.depmap.sanger.ac.uk/" class="website-link" target="_blank" data-tooltip="Sanger DepMap (Project Score): 大规模CRISPR-Cas9基因敲除筛选数据，评估基因对癌细胞存活的影响">
                                     <span class="link-icon">🔗</span> Project Score
                                 </a>
-                                <a href="https://www.broadinstitute.org/depmap" class="website-link" target="_blank" data-tooltip="Broad DepMap: 整合多种癌症模型的基因依赖性数据，支持基因必需性分析">
-                                    <span class="link-icon">🔗</span> Broad DepMap
-                                </a>
                                 <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">虚拟扰动</div>
-                                <a href="https://www.nature.com/articles/s41592-022-01548-5" class="website-link" target="_blank" data-tooltip="Perturb-seq: 单细胞CRISPR筛选技术，分析基因扰动后的转录组变化">
-                                    <span class="link-icon">🔗</span> Perturb-seq
-                                </a>
                                 <a href="https://github.com/snap-stanford/GEARS" class="website-link" target="_blank" data-tooltip="GEARS: 基于深度学习的基因扰动效应预测模型，预测单/多基因敲除后的转录组响应">
                                     <span class="link-icon">🔗</span> GEARS
                                 </a>
-                                <a href="https://github.com/bowang-lab/scFormer" class="website-link" target="_blank" data-tooltip="scFormer: 基于Transformer的单细胞基因扰动预测模型">
-                                    <span class="link-icon">🔗</span> scFormer
+                                <a href="https://github.com/snap-stanford/scGPT" class="website-link" target="_blank" data-tooltip="scGPT: 基于生成式预训练的单细胞基础模型，支持基因扰动预测和细胞状态模拟">
+                                    <span class="link-icon">🔗</span> scGPT
                                 </a>
                                 <a href="https://github.com/morris-lab/CellOracle" class="website-link" target="_blank" data-tooltip="CellOracle: 基因调控网络分析工具，预测转录因子扰动对细胞状态的影响">
                                     <span class="link-icon">🔗</span> CellOracle
@@ -656,28 +652,34 @@
                                 <a href="https://www.drugclip.com" class="website-link" target="_blank" data-tooltip="DrugCLIP: 清华出品，向量化检索（最快），免费学术，全基因组覆盖">
                                     <span class="link-icon">🔗</span> DrugCLIP
                                 </a>
-                                <a href="https://github.com/DrugReflector/DrugReflector" class="website-link" target="_blank" data-tooltip="DrugReflector: 基于单细胞转录组学数据，通过主动强化深度学习模型预测能调控疾病相关细胞表型的小分子化合物">
+                                <a href="https://drugreflector.deepmind.com.cn/" class="website-link" target="_blank" data-tooltip="DrugReflector: 深势科技，AI+分子对接，支持全基因组靶点筛选，速度接近DrugCLIP，免费学术通道">
                                     <span class="link-icon">🔗</span> DrugReflector
                                 </a>
+                                <a href="https://helixvs.com/" class="website-link" target="_blank" data-tooltip="HelixVS: 深度学习增强型筛选，云端批量筛库，支持PPI靶点，界面友好、免费试用">
+                                    <span class="link-icon">🔗</span> HelixVS
+                                </a>
+                                <a href="https://www.biomap.com/ai" class="website-link" target="_blank" data-tooltip="BioMap AI: 百图生科，蛋白-分子预训练大模型，支持靶点筛选+分子生成，学术用户免费额度">
+                                    <span class="link-icon">🔗</span> BioMap AI
+                                </a>
+                                <a href="https://www.nscc-gz.cn/" class="website-link" target="_blank" data-tooltip="SWDOCK-P2: 神威超算，国产超算+AI，万亿级筛选，适配AlphaFold结构，学术申请免费算力">
+                                    <span class="link-icon">🔗</span> SWDOCK-P2
+                                </a>
                                 <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">国际AI平台</div>
-                                <a href="https://www.eyesopen.com/orion" class="website-link" target="_blank" data-tooltip="Orion (OpenEye): 云端3D超快速筛选，秒级搜十亿级分子库，工业级精度">
+                                <a href="https://www.eyesopen.com/orion" class="website-link" target="_blank" data-tooltip="Orion (OpenEye): 云端3D超快速筛选，秒级搜十亿级分子库，工业级精度，学术/商业双模式">
                                     <span class="link-icon">🔗</span> Orion (OpenEye)
                                 </a>
-                                <a href="https://www.insilicomedicine.com/" class="website-link" target="_blank" data-tooltip="Insilico Medicine: 靶点发现+筛选+分子生成全流程，AI驱动，免费学术通道">
+                                <a href="https://www.insilicomedicine.com/" class="website-link" target="_blank" data-tooltip="Insilico Medicine: 靶点发现+筛选+分子生成全流程，AI驱动，免费学术项目通道">
                                     <span class="link-icon">🔗</span> Insilico Medicine
                                 </a>
                                 <a href="https://www.molport.com/" class="website-link" target="_blank" data-tooltip="MolPort AI: AI+传统对接混合筛选，内置百万级可购买分子库，免费初筛">
                                     <span class="link-icon">🔗</span> MolPort AI
                                 </a>
                                 <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">经典对接工具</div>
-                                <a href="https://vina.scripps.edu/" class="website-link" target="_blank" data-tooltip="AutoDock Vina: 快速准确的分子对接，开源免费">
-                                    <span class="link-icon">🔗</span> AutoDock Vina
-                                </a>
-                                <a href="https://www.schrodinger.com/glide" class="website-link" target="_blank" data-tooltip="Glide: 高精度分子对接，HTVS/SP/XP三种模式">
-                                    <span class="link-icon">🔗</span> Glide (Schrödinger)
-                                </a>
                                 <a href="https://pyrx.sourceforge.io/" class="website-link" target="_blank" data-tooltip="PyRx: AutoDock/Vina+AI重打分，免费开源，支持自定义库，适合学术初筛">
                                     <span class="link-icon">🔗</span> PyRx
+                                </a>
+                                <a href="https://zinc15.docking.org/" class="website-link" target="_blank" data-tooltip="ZINC15: 超大分子库（>10亿）在线筛选，支持对接/AI打分，免费学术用">
+                                    <span class="link-icon">🔗</span> ZINC15
                                 </a>
                                 <a href="https://www.swissdock.ch/" class="website-link" target="_blank" data-tooltip="SwissDock: 高精度对接+AI优化，免费网页版，支持蛋白-配体柔性对接">
                                     <span class="link-icon">🔗</span> SwissDock
@@ -705,6 +707,24 @@
                                 </a>
                                 <a href="https://github.com/DeepRank/deeprank" class="website-link" target="_blank" data-tooltip="DeepRank: 基于CNN的深度学习打分">
                                     <span class="link-icon">🔗</span> DeepRank
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step dry">
+                        <div class="step-content">
+                            <div class="step-icon">🔗</div>
+                            <div class="step-title">分子对接</div>
+                            <div class="step-desc">Molecular Docking<br>蛋白-配体相互作用预测</div>
+                            <span class="tools-badge">对接计算</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="website-links">
+                                <a href="https://vina.scripps.edu/" class="website-link" target="_blank" data-tooltip="AutoDock Vina: 快速准确的分子对接程序，开源免费，广泛使用">
+                                    <span class="link-icon">🔗</span> AutoDock Vina
+                                </a>
+                                <a href="https://www.schrodinger.com/glide" class="website-link" target="_blank" data-tooltip="Glide: 薛定谔公司的高精度分子对接软件，支持HTVS/SP/XP三种精度模式">
+                                    <span class="link-icon">🔗</span> Glide (Schrödinger)
                                 </a>
                             </div>
                         </div>
@@ -775,7 +795,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="step wet">
+                    <div class="step hybrid">
                         <div class="step-content">
                             <div class="step-icon">🧬</div>
                             <div class="step-title">类器官药效验证</div>
