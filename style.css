@@ -256,10 +256,10 @@ h1 {
     border-left-color: #f5576c;
 }
 
-.phase-4 .phase-header {
+.phase-3 .phase-header {
     background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 }
-.phase-4 .phase-header::after {
+.phase-3 .phase-header::after {
     border-left-color: #38f9d7;
 }
 
