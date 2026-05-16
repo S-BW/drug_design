@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小分子药物设计全流程平台</title>
+    <title>制药寻踪——肿瘤靶向原创新药研发平台</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>🧬 小分子药物设计全流程平台</h1>
-        <p class="subtitle">Small Molecule Drug Design Platform - Complete Workflow</p>
+        <h1>🧬 制药寻踪——肿瘤靶向原创新药研发平台</h1>
+        <p class="subtitle">PharmaTrace - Tumor-Targeted Innovative Drug Design Platform</p>
         
         <!-- 全局提示框 -->
         <div class="tooltip" id="global-tooltip"></div>
@@ -17,16 +17,16 @@
         <!-- 干湿实验图例 -->
         <div class="experiment-legend">
             <div class="exp-type">
-                <span class="exp-badge dry-lab">干实验</span>
-                <span>计算机模拟 / 数据分析</span>
+                <span class="exp-icon">💻</span>
+                <span>基于AI的抗肿瘤靶向药设计</span>
             </div>
             <div class="exp-type">
-                <span class="exp-badge wet-lab">湿实验</span>
-                <span>实验室生物学实验 — 深圳市肿瘤靶向原创新药重点实验室</span>
+                <span class="exp-icon">🧪</span>
+                <span>基于类器官及器官芯片的药物筛选平台</span>
             </div>
             <div class="exp-type">
-                <span class="exp-badge hybrid-lab">干湿结合</span>
-                <span>计算与实验结合</span>
+                <span class="exp-icon">🔬</span>
+                <span>实验室验证-基于深圳市肿瘤靶向原创新药重点实验室</span>
             </div>
         </div>
         
@@ -40,6 +40,42 @@
                     <div style="font-size:0.8em;opacity:0.8;margin-top:5px;">Target Discovery</div>
                 </div>
                 <div class="phase-content">
+                    <div class="step dry">
+                        <div class="step-content">
+                            <div class="step-icon">🗄️</div>
+                            <div class="step-title">数据库资源</div>
+                            <div class="step-desc">Multi-omics Databases<br>多组学数据资源整合</div>
+                            <span class="tools-badge">数据平台</span>
+                        </div>
+                        <div class="step-bottom">
+                            <div class="website-links">
+                                <div style="font-size: 0.7em; color: #00d4ff; margin: 0 0 4px 0; text-align: left; padding-left: 5px;">转录组数据库</div>
+                                <a href="https://portal.gdc.cancer.gov/" class="website-link" target="_blank" data-tooltip="TCGA/GDC: 癌症基因组图谱，最大规模的癌症多组学数据库，包含RNA-seq、临床数据等">
+                                    <span class="link-icon">🔗</span> TCGA (GDC)
+                                </a>
+                                <a href="https://www.ncbi.nlm.nih.gov/geo/" class="website-link" target="_blank" data-tooltip="GEO: 基因表达综合数据库，全球最大的转录组数据公共仓库，包含bulk和单细胞数据">
+                                    <span class="link-icon">🔗</span> GEO
+                                </a>
+                                <a href="https://xena.ucsc.edu/" class="website-link" target="_blank" data-tooltip="UCSC Xena: 癌症基因组数据可视化与整合平台，支持TCGA、TARGET、GTEx等数据集">
+                                    <span class="link-icon">🔗</span> UCSC Xena
+                                </a>
+                                <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">蛋白组数据库</div>
+                                <a href="https://pdc.cancer.gov/" class="website-link" target="_blank" data-tooltip="PDC (Proteomic Data Commons): NCI蛋白质组学数据公共平台，CPTAC数据主入口，包含泛癌蛋白组数据">
+                                    <span class="link-icon">🔗</span> PDC (CPTAC)
+                                </a>
+                                <a href="https://www.proteomicsdb.org/" class="website-link" target="_blank" data-tooltip="ProteomicsDB: 人类蛋白质组综合数据库，涵盖组织、细胞系和癌症蛋白质表达数据">
+                                    <span class="link-icon">🔗</span> ProteomicsDB
+                                </a>
+                                <div style="font-size: 0.7em; color: #00d4ff; margin: 8px 0 4px 0; text-align: left; padding-left: 5px;">单细胞数据库</div>
+                                <a href="http://tisch.compbio.cn/" class="website-link" target="_blank" data-tooltip="TISCH2: 肿瘤免疫单细胞数据库，600万+细胞，50种癌症类型，支持细胞通讯和转录因子分析">
+                                    <span class="link-icon">🔗</span> TISCH2
+                                </a>
+                                <a href="https://cellxgene.cziscience.com/" class="website-link" target="_blank" data-tooltip="CELLxGENE: CZ单细胞数据门户，人类细胞图谱数据，支持大规模单细胞数据可视化和分析">
+                                    <span class="link-icon">🔗</span> CELLxGENE
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                     <div class="step dry">
                         <div class="step-content">
                             <div class="step-icon">🧬</div>
@@ -448,7 +484,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="step wet">
+                    <div class="step hybrid">
                         <div class="step-content">
                             <div class="step-icon">⚠️</div>
                             <div class="step-title">毒理学评估</div>
@@ -462,6 +498,7 @@
                                     <li>• Ames 致突变性</li>
                                     <li>• 细胞毒性测试</li>
                                     <li>• 急性/慢性毒性</li>
+                                    <li>• 器官芯片毒理评估</li>
                                 </ul>
                             </div>
                         </div>

@@ -50,6 +50,25 @@ h1 {
     align-items: center;
     gap: 10px;
     font-size: 1em;
+    padding: 8px 15px;
+    border-radius: 25px;
+    color: #fff;
+}
+
+.exp-type:nth-child(1) {
+    background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+}
+
+.exp-type:nth-child(2) {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+}
+
+.exp-type:nth-child(3) {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+}
+
+.exp-icon {
+    font-size: 1.3em;
 }
 
 .exp-badge {
