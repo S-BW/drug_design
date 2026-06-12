@@ -121,7 +121,7 @@ const stepBottomCache = new Map();
 
 function lockStepBottoms() {
     document.querySelectorAll('.step-bottom').forEach(el => {
-        if (stepBottomCache.has(el) || el.classList.contains('step-bottom-locked')) return;
+        if (el.classList.contains('step-bottom-public') || stepBottomCache.has(el) || el.classList.contains('step-bottom-locked')) return;
 
         const realHTML = el.innerHTML;
         stepBottomCache.set(el, realHTML);
@@ -214,13 +214,13 @@ function applySegmentedMasks() {
         if (bar) bar.style.setProperty('--mask-gradient', completedMask);
     });
 
-    // 进行中线：到 phase3 顶部结束，前两段可见，第二段后透明
+    // 进行中线：phase1 与 phase2 之间切开，phase2 到 phase3 顶部连续延伸
     if (inProgressLine) {
         const bar = inProgressLine.querySelector('.drug-bar');
         if (bar) {
             const inProgressMask = buildMaskGradient([
                 { start: 0, end: p1Bottom },
-                { start: p2Top, end: p2Bottom }
+                { start: p2Top, end: p3Top }
             ], p3Top);
             bar.style.setProperty('--mask-gradient', inProgressMask);
         }
