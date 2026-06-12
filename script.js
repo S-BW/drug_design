@@ -124,11 +124,9 @@ function lockStepBottoms() {
         if (stepBottomCache.has(el) || el.classList.contains('step-bottom-locked')) return;
 
         const realHTML = el.innerHTML;
-        const height = el.offsetHeight;
         stepBottomCache.set(el, realHTML);
 
         el.classList.add('step-bottom-locked');
-        el.style.minHeight = height + 'px';
         el.innerHTML = `
             <div class="step-bottom-content step-bottom-placeholder"></div>
             <div class="step-bottom-overlay">
@@ -144,7 +142,6 @@ function unlockStepBottoms() {
         if (stepBottomCache.has(el)) {
             el.innerHTML = stepBottomCache.get(el);
             el.classList.remove('step-bottom-locked');
-            el.style.minHeight = '';
             stepBottomCache.delete(el);
         }
     });
@@ -189,8 +186,9 @@ function updatePhaseDividers() {
     const trackLines = document.querySelector('.drug-track-lines');
     const phase1 = document.querySelector('.phase-1');
     const phase2 = document.querySelector('.phase-2');
+    const phase3 = document.querySelector('.phase-3');
 
-    if (!trackLines || !phase1 || !phase2) return;
+    if (!trackLines || !phase1 || !phase2 || !phase3) return;
 
     // 清除旧分隔线
     trackLines.querySelectorAll('.phase-divider').forEach(el => el.remove());
@@ -198,16 +196,19 @@ function updatePhaseDividers() {
     const trackRect = trackLines.getBoundingClientRect();
     const trackTop = trackRect.top;
 
-    const positions = [
-        phase1.getBoundingClientRect().bottom - trackTop,
-        phase2.getBoundingClientRect().bottom - trackTop
+    // 计算两个 phase 之间的完整间隙（包括 arrow-down 间距）
+    const gaps = [
+        { start: phase1.getBoundingClientRect().bottom - trackTop, end: phase2.getBoundingClientRect().top - trackTop },
+        { start: phase2.getBoundingClientRect().bottom - trackTop, end: phase3.getBoundingClientRect().top - trackTop }
     ];
 
-    positions.forEach(top => {
-        if (top > 0 && top < trackRect.height) {
+    gaps.forEach(gap => {
+        const height = gap.end - gap.start;
+        if (height > 0 && gap.start < trackRect.height && gap.end > 0) {
             const divider = document.createElement('div');
             divider.className = 'phase-divider';
-            divider.style.top = top + 'px';
+            divider.style.top = gap.start + 'px';
+            divider.style.height = height + 'px';
             trackLines.appendChild(divider);
         }
     });

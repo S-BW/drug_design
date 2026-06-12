@@ -640,11 +640,16 @@ h1 {
     position: relative;
 }
 
+.step-bottom-locked {
+    min-height: 90px;
+}
+
 .step-bottom-locked .step-bottom-content {
     filter: blur(10px);
     pointer-events: none;
     user-select: none;
     opacity: 0.5;
+    min-height: 90px;
 }
 
 .step-bottom-overlay {
@@ -808,17 +813,16 @@ h1 {
     color: #5af9d7;
 }
 
-/* 阶段分隔线，与左侧 01/02/03 分格对齐 */
+/* 阶段分隔线，与左侧 01/02/03 分格对齐，宽度覆盖 phase 之间的整个间隙 */
 .phase-divider {
     position: absolute;
     left: -5px;
     right: -5px;
-    height: 3px;
-    background: rgba(8, 40, 28, 0.6);
-    border-radius: 2px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background-attachment: fixed;
+    border-radius: 0;
     pointer-events: none;
     z-index: 2;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
 }
 
 /* 底部入驻引导 */
@@ -1195,5 +1199,9 @@ h1 {
     }
     .drug-line:hover .drug-label {
         font-size: 0.8em;
+    }
+    .step-bottom-locked,
+    .step-bottom-locked .step-bottom-content {
+        min-height: 60px;
     }
 }
