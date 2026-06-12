@@ -665,8 +665,8 @@ h1 {
 }
 
 .drug-track {
-    width: 140px;
-    min-width: 140px;
+    width: 170px;
+    min-width: 170px;
     display: flex;
     justify-content: space-around;
     position: relative;
@@ -675,12 +675,16 @@ h1 {
 
 .drug-line {
     position: relative;
-    width: 4px;
+    width: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background: linear-gradient(to bottom, #43e97b 0%, #38f9d7 100%);
-    border-radius: 2px;
+    border-radius: 16px;
     transition: all 0.3s ease;
     cursor: pointer;
     text-decoration: none;
+    overflow: visible;
 }
 
 .drug-line.completed {
@@ -692,22 +696,21 @@ h1 {
 }
 
 .drug-label {
-    position: absolute;
-    top: -34px;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    color: #43e97b;
-    font-weight: 600;
+    margin-top: 16px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    color: #084c2f;
+    font-weight: 800;
     font-size: 0.85em;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     transition: all 0.3s ease;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+    line-height: 1;
 }
 
 .drug-arrow {
     position: absolute;
-    bottom: -16px;
+    bottom: -20px;
     left: 50%;
     transform: translateX(-50%);
     color: #43e97b;
@@ -722,15 +725,16 @@ h1 {
 }
 
 .drug-line:hover {
-    width: 7px;
+    width: 42px;
     background: linear-gradient(to bottom, #5af08e 0%, #5af9d7 100%);
     box-shadow: 0 0 20px rgba(67, 233, 123, 0.6), 0 0 40px rgba(67, 233, 123, 0.25);
 }
 
 .drug-line:hover .drug-label {
-    font-weight: 800;
-    font-size: 1em;
-    color: #5af9d7;
+    font-weight: 900;
+    font-size: 0.95em;
+    color: #042a1a;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.45);
 }
 
 .drug-line:hover .drug-arrow {
@@ -1064,7 +1068,7 @@ h1 {
     .drug-track {
         width: 100%;
         min-width: auto;
-        height: 60px;
+        height: 70px;
         padding-top: 0;
         flex-direction: row;
         align-items: flex-start;
@@ -1073,17 +1077,27 @@ h1 {
     }
     .drug-line {
         width: auto;
-        height: 4px !important;
+        height: 26px !important;
         flex: 1;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        border-radius: 13px;
     }
     .drug-label {
-        top: -26px;
-        font-size: 0.75em;
+        margin-top: 0;
+        writing-mode: horizontal-tb;
+        text-orientation: mixed;
+        font-size: 0.72em;
+        white-space: nowrap;
     }
     .drug-arrow {
         display: none;
     }
     .drug-line:hover {
-        height: 6px !important;
+        height: 34px !important;
+    }
+    .drug-line:hover .drug-label {
+        font-size: 0.8em;
     }
 }
