@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于我们 - 智药寻踪——肿瘤靶向原创新药研发平台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 登录遮罩 -->
+    <div class="login-overlay hidden" id="login-overlay">
+        <div class="login-box">
+            <button type="button" class="login-close" id="login-close" aria-label="关闭">×</button>
+            <div class="login-logo">🧬</div>
+            <h2>智药寻踪</h2>
+            <p class="login-subtitle">肿瘤靶向原创新药研发平台</p>
+            <form id="login-form" autocomplete="off">
+                <div class="form-group">
+                    <label for="username">账号</label>
+                    <input type="text" id="username" placeholder="请输入账号" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="login-btn">登录</button>
+                <div class="login-error" id="login-error"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="page-header">
+            <div class="header-titles">
+                <h1>🧬 智药寻踪——肿瘤靶向原创新药研发平台</h1>
+                <p class="subtitle">PharmaTrace - Tumor-Targeted Innovative Drug Design Platform</p>
+            </div>
+            <nav class="main-nav">
+                <a href="index.html">首页</a>
+                <a href="about.html" class="active">关于我们</a>
+            </nav>
+            <div class="user-bar" id="user-bar" style="display: none;">
+                <span class="user-name" id="user-name"></span>
+                <button class="logout-btn" id="logout-btn">退出</button>
+            </div>
+            <button class="login-trigger" id="login-trigger">🔐 登录</button>
+        </header>
+
+        <!-- 全局提示框 -->
+        <div class="tooltip" id="global-tooltip"></div>
+
+        <main class="about-content">
+            <div class="about-hero">
+                <h2>关于我们</h2>
+                <p>思诺达药业致力于打造国际领先的 AI 驱动抗肿瘤药物研发平台，构建从靶点发现到临床前验证的端到端智能化闭环。</p>
+            </div>
+
+            <section class="about-section">
+                <h3 class="section-title"><span class="section-number">01</span> 核心团队</h3>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-02.png" alt="核心团队封面：国际顶尖，多点协同">
+                    <figcaption>核心团队：国际顶尖，多点协同</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-03.png" alt="首席科学家 Peter E. Lobie 院士">
+                    <figcaption>首席科学家：Peter E. Lobie 院士</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-04.png" alt="核心团队介绍">
+                    <figcaption>核心团队：汇聚全球行业精英</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-05.png" alt="顾问团队介绍">
+                    <figcaption>顾问团队：跨学科协作网络</figcaption>
+                </figure>
+            </section>
+
+            <section class="about-section">
+                <h3 class="section-title"><span class="section-number">02</span> 市场分析</h3>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-06.png" alt="市场分析：痛点明确，规模千亿">
+                    <figcaption>市场分析：痛点明确，规模千亿</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-07.png" alt="中国癌症发病与死亡数据">
+                    <figcaption>中国癌症现状与慢病化管理</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-08.png" alt="全球小分子抗肿瘤靶向药市场规模">
+                    <figcaption>全球小分子抗肿瘤靶向药市场规模</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-09.png" alt="行业核心数据汇总表">
+                    <figcaption>行业核心数据与重磅交易</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-10.png" alt="市场痛点与目标适应症">
+                    <figcaption>市场痛点、目标适应症与未来方向</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-11.png" alt="药物研发瓶颈">
+                    <figcaption>药物研发四大瓶颈</figcaption>
+                </figure>
+            </section>
+
+            <section class="about-section">
+                <h3 class="section-title"><span class="section-number">03</span> 技术平台</h3>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-12.png" alt="技术平台：AI 驱动，高效创新">
+                    <figcaption>技术平台：AI 驱动，高效创新</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-13.png" alt="AI 驱动的多组学靶点识别与个性化治疗决策平台">
+                    <figcaption>AI 驱动的多组学靶点识别与个性化治疗决策平台</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-14.png" alt="平台核心模块及技术指标">
+                    <figcaption>平台核心模块及技术指标</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-15.png" alt="OncoTarget 靶点智能体">
+                    <figcaption>OncoTarget · 靶点智能体</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-16.png" alt="ChemAI-Gen 分子生成引擎">
+                    <figcaption>ChemAI-Gen · 分子生成引擎</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-17.png" alt="VS-MegaScreen 亿级虚拟筛选平台">
+                    <figcaption>VS-MegaScreen · 亿级虚拟筛选平台</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-18.png" alt="VS-MegaScreen 平台优势">
+                    <figcaption>VS-MegaScreen · 平台优势</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-19.png" alt="PDO-Array 高通量评价体系">
+                    <figcaption>PDO-Array · 高通量评价体系</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-20.png" alt="Toxi-Organoid 多器官芯片">
+                    <figcaption>Toxi-Organoid · 多器官芯片</figcaption>
+                </figure>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-21.png" alt="湿实验平台与研发管线">
+                    <figcaption>完善的湿实验平台与 AI + 湿实验研发管线</figcaption>
+                </figure>
+            </section>
+
+            <section class="about-section">
+                <h3 class="section-title"><span class="section-number">04</span> 三位一体创新范式</h3>
+                <figure class="slide-figure">
+                    <img src="images/about/slide-22.png" alt="三位一体创新范式">
+                    <figcaption>三位一体创新范式：更快、更省、更成功</figcaption>
+                </figure>
+            </section>
+        </main>
+
+        <!-- 底部入驻引导 -->
+        <footer class="site-footer" id="site-footer">
+            <div class="footer-inner">
+                <div class="footer-icon">🔐</div>
+                <h3>联系我们获取账号，申请入驻权</h3>
+                <p>如需开通平台账号或申请机构入驻，请联系管理员获取授权。</p>
+                <div class="footer-actions">
+                    <button class="footer-btn primary" id="apply-trigger">
+                        <span>📝</span> 申请入驻授权
+                    </button>
+                </div>
+                <div class="footer-tip">登录后可查看完整工具链接与实验详情</div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 申请入驻授权弹窗 -->
+    <div class="apply-overlay hidden" id="apply-overlay">
+        <div class="apply-box">
+            <button type="button" class="apply-close" id="apply-close" aria-label="关闭">×</button>
+            <div class="apply-header">
+                <h2>申请入驻授权</h2>
+                <p>填写以下信息，开始您的科研算力之旅</p>
+            </div>
+            <form id="apply-form" autocomplete="off">
+                <div class="apply-tabs">
+                    <button type="button" class="apply-tab active" data-tab="org">机构注册</button>
+                    <button type="button" class="apply-tab" data-tab="person">个人申请</button>
+                </div>
+                <input type="hidden" id="apply-type" value="org">
+
+                <div class="form-group">
+                    <label for="apply-name"><span id="name-label">机构全称</span><span class="required">*</span></label>
+                    <input type="text" id="apply-name" placeholder="请输入机构全称" required>
+                </div>
+                <div class="form-group">
+                    <label for="apply-email">单位邮箱<span class="required">*</span></label>
+                    <input type="email" id="apply-email" placeholder="name@institution.edu" required>
+                </div>
+                <div class="form-group">
+                    <label for="apply-field">研究领域<span class="required">*</span></label>
+                    <select id="apply-field" required>
+                        <option value="" disabled selected>请选择研究领域</option>
+                        <option value="靶点发现与验证">靶点发现与验证</option>
+                        <option value="苗头化合物发现">苗头化合物发现</option>
+                        <option value="先导化合物优化">先导化合物优化</option>
+                        <option value="分子动力学模拟">分子动力学模拟</option>
+                        <option value="ADMET 预测">ADMET 预测</option>
+                        <option value="药物重定位">药物重定位</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="apply-desc">需求说明<span class="required">*</span></label>
+                    <textarea id="apply-desc" rows="4" placeholder="请简要描述您的研究需求、预期算力规模及使用周期..." required></textarea>
+                </div>
+                <button type="submit" class="apply-submit">提交申请</button>
+                <p class="apply-note">提交即表示您同意我们的服务条款与隐私政策。您的信息将受到端到端加密保护。</p>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
