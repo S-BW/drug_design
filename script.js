@@ -55,6 +55,7 @@ function setLoginState(username) {
     localStorage.setItem('pharmatrace_user', username);
     document.body.classList.remove('logged-out');
     document.body.classList.add('logged-in');
+    unlockStepBottoms();
     closeLoginModal();
     if (loginTrigger) loginTrigger.style.display = 'none';
     if (userBar) {
@@ -67,6 +68,7 @@ function setLogoutState() {
     localStorage.removeItem('pharmatrace_user');
     document.body.classList.remove('logged-in');
     document.body.classList.add('logged-out');
+    lockStepBottoms();
     if (loginTrigger) loginTrigger.style.display = 'inline-flex';
     if (userBar) userBar.style.display = 'none';
     if (usernameInput) usernameInput.value = '';
@@ -113,6 +115,48 @@ if (logoutBtn) {
     logoutBtn.addEventListener('click', setLogoutState);
 }
 
+// ================= step-bottom 登录保护 =================
+// 未登录时用占位内容替换真实内容，防止控制台直接去除 blur 查看
+const stepBottomCache = new Map();
+
+function lockStepBottoms() {
+    document.querySelectorAll('.step-bottom').forEach(el => {
+        if (stepBottomCache.has(el) || el.classList.contains('step-bottom-locked')) return;
+
+        const realHTML = el.innerHTML;
+        const height = el.offsetHeight;
+        stepBottomCache.set(el, realHTML);
+
+        el.classList.add('step-bottom-locked');
+        el.style.minHeight = height + 'px';
+        el.innerHTML = `
+            <div class="step-bottom-content step-bottom-placeholder"></div>
+            <div class="step-bottom-overlay">
+                <span class="step-bottom-overlay-text">🔒 登录后显示完整内容</span>
+                <button type="button" class="step-bottom-overlay-btn login-trigger-from-blur">立即登录</button>
+            </div>
+        `;
+    });
+}
+
+function unlockStepBottoms() {
+    document.querySelectorAll('.step-bottom-locked').forEach(el => {
+        if (stepBottomCache.has(el)) {
+            el.innerHTML = stepBottomCache.get(el);
+            el.classList.remove('step-bottom-locked');
+            el.style.minHeight = '';
+            stepBottomCache.delete(el);
+        }
+    });
+}
+
+// 点击虚化层上的登录按钮也能打开登录弹窗
+document.addEventListener('click', function(e) {
+    if (e.target && e.target.classList.contains('login-trigger-from-blur')) {
+        openLoginModal();
+    }
+});
+
 // 页面加载时检查登录状态
 if (isLoggedIn()) {
     setLoginState(getLoggedInUser());
@@ -120,42 +164,82 @@ if (isLoggedIn()) {
     document.body.classList.add('logged-out');
     if (loginTrigger) loginTrigger.style.display = 'inline-flex';
     if (userBar) userBar.style.display = 'none';
+    lockStepBottoms();
 }
 
-// ================= 药物管线进度条定位 =================
+// ================= 药物管线进度条定位与分隔线 =================
 function updateDrugLinePositions() {
     const workflow = document.querySelector('.workflow');
     const phase3 = document.querySelector('.phase-3');
     const sin4 = document.querySelector('.drug-line.in-progress');
+    const trackLines = document.querySelector('.drug-track-lines');
 
-    if (workflow && phase3 && sin4) {
+    if (workflow && phase3 && sin4 && trackLines) {
         const workflowRect = workflow.getBoundingClientRect();
         const phase3Rect = phase3.getBoundingClientRect();
         const height = phase3Rect.top - workflowRect.top;
-        const trackRect = sin4.parentElement.getBoundingClientRect();
+        const trackRect = trackLines.getBoundingClientRect();
         const trackTop = trackRect.top;
         const relativeTop = workflowRect.top - trackTop;
         sin4.style.height = Math.max(0, height + relativeTop) + 'px';
     }
 }
 
-window.addEventListener('load', updateDrugLinePositions);
-window.addEventListener('resize', updateDrugLinePositions);
+function updatePhaseDividers() {
+    const trackLines = document.querySelector('.drug-track-lines');
+    const phase1 = document.querySelector('.phase-1');
+    const phase2 = document.querySelector('.phase-2');
 
-// 为所有带 data-tooltip 的元素添加悬停事件
-document.querySelectorAll('[data-tooltip]').forEach(el => {
-    el.addEventListener('mouseenter', function(e) {
-        const text = this.getAttribute('data-tooltip');
-        tooltip.textContent = text;
-        tooltip.classList.add('visible');
-        updateTooltipPosition(e);
+    if (!trackLines || !phase1 || !phase2) return;
+
+    // 清除旧分隔线
+    trackLines.querySelectorAll('.phase-divider').forEach(el => el.remove());
+
+    const trackRect = trackLines.getBoundingClientRect();
+    const trackTop = trackRect.top;
+
+    const positions = [
+        phase1.getBoundingClientRect().bottom - trackTop,
+        phase2.getBoundingClientRect().bottom - trackTop
+    ];
+
+    positions.forEach(top => {
+        if (top > 0 && top < trackRect.height) {
+            const divider = document.createElement('div');
+            divider.className = 'phase-divider';
+            divider.style.top = top + 'px';
+            trackLines.appendChild(divider);
+        }
     });
-    
-    el.addEventListener('mousemove', updateTooltipPosition);
-    
-    el.addEventListener('mouseleave', function() {
-        tooltip.classList.remove('visible');
-    });
+}
+
+function refreshDrugTrack() {
+    updateDrugLinePositions();
+    updatePhaseDividers();
+}
+
+window.addEventListener('load', refreshDrugTrack);
+window.addEventListener('resize', refreshDrugTrack);
+
+// 为所有带 data-tooltip 的元素添加悬停事件（事件委托，支持动态内容）
+document.body.addEventListener('mouseover', function(e) {
+    const target = e.target.closest('[data-tooltip]');
+    if (!target) return;
+    const text = target.getAttribute('data-tooltip');
+    tooltip.textContent = text;
+    tooltip.classList.add('visible');
+    updateTooltipPosition(e);
+});
+
+document.body.addEventListener('mousemove', function(e) {
+    if (!e.target.closest('[data-tooltip]')) return;
+    updateTooltipPosition(e);
+});
+
+document.body.addEventListener('mouseout', function(e) {
+    const target = e.target.closest('[data-tooltip]');
+    if (!target) return;
+    tooltip.classList.remove('visible');
 });
 
 function updateTooltipPosition(e) {

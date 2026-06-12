@@ -634,13 +634,60 @@ h1 {
     min-height: 1.2em;
 }
 
-/* 未登录时隐藏详细内容 */
+/* 未登录时 step-bottom 显示但虚化，登录后显示真实内容 */
 .step-bottom {
-    display: none;
+    display: block;
+    position: relative;
 }
 
-.logged-in .step-bottom {
-    display: block;
+.step-bottom-locked .step-bottom-content {
+    filter: blur(10px);
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.5;
+}
+
+.step-bottom-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 12px;
+    z-index: 10;
+    gap: 10px;
+    text-align: center;
+    padding: 10px;
+}
+
+.step-bottom-overlay-text {
+    color: #5af9d7;
+    font-weight: 700;
+    font-size: 0.85em;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.step-bottom-overlay-btn {
+    padding: 7px 16px;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    color: #084c2f;
+    font-weight: 700;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.step-bottom-overlay-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(67, 233, 123, 0.5);
+}
+
+.logged-in .site-footer {
+    display: none;
 }
 
 .logged-out .workflow {
@@ -668,9 +715,29 @@ h1 {
     width: 170px;
     min-width: 170px;
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
+    align-items: center;
     position: relative;
-    padding-top: 40px;
+    padding-top: 16px;
+}
+
+.drug-track-title {
+    color: #43e97b;
+    font-weight: 700;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
+    text-align: center;
+    margin-bottom: 14px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.drug-track-lines {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    position: relative;
+    width: 100%;
+    flex: 1;
 }
 
 .drug-line {
@@ -739,6 +806,19 @@ h1 {
 
 .drug-line:hover .drug-arrow {
     color: #5af9d7;
+}
+
+/* 阶段分隔线，与左侧 01/02/03 分格对齐 */
+.phase-divider {
+    position: absolute;
+    left: -5px;
+    right: -5px;
+    height: 3px;
+    background: rgba(8, 40, 28, 0.6);
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 2;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
 }
 
 /* 底部入驻引导 */
@@ -1071,9 +1151,22 @@ h1 {
         height: 70px;
         padding-top: 0;
         flex-direction: row;
-        align-items: flex-start;
+        align-items: center;
         order: -1;
         margin-bottom: 10px;
+        gap: 10px;
+    }
+    .drug-track-title {
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        font-size: 0.75em;
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+    .drug-track-lines {
+        flex: 1;
+        height: 100%;
+        align-items: center;
     }
     .drug-line {
         width: auto;
@@ -1092,6 +1185,9 @@ h1 {
         white-space: nowrap;
     }
     .drug-arrow {
+        display: none;
+    }
+    .phase-divider {
         display: none;
     }
     .drug-line:hover {
