@@ -166,48 +166,45 @@ if (isLoggedIn()) {
 
 // ================= 药物管线进度条定位与分隔线 =================
 function updateDrugLinePositions() {
-    const workflow = document.querySelector('.workflow');
+    const trackLines = document.querySelector('.drug-track-lines');
     const phase3 = document.querySelector('.phase-3');
     const sin4 = document.querySelector('.drug-line.in-progress');
-    const trackLines = document.querySelector('.drug-track-lines');
 
-    if (workflow && phase3 && sin4 && trackLines) {
-        const workflowRect = workflow.getBoundingClientRect();
-        const phase3Rect = phase3.getBoundingClientRect();
-        const height = phase3Rect.top - workflowRect.top;
-        const trackRect = trackLines.getBoundingClientRect();
-        const trackTop = trackRect.top;
-        const relativeTop = workflowRect.top - trackTop;
-        sin4.style.height = Math.max(0, height + relativeTop) + 'px';
+    if (trackLines && phase3 && sin4) {
+        const trackTop = trackLines.getBoundingClientRect().top;
+        const phase3Top = phase3.getBoundingClientRect().top;
+        sin4.style.height = Math.max(0, phase3Top - trackTop) + 'px';
     }
 }
 
 // 用 CSS mask 在 drug-bar 上“切开” phase 之间的间隙
+// 所有位置以 drug-track-lines 顶部为基准，确保切口与左侧 phase 间隙对齐
 function applySegmentedMasks() {
-    const workflow = document.querySelector('.workflow');
+    const trackLines = document.querySelector('.drug-track-lines');
     const phase1 = document.querySelector('.phase-1');
     const phase2 = document.querySelector('.phase-2');
     const phase3 = document.querySelector('.phase-3');
     const completedLines = document.querySelectorAll('.drug-line.completed');
     const inProgressLine = document.querySelector('.drug-line.in-progress');
 
-    if (!workflow || !phase1 || !phase2 || !phase3) return;
+    if (!trackLines || !phase1 || !phase2 || !phase3) return;
 
-    const workflowTop = workflow.getBoundingClientRect().top;
-    const p1Bottom = phase1.getBoundingClientRect().bottom - workflowTop;
-    const p2Top = phase2.getBoundingClientRect().top - workflowTop;
-    const p2Bottom = phase2.getBoundingClientRect().bottom - workflowTop;
-    const p3Top = phase3.getBoundingClientRect().top - workflowTop;
-    const p3Bottom = phase3.getBoundingClientRect().bottom - workflowTop;
+    const trackRect = trackLines.getBoundingClientRect();
+    const trackTop = trackRect.top;
+    const trackHeight = trackRect.height;
 
-    const totalHeight = p3Bottom;
+    const p1Bottom = phase1.getBoundingClientRect().bottom - trackTop;
+    const p2Top = phase2.getBoundingClientRect().top - trackTop;
+    const p2Bottom = phase2.getBoundingClientRect().bottom - trackTop;
+    const p3Top = phase3.getBoundingClientRect().top - trackTop;
+    const p3Bottom = phase3.getBoundingClientRect().bottom - trackTop;
 
     // 完成线：三段可见，中间两段间隙透明
     const completedMask = buildMaskGradient([
         { start: 0, end: p1Bottom },
         { start: p2Top, end: p2Bottom },
         { start: p3Top, end: p3Bottom }
-    ], totalHeight);
+    ], trackHeight);
 
     completedLines.forEach(line => {
         const bar = line.querySelector('.drug-bar');
