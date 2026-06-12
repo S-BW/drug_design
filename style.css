@@ -751,8 +751,6 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: linear-gradient(to bottom, #43e97b 0%, #38f9d7 100%);
-    border-radius: 16px;
     transition: all 0.3s ease;
     cursor: pointer;
     text-decoration: none;
@@ -767,7 +765,22 @@ h1 {
     height: 68%;
 }
 
+.drug-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #43e97b 0%, #38f9d7 100%);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    -webkit-mask-image: var(--mask-gradient, none);
+    mask-image: var(--mask-gradient, none);
+}
+
 .drug-label {
+    position: relative;
+    z-index: 3;
     margin-top: 16px;
     writing-mode: vertical-rl;
     text-orientation: mixed;
@@ -785,6 +798,7 @@ h1 {
     bottom: -20px;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 3;
     color: #43e97b;
     font-size: 0.9em;
     line-height: 1;
@@ -796,8 +810,9 @@ h1 {
     50% { opacity: 0.6; transform: translateX(-50%) translateY(3px); }
 }
 
-.drug-line:hover {
+.drug-line:hover .drug-bar {
     width: 42px;
+    left: -5px;
     background: linear-gradient(to bottom, #5af08e 0%, #5af9d7 100%);
     box-shadow: 0 0 20px rgba(67, 233, 123, 0.6), 0 0 40px rgba(67, 233, 123, 0.25);
 }
@@ -813,17 +828,7 @@ h1 {
     color: #5af9d7;
 }
 
-/* 阶段分隔线，与左侧 01/02/03 分格对齐，宽度覆盖 phase 之间的整个间隙 */
-.phase-divider {
-    position: absolute;
-    left: -5px;
-    right: -5px;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    background-attachment: fixed;
-    border-radius: 0;
-    pointer-events: none;
-    z-index: 2;
-}
+/* 阶段分隔通过 drug-bar 的 mask-gradient 实现，无需额外元素 */
 
 /* 底部入驻引导 */
 .site-footer {
@@ -1179,7 +1184,11 @@ h1 {
         flex-direction: row;
         justify-content: center;
         align-items: center;
+    }
+    .drug-bar {
         border-radius: 13px;
+        -webkit-mask-image: none !important;
+        mask-image: none !important;
     }
     .drug-label {
         margin-top: 0;
@@ -1191,11 +1200,11 @@ h1 {
     .drug-arrow {
         display: none;
     }
-    .phase-divider {
-        display: none;
-    }
-    .drug-line:hover {
+    .drug-line:hover .drug-bar {
         height: 34px !important;
+        width: 100%;
+        left: 0;
+        top: -4px;
     }
     .drug-line:hover .drug-label {
         font-size: 0.8em;

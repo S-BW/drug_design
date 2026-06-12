@@ -182,41 +182,75 @@ function updateDrugLinePositions() {
     }
 }
 
-function updatePhaseDividers() {
-    const trackLines = document.querySelector('.drug-track-lines');
+// 用 CSS mask 在 drug-bar 上“切开” phase 之间的间隙
+function applySegmentedMasks() {
+    const workflow = document.querySelector('.workflow');
     const phase1 = document.querySelector('.phase-1');
     const phase2 = document.querySelector('.phase-2');
     const phase3 = document.querySelector('.phase-3');
+    const completedLines = document.querySelectorAll('.drug-line.completed');
+    const inProgressLine = document.querySelector('.drug-line.in-progress');
 
-    if (!trackLines || !phase1 || !phase2 || !phase3) return;
+    if (!workflow || !phase1 || !phase2 || !phase3) return;
 
-    // 清除旧分隔线
-    trackLines.querySelectorAll('.phase-divider').forEach(el => el.remove());
+    const workflowTop = workflow.getBoundingClientRect().top;
+    const p1Bottom = phase1.getBoundingClientRect().bottom - workflowTop;
+    const p2Top = phase2.getBoundingClientRect().top - workflowTop;
+    const p2Bottom = phase2.getBoundingClientRect().bottom - workflowTop;
+    const p3Top = phase3.getBoundingClientRect().top - workflowTop;
+    const p3Bottom = phase3.getBoundingClientRect().bottom - workflowTop;
 
-    const trackRect = trackLines.getBoundingClientRect();
-    const trackTop = trackRect.top;
+    const totalHeight = p3Bottom;
 
-    // 计算两个 phase 之间的完整间隙（包括 arrow-down 间距）
-    const gaps = [
-        { start: phase1.getBoundingClientRect().bottom - trackTop, end: phase2.getBoundingClientRect().top - trackTop },
-        { start: phase2.getBoundingClientRect().bottom - trackTop, end: phase3.getBoundingClientRect().top - trackTop }
-    ];
+    // 完成线：三段可见，中间两段间隙透明
+    const completedMask = buildMaskGradient([
+        { start: 0, end: p1Bottom },
+        { start: p2Top, end: p2Bottom },
+        { start: p3Top, end: p3Bottom }
+    ], totalHeight);
 
-    gaps.forEach(gap => {
-        const height = gap.end - gap.start;
-        if (height > 0 && gap.start < trackRect.height && gap.end > 0) {
-            const divider = document.createElement('div');
-            divider.className = 'phase-divider';
-            divider.style.top = gap.start + 'px';
-            divider.style.height = height + 'px';
-            trackLines.appendChild(divider);
-        }
+    completedLines.forEach(line => {
+        const bar = line.querySelector('.drug-bar');
+        if (bar) bar.style.setProperty('--mask-gradient', completedMask);
     });
+
+    // 进行中线：到 phase3 顶部结束，前两段可见，第二段后透明
+    if (inProgressLine) {
+        const bar = inProgressLine.querySelector('.drug-bar');
+        if (bar) {
+            const inProgressMask = buildMaskGradient([
+                { start: 0, end: p1Bottom },
+                { start: p2Top, end: p2Bottom }
+            ], p3Top);
+            bar.style.setProperty('--mask-gradient', inProgressMask);
+        }
+    }
+}
+
+function buildMaskGradient(segments, totalHeight) {
+    if (totalHeight <= 0) return 'none';
+    const stops = [];
+    let pos = 0;
+    segments.forEach(seg => {
+        const s = Math.max(0, Math.min(100, seg.start / totalHeight * 100));
+        const e = Math.max(0, Math.min(100, seg.end / totalHeight * 100));
+        if (s > pos) {
+            stops.push(`transparent ${pos.toFixed(3)}%`, `transparent ${s.toFixed(3)}%`);
+        }
+        if (e > s) {
+            stops.push(`black ${s.toFixed(3)}%`, `black ${e.toFixed(3)}%`);
+        }
+        pos = e;
+    });
+    if (pos < 100) {
+        stops.push(`transparent ${pos.toFixed(3)}%`, `transparent 100%`);
+    }
+    return `linear-gradient(to bottom, ${stops.join(', ')})`;
 }
 
 function refreshDrugTrack() {
     updateDrugLinePositions();
-    updatePhaseDividers();
+    applySegmentedMasks();
 }
 
 window.addEventListener('load', refreshDrugTrack);
