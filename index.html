@@ -61,8 +61,9 @@
             </div>
         </div>
         
-        <div class="workflow">
-            <!-- Phase 1: Target Identification -->
+        <div class="workflow-wrapper">
+            <div class="workflow">
+                <!-- Phase 1: Target Identification -->
             <div class="phase phase-1">
                 <div class="phase-header">
                     <span class="phase-number">01</span>
@@ -553,9 +554,27 @@
                         </div>
                     </div>
                 </div>
+            </div><!-- .phase-3 -->
+        </div><!-- .workflow -->
+
+            <!-- 药物管线进度条 -->
+            <div class="drug-track">
+                <a href="sin001.html" class="drug-line completed" data-drug="SIN001" title="SIN001">
+                    <span class="drug-label">SIN001</span>
+                </a>
+                <a href="sin002.html" class="drug-line completed" data-drug="SIN002" title="SIN002">
+                    <span class="drug-label">SIN002</span>
+                </a>
+                <a href="sin003.html" class="drug-line completed" data-drug="SIN003" title="SIN003">
+                    <span class="drug-label">SIN003</span>
+                </a>
+                <a href="sin004.html" class="drug-line in-progress" data-drug="SIN004" title="SIN004">
+                    <span class="drug-label">SIN004</span>
+                    <span class="drug-arrow">▼</span>
+                </a>
             </div>
-        </div>
-        
+        </div><!-- .workflow-wrapper -->
+
         <div class="legend">
             <div class="legend-item">
                 <div class="legend-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>

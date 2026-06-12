@@ -652,6 +652,91 @@ h1 {
     display: none;
 }
 
+/* 药物管线进度条 */
+.workflow-wrapper {
+    display: flex;
+    gap: 24px;
+    align-items: stretch;
+}
+
+.workflow {
+    flex: 1;
+    min-width: 0;
+}
+
+.drug-track {
+    width: 140px;
+    min-width: 140px;
+    display: flex;
+    justify-content: space-around;
+    position: relative;
+    padding-top: 40px;
+}
+
+.drug-line {
+    position: relative;
+    width: 4px;
+    background: linear-gradient(to bottom, #43e97b 0%, #38f9d7 100%);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.drug-line.completed {
+    height: 100%;
+}
+
+.drug-line.in-progress {
+    height: 68%;
+}
+
+.drug-label {
+    position: absolute;
+    top: -34px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    color: #43e97b;
+    font-weight: 600;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.drug-arrow {
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #43e97b;
+    font-size: 0.9em;
+    line-height: 1;
+    animation: pulseArrow 1.5s infinite;
+}
+
+@keyframes pulseArrow {
+    0%, 100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    50% { opacity: 0.6; transform: translateX(-50%) translateY(3px); }
+}
+
+.drug-line:hover {
+    width: 7px;
+    background: linear-gradient(to bottom, #5af08e 0%, #5af9d7 100%);
+    box-shadow: 0 0 20px rgba(67, 233, 123, 0.6), 0 0 40px rgba(67, 233, 123, 0.25);
+}
+
+.drug-line:hover .drug-label {
+    font-weight: 800;
+    font-size: 1em;
+    color: #5af9d7;
+}
+
+.drug-line:hover .drug-arrow {
+    color: #5af9d7;
+}
+
 /* 底部入驻引导 */
 .site-footer {
     margin-top: 50px;
@@ -967,7 +1052,38 @@ h1 {
     .login-box {
         padding: 30px 24px;
     }
+    .apply-box {
+        padding: 28px 20px;
+    }
     .footer-actions {
         flex-direction: column;
+    }
+    .workflow-wrapper {
+        flex-direction: column;
+    }
+    .drug-track {
+        width: 100%;
+        min-width: auto;
+        height: 60px;
+        padding-top: 0;
+        flex-direction: row;
+        align-items: flex-start;
+        order: -1;
+        margin-bottom: 10px;
+    }
+    .drug-line {
+        width: auto;
+        height: 4px !important;
+        flex: 1;
+    }
+    .drug-label {
+        top: -26px;
+        font-size: 0.75em;
+    }
+    .drug-arrow {
+        display: none;
+    }
+    .drug-line:hover {
+        height: 6px !important;
     }
 }

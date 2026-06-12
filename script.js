@@ -122,6 +122,26 @@ if (isLoggedIn()) {
     if (userBar) userBar.style.display = 'none';
 }
 
+// ================= 药物管线进度条定位 =================
+function updateDrugLinePositions() {
+    const workflow = document.querySelector('.workflow');
+    const phase3 = document.querySelector('.phase-3');
+    const sin4 = document.querySelector('.drug-line.in-progress');
+
+    if (workflow && phase3 && sin4) {
+        const workflowRect = workflow.getBoundingClientRect();
+        const phase3Rect = phase3.getBoundingClientRect();
+        const height = phase3Rect.top - workflowRect.top;
+        const trackRect = sin4.parentElement.getBoundingClientRect();
+        const trackTop = trackRect.top;
+        const relativeTop = workflowRect.top - trackTop;
+        sin4.style.height = Math.max(0, height + relativeTop) + 'px';
+    }
+}
+
+window.addEventListener('load', updateDrugLinePositions);
+window.addEventListener('resize', updateDrugLinePositions);
+
 // 为所有带 data-tooltip 的元素添加悬停事件
 document.querySelectorAll('[data-tooltip]').forEach(el => {
     el.addEventListener('mouseenter', function(e) {
