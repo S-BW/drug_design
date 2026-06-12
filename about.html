@@ -31,19 +31,21 @@
 
     <div class="container">
         <header class="page-header">
-            <div class="header-titles">
-                <h1>🧬 智药寻踪——肿瘤靶向原创新药研发平台</h1>
-                <p class="subtitle">PharmaTrace - Tumor-Targeted Innovative Drug Design Platform</p>
-            </div>
             <nav class="main-nav">
                 <a href="index.html">首页</a>
                 <a href="about.html" class="active">关于我们</a>
             </nav>
-            <div class="user-bar" id="user-bar" style="display: none;">
-                <span class="user-name" id="user-name"></span>
-                <button class="logout-btn" id="logout-btn">退出</button>
+            <div class="header-titles">
+                <h1>🧬 智药寻踪——肿瘤靶向原创新药研发平台</h1>
+                <p class="subtitle">PharmaTrace - Tumor-Targeted Innovative Drug Design Platform</p>
             </div>
-            <button class="login-trigger" id="login-trigger">🔐 登录</button>
+            <div class="header-actions">
+                <div class="user-bar" id="user-bar" style="display: none;">
+                    <span class="user-name" id="user-name"></span>
+                    <button class="logout-btn" id="logout-btn">退出</button>
+                </div>
+                <button class="login-trigger" id="login-trigger">🔐 登录</button>
+            </div>
         </header>
 
         <!-- 全局提示框 -->
@@ -52,107 +54,426 @@
         <main class="about-content">
             <div class="about-hero">
                 <h2>关于我们</h2>
-                <p>思诺达药业致力于打造国际领先的 AI 驱动抗肿瘤药物研发平台，构建从靶点发现到临床前验证的端到端智能化闭环。</p>
+                <p>思诺达药业致力于打造国际领先的 AI 驱动抗肿瘤药物研发平台，汇聚全球顶尖科学家与产业专家，构建从靶点发现到临床前验证的端到端智能化闭环。</p>
             </div>
 
+            <!-- 01 核心团队 -->
             <section class="about-section">
-                <h3 class="section-title"><span class="section-number">01</span> 核心团队</h3>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-02.png" alt="核心团队封面：国际顶尖，多点协同">
-                    <figcaption>核心团队：国际顶尖，多点协同</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-03.png" alt="首席科学家 Peter E. Lobie 院士">
-                    <figcaption>首席科学家：Peter E. Lobie 院士</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-04.png" alt="核心团队介绍">
-                    <figcaption>核心团队：汇聚全球行业精英</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-05.png" alt="顾问团队介绍">
-                    <figcaption>顾问团队：跨学科协作网络</figcaption>
-                </figure>
+                <h3 class="section-title"><span class="section-number">01</span> 核心团队 · 国际顶尖，多点协同</h3>
+
+                <p class="lead">汇聚全球行业精英，构建跨学科协作网络。团队拥有国际顶尖学术背景、20+ 年创新药研发经验，以及从基础研究到产业化的完整闭环能力。</p>
+
+                <div class="grid-3">
+                    <div class="card metric">
+                        <div class="metric-value">中国政府友谊奖</div>
+                        <div class="metric-label">国家级荣誉</div>
+                    </div>
+                    <div class="card metric">
+                        <div class="metric-value">Tsinghua iBHE</div>
+                        <div class="metric-label">清华大学生物医药与健康工程研究院</div>
+                    </div>
+                    <div class="card metric">
+                        <div class="metric-value">Fellow of Royal Society</div>
+                        <div class="metric-label">皇家科学院院士认证</div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 24px;">
+                    <h4>🎓 首席科学家：Peter E. Lobie 院士</h4>
+                    <p style="margin-bottom: 12px;">
+                        <span class="tag">新西兰皇家科学院院士</span>
+                        <span class="tag">中国政府国家“友谊奖”</span>
+                        <span class="tag">清华大学长聘教授</span>
+                    </p>
+                    <div class="grid-2">
+                        <div>
+                            <strong style="color:#fff;">工作经历</strong>
+                            <ul>
+                                <li>2003–2010 新西兰奥克兰大学，教授、博导、副院长</li>
+                                <li>2010–2017 新加坡国立大学癌症科学研究所，教授、博导、首席科学家</li>
+                                <li>2017–至今 清华大学深圳国际研究生院，精准医学与公共健康中心主任、教授、博导、学术委员会副主任</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color:#fff;">学术成果</strong>
+                            <ul>
+                                <li>发表高水平 SCI 论文 >200 篇</li>
+                                <li>总引用 >15,000，h 因子 70</li>
+                                <li>担任 CNS 等 50+ 学术期刊审稿人</li>
+                                <li>Endocrinology、Mol. Endocrinology、Precision Medicine 等国际期刊资深编委</li>
+                                <li>连续多年被爱思唯尔评为“中国高被引用学者”</li>
+                            </ul>
+                            <strong style="color:#fff; display:block; margin-top:14px;">产业化经验</strong>
+                            <ul>
+                                <li>拥有 30+ 授权专利，7 项已转让</li>
+                                <li>受聘辉瑞、罗氏医药公司任研究顾问</li>
+                                <li>新加坡卫生部、科技部科学发展顾问</li>
+                                <li>Sinotar Therapeutics Ltd 创始人</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-auto" style="margin-top: 24px;">
+                    <div class="card">
+                        <h4>张熙 · CEO 兼研发总监</h4>
+                        <p>慕尼黑大学医学博士，深圳湾实验室助理研究员，清华大学博士后。深耕肿瘤靶向药物研发与科研管理。</p>
+                        <p><span class="tag">30+ 论文</span> <span class="tag">8+ 专利</span> <span class="tag">5+ 基金</span></p>
+                    </div>
+                    <div class="card">
+                        <h4>李婧 · 商务拓展负责人</h4>
+                        <p>法国格勒诺布尔大学博士，25+ 年生物医药行业经验，战略规划与商务拓展专家，精通行业洞察与客户关系管理。</p>
+                        <p><span class="tag">25+ 管理经验</span> <span class="tag">10+ 项目转化</span></p>
+                    </div>
+                    <div class="card">
+                        <h4>Steve Guo · 项目总监</h4>
+                        <p>山西农业大学硕士，超过 15 年 CRO 端项目管理经验，负责整体战略、业务开发及客户关系管理。</p>
+                        <p><span class="tag">15+ 行业经验</span> <span class="tag">10+ 项目管理</span></p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 24px;">
+                    <h4>团队整体实力</h4>
+                    <div class="grid-4">
+                        <div class="metric"><div class="metric-value">250+</div><div class="metric-label">高水平 SCI 论文</div></div>
+                        <div class="metric"><div class="metric-value">H75</div><div class="metric-label">首席科学家 h 指数</div></div>
+                        <div class="metric"><div class="metric-value">30+</div><div class="metric-label">国内外授权专利</div></div>
+                        <div class="metric"><div class="metric-value">¥5000万+</div><div class="metric-label">近 5 年政府科研资助</div></div>
+                    </div>
+                    <p style="margin-top:12px;"><span class="tag">3+ 条 1.1 类小分子创新药（PCC）管线</span></p>
+                </div>
             </section>
 
+            <!-- 顾问团队 -->
             <section class="about-section">
-                <h3 class="section-title"><span class="section-number">02</span> 市场分析</h3>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-06.png" alt="市场分析：痛点明确，规模千亿">
-                    <figcaption>市场分析：痛点明确，规模千亿</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-07.png" alt="中国癌症发病与死亡数据">
-                    <figcaption>中国癌症现状与慢病化管理</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-08.png" alt="全球小分子抗肿瘤靶向药市场规模">
-                    <figcaption>全球小分子抗肿瘤靶向药市场规模</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-09.png" alt="行业核心数据汇总表">
-                    <figcaption>行业核心数据与重磅交易</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-10.png" alt="市场痛点与目标适应症">
-                    <figcaption>市场痛点、目标适应症与未来方向</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-11.png" alt="药物研发瓶颈">
-                    <figcaption>药物研发四大瓶颈</figcaption>
-                </figure>
+                <h3 class="section-title"><span class="section-number">+</span> 顾问团队</h3>
+                <p class="lead">汇聚药物化学、生物光子学、医学工程等领域的资深专家，为平台提供战略指导与技术支撑。</p>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>高丹 · 高级顾问</h4>
+                        <p>北京化工大学博士，清华大学深圳国际研究生院副研究员，深圳市海外高层次人才，深圳市分析测试协会生化专委委员。</p>
+                        <p><span class="tag">60+ 论文</span> <span class="tag">5+ 专利</span> <span class="tag">6+ 基金</span></p>
+                    </div>
+                    <div class="card">
+                        <h4>秦培武 · 高级顾问</h4>
+                        <p>美国密苏里大学哥伦比亚分校生物化学博士，广东省中医药实验室研究员，清华大学深圳国际研究生院副研究员，中国生物光子学会委员。</p>
+                        <p><span class="tag">100+ 论文</span> <span class="tag">10+ 专利</span> <span class="tag">20+ 基金</span></p>
+                    </div>
+                    <div class="card">
+                        <h4>Basappa · 高级顾问</h4>
+                        <p>印度迈索尔大学化学博士，有机化学研究所所长、副教授，长期从事化学合成研究工作，拥有丰富制药工业经验。</p>
+                        <p><span class="tag">100+ 论文</span> <span class="tag">10+ 专利</span> <span class="tag">20+ 基金</span></p>
+                    </div>
+                    <div class="card">
+                        <h4>马少华 · 高级顾问</h4>
+                        <p>剑桥大学医学工程博士，清华大学长聘副教授，清华大学生物医药与健康工程研究院副院长。</p>
+                        <p><span class="tag">50+ 论文</span> <span class="tag">10+ 专利</span> <span class="tag">20+ 基金</span></p>
+                    </div>
+                </div>
             </section>
 
+            <!-- 02 市场分析 -->
             <section class="about-section">
-                <h3 class="section-title"><span class="section-number">03</span> 技术平台</h3>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-12.png" alt="技术平台：AI 驱动，高效创新">
-                    <figcaption>技术平台：AI 驱动，高效创新</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-13.png" alt="AI 驱动的多组学靶点识别与个性化治疗决策平台">
-                    <figcaption>AI 驱动的多组学靶点识别与个性化治疗决策平台</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-14.png" alt="平台核心模块及技术指标">
-                    <figcaption>平台核心模块及技术指标</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-15.png" alt="OncoTarget 靶点智能体">
-                    <figcaption>OncoTarget · 靶点智能体</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-16.png" alt="ChemAI-Gen 分子生成引擎">
-                    <figcaption>ChemAI-Gen · 分子生成引擎</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-17.png" alt="VS-MegaScreen 亿级虚拟筛选平台">
-                    <figcaption>VS-MegaScreen · 亿级虚拟筛选平台</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-18.png" alt="VS-MegaScreen 平台优势">
-                    <figcaption>VS-MegaScreen · 平台优势</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-19.png" alt="PDO-Array 高通量评价体系">
-                    <figcaption>PDO-Array · 高通量评价体系</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-20.png" alt="Toxi-Organoid 多器官芯片">
-                    <figcaption>Toxi-Organoid · 多器官芯片</figcaption>
-                </figure>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-21.png" alt="湿实验平台与研发管线">
-                    <figcaption>完善的湿实验平台与 AI + 湿实验研发管线</figcaption>
-                </figure>
+                <h3 class="section-title"><span class="section-number">02</span> 市场分析 · 痛点明确，规模千亿</h3>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h4>🌏 中国癌症现状与慢病化管理</h4>
+                    <p>近年来，中国新发病例和死亡人数均为全球第一，已成为名副其实的“癌症大国”。世界卫生组织（WHO）、中国国家卫生健康委员会等权威机构均已将癌症纳入慢性疾病管理体系，期望癌症患者可通过长期口服药物、阶段性维持治疗，将肿瘤控制在“休眠”状态，实现数年甚至十几年的无进展生存。</p>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h4>📈 全球小分子抗肿瘤靶向药市场规模</h4>
+                    <p>全球小分子抗肿瘤靶向药市场展现出强劲的增长韧性，在多方因素共同驱动下，市场规模持续稳步扩大。</p>
+                    <div class="grid-3">
+                        <div class="metric">
+                            <div class="metric-value">634.5 亿 USD</div>
+                            <div class="metric-label">2024 年市场规模（区间 600–634.5 亿）</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">687.6 亿 USD</div>
+                            <div class="metric-label">2025 年市场规模（区间 658–687.6 亿）</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">9.3%</div>
+                            <div class="metric-label">年均复合增长率 CAGR（9%–9.3%）</div>
+                        </div>
+                    </div>
+                    <strong style="color:#fff; display:block; margin-top:18px;">核心驱动力</strong>
+                    <div class="grid-2" style="margin-top:10px;">
+                        <div><span class="tag">新靶点药物商业化</span> KRAS、BTK、BCL-2 等新型靶向药物陆续获批上市并放量。</div>
+                        <div><span class="tag">适应症不断拓展</span> 现有药物通过临床试验不断拓展新适应症，覆盖更多患者群体。</div>
+                        <div><span class="tag">精准医疗普及</span> 基因检测技术进步，提升药物可及性和有效性，实现“对症下药”。</div>
+                        <div><span class="tag">支付能力提升</span> 各国政府和商业保险对创新药支付意愿增强，降低患者用药门槛。</div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h4>🤝 行业核心数据与重磅交易</h4>
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>交易/合作</th><th>靶点/技术</th><th>金额</th><th>时间</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>亚盛医药 → 武田</td><td>BCR-ABL 热门靶点</td><td>13 亿美元</td><td>2024 年</td></tr>
+                                <tr><td>加科思 → 阿斯利康</td><td>Pan-KRAS 前沿技术</td><td>20.15 亿美元</td><td>2025 年</td></tr>
+                                <tr><td>拜耳 → Kumquat</td><td>KRAS G12D 精准治疗</td><td>13 亿美元</td><td>2025 年</td></tr>
+                                <tr><td>默克收购 Springworks</td><td>γ-secretase/MEK 双重机制</td><td>39 亿美元</td><td>2025 年</td></tr>
+                                <tr><td>锐格医药 → 罗氏</td><td>CDK 抑制剂 细胞周期调控</td><td>8.5 亿美元（首付）</td><td>2024 年</td></tr>
+                                <tr><td>来凯医药 → 齐鲁制药</td><td>AKT 靶点 信号通路</td><td>20.45 亿元人民币</td><td>2025 年</td></tr>
+                                <tr><td>海正药业 → 艾欣达伟</td><td>SMDC (AKR1C3) 双靶点技术平台</td><td>2.4 亿元首付款 + 里程碑</td><td>2025 年 | 本土药企合作典范</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid-2" style="margin-bottom: 24px;">
+                    <div class="card">
+                        <h4>🎯 市场定位与目标</h4>
+                        <ul>
+                            <li><strong style="color:#fff;">¥1000 亿</strong> — 中国小分子抗肿瘤药物市场（2026）</li>
+                            <li><strong style="color:#fff;">16%</strong> — 耐药肿瘤年复合增长率</li>
+                            <li>目标市场份额：耐药肿瘤适应症中占 10–15%</li>
+                            <li>销售峰值预测：每年 30–50 亿元人民币</li>
+                            <li>目标客户：公立医院及私立医疗机构</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>⚠️ 三大核心痛点</h4>
+                        <ul>
+                            <li><strong style="color:#fff;">晚期癌症患者治疗选择有限</strong>：原研药物稀缺，一线治疗后存在显著未满足需求。</li>
+                            <li><strong style="color:#fff;">肿瘤耐药性</strong>：由耐药性引发的癌症死亡占比超 90%。</li>
+                            <li><strong style="color:#fff;">多数癌症无特异性驱动靶点</strong>：大量癌症处于“有肿瘤、无靶点”的无药可治状态。</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h4>🎯 目标适应症</h4>
+                    <p>缺乏有效靶向治疗的耐药、转移晚期实体肿瘤患者，主要包括：</p>
+                    <div class="grid-2" style="margin-top:10px;">
+                        <div>
+                            <strong style="color:#fff;">靶点缺失型</strong>
+                            <ul>
+                                <li>三阴性乳腺癌：无有效靶向</li>
+                                <li>胃癌：无有效靶向</li>
+                                <li>肺鳞癌：驱动靶点缺失</li>
+                                <li>头颈部鳞癌：核心靶点缺失</li>
+                                <li>胶质母细胞瘤：靶点复杂无效</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color:#fff;">晚期 / 耐药型</strong>
+                            <ul>
+                                <li>卵巢癌：晚期化疗耐药</li>
+                                <li>胰腺癌：晚期 KRAS 突变</li>
+                                <li>肺腺癌：晚期 TKI 耐药</li>
+                                <li>结直肠癌（RAS）：RAS 突变靶向无效</li>
+                                <li>宫颈癌：晚期复发靶向有限</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>🔮 医药研发未来方向</h4>
+                        <ul>
+                            <li><strong style="color:#fff;">找靶点</strong>：通过多组学分析，挖掘更多有效靶点</li>
+                            <li><strong style="color:#fff;">造药物</strong>：研发泛靶点抑制剂、PROTAC 等，克服耐药 / 异质性</li>
+                            <li><strong style="color:#fff;">定方案</strong>：结合免疫 / 化疗 / 靶向，从“单一打击”升级为“多维度精准调控”</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>🧬 技术驱动</h4>
+                        <ul>
+                            <li>AI 赋能多组学融合的靶点挖掘平台</li>
+                            <li>生成式 AI 的药物设计与评价平台</li>
+                            <li>基于器官芯片体系的临床前药效评估平台</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 24px;">
+                    <h4>🚧 药物研发瓶颈</h4>
+                    <div class="grid-4">
+                        <div class="metric"><div class="metric-value" style="font-size:1.4em;">靶点发现困难</div></div>
+                        <div class="metric"><div class="metric-value" style="font-size:1.4em;">化合物筛选效率低下</div></div>
+                        <div class="metric"><div class="metric-value" style="font-size:1.4em;">临床前模型预测性差</div></div>
+                        <div class="metric"><div class="metric-value" style="font-size:1.4em;">“一刀切”治疗模式</div></div>
+                    </div>
+                </div>
             </section>
 
+            <!-- 03 技术平台 -->
+            <section class="about-section">
+                <h3 class="section-title"><span class="section-number">03</span> 技术平台 · AI 驱动，高效创新</h3>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h4>🧠 “智药寻踪”平台：AI 重塑研发新范式</h4>
+                    <p>现有 AI 工具如 Drugnome AI、PandaOmics、Drug CLIP、Glide、AlphaFold-Multimer 以及 ChemGPT 等多为单一功能工具，无法覆盖药物研发全流程。我们集成并开发了统一的多组学数据分析管道、AI 增强的计算机辅助药物设计与虚拟筛选平台，以及 AI 赋能的临床前评价与试验优化平台。</p>
+                    <div class="grid-3" style="margin-top:16px;">
+                        <div>
+                            <strong style="color:#fff;">多组学靶点识别</strong>
+                            <ul>
+                                <li>癌症特异性靶点发现</li>
+                                <li>生物标志物与耐药性预测</li>
+                                <li>个性化治疗方案推荐</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color:#fff;">AI 药物设计</strong>
+                            <ul>
+                                <li>大规模虚拟筛选</li>
+                                <li>AI 分子生成与优化</li>
+                                <li>多靶点药物理性设计</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color:#fff;">临床前评价</strong>
+                            <ul>
+                                <li>基于肿瘤类器官的药效评价</li>
+                                <li>基于器官芯片的 ADMET 评价</li>
+                                <li>自动化类器官培养与检测体系</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p style="margin-top:16px;"><span class="tag">平台优势</span> 可覆盖药物研发全流程，也可根据实际研发阶段按需组合，实现“效率 + 精度”双保障；耗时 <strong style="color:#fff;">7–10 天</strong>，核心成本 <strong style="color:#fff;">2000–3500 元</strong> 即可筛选出苗头分子候选清单（可直接用于体外实验）。</p>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h4>📊 平台核心模块及技术指标</h4>
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>模块</th><th>核心技术</th><th>性能指标</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>靶点智能体</td><td>OncoTarget</td><td>靶点预测准确率 ≥82%</td></tr>
+                                <tr><td>分子生成器</td><td>ChemAI</td><td>月生成 500+ 候选分子</td></tr>
+                                <tr><td>虚拟筛选</td><td>VS-Screen</td><td>处理海量分子库</td></tr>
+                                <tr><td>类器官药效评价平台</td><td>PDO-Array</td><td>年测试 200 例 PDO</td></tr>
+                                <tr><td>类器官安全评价平台</td><td>Toxi-Organoid</td><td>毒性预测准确率 ≥90%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid-2" style="margin-bottom: 24px;">
+                    <div class="card">
+                        <h4>🎯 OncoTarget · 靶点智能体</h4>
+                        <p>构建基于 Transformer 架构的多组学基础模型，实现对基因组、转录组、蛋白组、表观基因组等核心数据类型的统一表征与融合分析。</p>
+                    </div>
+                    <div class="card">
+                        <h4>⚗️ ChemAI-Gen · 分子生成引擎</h4>
+                        <p>整合蛋白结构预测（同源建模 / AI 预测）、结合位点识别、激酶与 GPCR 的 Type I / Type II 抑制剂设计，支持从靶点到可药性分子的一体化生成。</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h4>🔍 VS-MegaScreen · 亿级虚拟筛选平台</h4>
+                    <p>从 PDB 或序列出发，结合同源建模、分子对接、基于配体的 AI 建模、骨架与子结构搜索，从百万至数十亿量级的商用库中快速聚焦候选化合物。</p>
+
+                    <div class="grid-2" style="margin-top:16px;">
+                        <div>
+                            <strong style="color:#fff;">平台优势</strong>
+                            <ul>
+                                <li>海量化合物的智能筛选（百万至数十亿量级）</li>
+                                <li>高效筛选，高成功率</li>
+                                <li>明确研发起点，指导苗头化合物识别与先导优化</li>
+                                <li>降本增效，加速新药发现</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color:#fff;">扩展能力</strong>
+                            <ul>
+                                <li>分子动力学模拟（Molecular Dynamics Simulation, MD）</li>
+                                <li>Phase I / Phase II 代谢预测</li>
+                                <li>预测药物代谢反应（Metabolic prediction）</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="data-table-wrapper" style="margin-top:16px;">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>方法</th><th>化学空间</th><th>耗时</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Docking</td><td>Millions</td><td>Days</td></tr>
+                                <tr><td>Pharmacophore</td><td>Millions</td><td>Days</td></tr>
+                                <tr><td>Shape</td><td>Millions</td><td>Hours</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="data-table-wrapper" style="margin-top:16px;">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Target</th><th>测试化合物数</th><th>Hits (I% > 50% @ 100μM)</th><th>Hit rate</th><th>最优化合物 IC50</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>A</td><td>286</td><td>25</td><td>8.7%</td><td>1.35 μM</td></tr>
+                                <tr><td>B</td><td>216</td><td>26</td><td>12.04%</td><td>9.64 μM</td></tr>
+                                <tr><td>C</td><td>270</td><td>14</td><td>6.60%</td><td>1.32 μM</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid-2" style="margin-bottom: 24px;">
+                    <div class="card">
+                        <h4>🧫 PDO-Array · 高通量评价体系</h4>
+                        <p>建立患者来源类器官（PDO）生物样本库，构建能真实反映肿瘤异质性的“试药替身”。</p>
+                        <ul>
+                            <li><strong style="color:#fff;">高覆盖样本库</strong>：年新增 200+ 例患者类器官，覆盖肺癌、乳腺癌、胰腺癌、肝癌等 5 类高致死率肿瘤</li>
+                            <li><strong style="color:#fff;">自动化测试</strong>：机械臂与自动化显微镜每周完成 1000+ 药物条件测试</li>
+                            <li><strong style="color:#fff;">临床响应预测</strong>：PDO2Clinic 模型预测临床响应准确率达 83%（AUC 0.88）</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>❤️ Toxi-Organoid · 多器官芯片</h4>
+                        <p>在微流控芯片上共培养肝脏、心脏、肠道类器官，模拟药物全身暴露，实现早期、精准的毒性预测。</p>
+                        <ul>
+                            <li><strong style="color:#fff;">多器官联动检测</strong>：同步检测 ALT（肝）、QT 间期（心）、肠屏障完整性（肠）等关键指标</li>
+                            <li><strong style="color:#fff;">超高灵敏度</strong>：可检测到占比 0.1% 的损伤细胞亚群</li>
+                            <li><strong style="color:#fff;">高临床相关性</strong>：28 天重复给药试验中，预计预测 90% 的临床相关毒性</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>🧪 完善的湿实验平台与 AI + 湿实验研发管线</h4>
+                    <p>我们拥有设备完善的湿实验平台，涵盖 In vitro、Ex-vivo、In-vivo 多层次评价体系，支持靶点验证、功能鉴定、机制验证、药效评价、PK/PD/毒理学分析、精准医学与生物标志物发现。</p>
+                    <p style="margin-top:12px;">在实际应用中，平台将分子对接、ADMET 预测、细胞实验、动物模型等技术协同使用，构建 <strong style="color:#fff;">“AI 筛选 + 湿实验验证”</strong> 的高效药物研发管线。</p>
+                </div>
+            </section>
+
+            <!-- 04 三位一体创新范式 -->
             <section class="about-section">
                 <h3 class="section-title"><span class="section-number">04</span> 三位一体创新范式</h3>
-                <figure class="slide-figure">
-                    <img src="images/about/slide-22.png" alt="三位一体创新范式">
-                    <figcaption>三位一体创新范式：更快、更省、更成功</figcaption>
-                </figure>
+
+                <div class="grid-3" style="margin-bottom: 24px;">
+                    <div class="card metric">
+                        <div class="metric-value">1–2 年</div>
+                        <div class="metric-label">完成临床前研究（传统需 3–6 年）</div>
+                    </div>
+                    <div class="card metric">
+                        <div class="metric-value">>50%</div>
+                        <div class="metric-label">降低研发成本（目标 50%–70%）</div>
+                    </div>
+                    <div class="card metric">
+                        <div class="metric-value">>50%</div>
+                        <div class="metric-label">提升临床成功率（传统 <5%）</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>🚀 愿景与使命</h4>
+                    <p>本平台将填补国内空白，为开发针对 <strong style="color:#fff;">高死亡率实体瘤</strong> 及 <strong style="color:#fff;">“无药可医”罕见肿瘤</strong> 的突破性疗法提供核心引擎。</p>
+                    <p style="margin-top:10px;">构建国际领先的 AI 驱动抗肿瘤药物研发平台，实现从靶点发现到临床前验证的端到端智能化闭环。</p>
+                </div>
             </section>
         </main>
 
