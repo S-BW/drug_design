@@ -795,19 +795,20 @@ h1 {
 
 .drug-arrow {
     position: absolute;
-    bottom: -20px;
+    bottom: -30px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 3;
     color: #43e97b;
-    font-size: 0.9em;
+    font-size: 1.6em;
     line-height: 1;
     animation: pulseArrow 1.5s infinite;
+    text-shadow: 0 0 8px rgba(67, 233, 123, 0.9), 0 0 18px rgba(67, 233, 123, 0.6), 0 0 28px rgba(67, 233, 123, 0.3);
 }
 
 @keyframes pulseArrow {
-    0%, 100% { opacity: 1; transform: translateX(-50%) translateY(0); }
-    50% { opacity: 0.6; transform: translateX(-50%) translateY(3px); }
+    0%, 100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    50% { opacity: 0.75; transform: translateX(-50%) translateY(6px) scale(1.15); }
 }
 
 .drug-line:hover .drug-bar {

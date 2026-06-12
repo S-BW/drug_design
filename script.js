@@ -172,8 +172,9 @@ function updateDrugLinePositions() {
 
     if (trackLines && phase3 && sin4) {
         const trackTop = trackLines.getBoundingClientRect().top;
-        const phase3Top = phase3.getBoundingClientRect().top;
-        sin4.style.height = Math.max(0, phase3Top - trackTop) + 'px';
+        const phase3Rect = phase3.getBoundingClientRect();
+        const phase3Mid = phase3Rect.top + (phase3Rect.bottom - phase3Rect.top) / 2;
+        sin4.style.height = Math.max(0, phase3Mid - trackTop) + 'px';
     }
 }
 
@@ -211,14 +212,16 @@ function applySegmentedMasks() {
         if (bar) bar.style.setProperty('--mask-gradient', completedMask);
     });
 
-    // 进行中线：phase1 与 phase2 之间切开，phase2 到 phase3 顶部连续延伸
+    // 进行中线：01/02、02/03 之间都切开，并延伸到 03 的一半
     if (inProgressLine) {
         const bar = inProgressLine.querySelector('.drug-bar');
         if (bar) {
+            const halfP3 = p3Top + (p3Bottom - p3Top) / 2;
             const inProgressMask = buildMaskGradient([
                 { start: 0, end: p1Bottom },
-                { start: p2Top, end: p3Top }
-            ], p3Top);
+                { start: p2Top, end: p2Bottom },
+                { start: p3Top, end: halfP3 }
+            ], halfP3);
             bar.style.setProperty('--mask-gradient', inProgressMask);
         }
     }
