@@ -502,10 +502,11 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="vs-table-triangle"></div>
                                 </div>
                             </div>
 
-                            <div class="vs-table-triangle"></div>
                             <div class="data-table-wrapper vs-activity-table" style="margin-top: 0;">
                                 <div class="vs-table-title">Activity verification of compounds obtained by virtual screening：</div>
                                 <table class="data-table vs-table-center">
@@ -911,6 +912,50 @@
                 photoImg.src = hoverSrc;
             });
         });
+    })();
+    </script>
+
+    <script>
+    (function () {
+        function updateVsTriangles() {
+            document.querySelectorAll('.vs-flow').forEach(function (flow) {
+                const dot = flow.querySelector('.vs-line-dot-dark');
+                const triangle = flow.querySelector('.vs-table-triangle');
+                if (!dot || !triangle) return;
+
+                const flowRect = flow.getBoundingClientRect();
+                const dotRect = dot.getBoundingClientRect();
+                if (!dotRect.width || !dotRect.height) return;
+
+                const flowStyle = window.getComputedStyle(flow);
+                const paddingLeft = parseFloat(flowStyle.paddingLeft) || 0;
+                const paddingRight = parseFloat(flowStyle.paddingRight) || 0;
+                const borderLeft = parseFloat(flowStyle.borderLeftWidth) || 0;
+                const borderRight = parseFloat(flowStyle.borderRightWidth) || 0;
+
+                const contentLeft = flowRect.left + paddingLeft + borderLeft;
+                const contentWidth = flowRect.width - paddingLeft - paddingRight - borderLeft - borderRight;
+                const dotCenter = dotRect.left + dotRect.width / 2;
+                const dotPct = contentWidth > 0 ? ((dotCenter - contentLeft) / contentWidth) * 100 : 96;
+
+                // Keep a right-anchored triangle; base left edge follows the apex so the shape stays proportional
+                const baseLeft = Math.max(0, dotPct - 25);
+                triangle.style.clipPath = `polygon(${dotPct.toFixed(2)}% 0%, ${baseLeft.toFixed(2)}% 100%, 100% 100%)`;
+            });
+        }
+
+        let resizeTimer;
+        function onResize() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(updateVsTriangles, 80);
+        }
+
+        window.addEventListener('load', updateVsTriangles);
+        window.addEventListener('resize', onResize);
+        // Initial call in case DOM is already ready
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            updateVsTriangles();
+        }
     })();
     </script>
 
