@@ -526,7 +526,7 @@
                     <!-- 第二行：方法对比表 + 分子动力学模拟 -->
                     <div class="grid-2 vs-layout-row">
                         <div class="data-table-wrapper">
-                            <table class="data-table">
+                            <table class="data-table vs-methods-table">
                                 <thead>
                                     <tr><th>方法</th><th>Chemical Space</th><th>Time Consuming</th></tr>
                                 </thead>
@@ -556,8 +556,39 @@
                         </div>
                     </div>
 
+                    <script>
+                        (function () {
+                            function updateMdBlock() {
+                                const block = document.querySelector('.vs-md-block');
+                                const wrapper = document.querySelector('.vs-layout-row .data-table-wrapper');
+                                if (block && wrapper) {
+                                    wrapper.style.height = block.getBoundingClientRect().height + 'px';
+                                }
+                                const img = block?.querySelector('.vs-md-img');
+                                const list = block?.querySelector('.vs-md-list');
+                                if (img && list) {
+                                    img.style.height = list.getBoundingClientRect().height + 'px';
+                                }
+                                const heading = block?.querySelector('.vs-subheading');
+                                if (heading && block) {
+                                    const headingRect = heading.getBoundingClientRect();
+                                    const headingStyle = window.getComputedStyle(heading);
+                                    const marginBottom = parseFloat(headingStyle.marginBottom) || 0;
+                                    const blockStyle = window.getComputedStyle(block);
+                                    const paddingTop = parseFloat(blockStyle.paddingTop) || 0;
+                                    block.style.marginTop = -(headingRect.height + marginBottom + paddingTop) + 'px';
+                                }
+                            }
+                            window.addEventListener('load', updateMdBlock);
+                            window.addEventListener('resize', updateMdBlock);
+                            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                                updateMdBlock();
+                            }
+                        })();
+                    </script>
+
                     <!-- 第三行：平台优势 + 代谢预测 -->
-                    <div class="grid-2 vs-layout-row">
+                    <div class="grid-2 vs-layout-row vs-bottom-align-row">
                         <div class="vs-advantages">
                             <h5 class="vs-subheading">平台优势</h5>
                             <ul class="vs-list">
@@ -568,18 +599,12 @@
                             </ul>
                         </div>
 
-                        <div class="vs-metabolism">
-                            <div class="vs-metabolism-item">
-                                <div class="vs-metabolism-title">预测药物代谢反应（Metabolic prediction）</div>
-                                <img src="images/about/metabolic-prediction.png" alt="Metabolic prediction" class="vs-metabolism-img">
-                            </div>
-                            <div class="vs-metabolism-item">
-                                <div class="vs-metabolism-title">Phase I Metabolism</div>
-                                <img src="images/about/phase1-metabolism.png" alt="Phase I metabolism" class="vs-metabolism-img">
-                            </div>
-                            <div class="vs-metabolism-item">
-                                <div class="vs-metabolism-title">Phase II Metabolism</div>
-                                <img src="images/about/phase2-metabolism.png" alt="Phase II metabolism" class="vs-metabolism-img">
+                        <div class="vs-metabolic-block">
+                            <div class="vs-md-metabolic-title">预测药物代谢反应（Metabolic prediction）</div>
+                            <img src="images/about/metabolic-prediction.png" alt="Metabolic prediction" class="vs-md-metabolic-img">
+                            <div class="vs-md-extra-imgs">
+                                <img src="images/about/phase1-metabolism.png" alt="Phase I metabolism" class="vs-md-extra-img">
+                                <img src="images/about/phase2-metabolism.png" alt="Phase II metabolism" class="vs-md-extra-img">
                             </div>
                         </div>
                     </div>
