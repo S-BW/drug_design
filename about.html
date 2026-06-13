@@ -71,23 +71,24 @@
                     <h3 class="profile-name">🎓 首席科学家：Peter E. Lobie 院士</h3>
 
                     <div class="profile-grid">
-                        <div class="img-card profile-photo">
-                            <img src="images/about/peter-lobie.png" alt="Peter E. Lobie 院士" class="team-lead-img">
-                            <figcaption class="img-caption">Peter E. Lobie 院士</figcaption>
-                        </div>
-
+                        
                         <div class="profile-highlights">
                             <div class="highlight-cards">
-                                <div class="card metric">
+                                <div class="card metric" data-hover-img="images/about/yuanshi.png">
                                     <div class="metric-value"><img src="images/about/1.png" alt="" class="tag-icon">新西兰皇家科学院院士</div>
                                 </div>
-                                <div class="card metric">
+                                <div class="card metric" data-hover-img="images/about/youyijiang.png">
                                     <div class="metric-value"><img src="images/about/2.png" alt="" class="tag-icon">中国政府国家“友谊奖”</div>
                                 </div>
-                                <div class="card metric">
+                                <div class="card metric" data-hover-img="images/about/peter-lobie.png">
                                     <div class="metric-value"><img src="images/about/3.png" alt="" class="tag-icon">清华大学长聘教授</div>
                                 </div>
                             </div>
+                        </div>
+                        
+                        <div class="img-card profile-photo">
+                            <img src="images/about/peter-lobie.png" alt="Peter E. Lobie 院士" class="team-lead-img">
+                            <figcaption class="img-caption">Peter E. Lobie 院士</figcaption>
                         </div>
 
                         <div class="profile-bio">
@@ -373,37 +374,42 @@
                     <h4>🧠 “智药寻踪”平台：AI 重塑研发新范式</h4>
                     <p>现有 AI 工具如 Drugnome AI、PandaOmics、Drug CLIP、Glide、AlphaFold-Multimer 以及 ChemGPT 等多为单一功能工具，无法覆盖药物研发全流程。我们集成并开发了统一的多组学数据分析管道、AI 增强的计算机辅助药物设计与虚拟筛选平台，以及 AI 赋能的临床前评价与试验优化平台。</p>
 
-                    <figure class="about-figure" style="max-width:900px; margin:20px auto;">
-                        <img src="images/about/cadd-capabilities.png" alt="CADD 平台能力环" class="about-img">
-                        <figcaption class="img-caption">CADD 平台核心能力：结构预测、对接、虚拟筛选、ADMET、分子动力学等</figcaption>
-                    </figure>
+                    <div class="platform-layout">
+                        <figure class="about-figure platform-figure">
+                            <img src="images/about/cadd-capabilities.png" alt="CADD 平台能力环" class="about-img platform-img">
+                            <figcaption class="img-caption">CADD 平台核心能力：结构预测、对接、虚拟筛选、ADMET、分子动力学等</figcaption>
+                        </figure>
 
-                    <div class="grid-3" style="margin-top:16px;">
-                        <div>
-                            <strong style="color:#fff;">多组学靶点识别</strong>
-                            <ul>
-                                <li>癌症特异性靶点发现</li>
-                                <li>生物标志物与耐药性预测</li>
-                                <li>个性化治疗方案推荐</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <strong style="color:#fff;">AI 药物设计</strong>
-                            <ul>
-                                <li>大规模虚拟筛选</li>
-                                <li>AI 分子生成与优化</li>
-                                <li>多靶点药物理性设计</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <strong style="color:#fff;">临床前评价</strong>
-                            <ul>
-                                <li>基于肿瘤类器官的药效评价</li>
-                                <li>基于器官芯片的 ADMET 评价</li>
-                                <li>自动化类器官培养与检测体系</li>
-                            </ul>
+                        <div class="platform-steps">
+                            <div class="card platform-step">
+                                <h5>🧬 多组学靶点识别</h5>
+                                <ul>
+                                    <li>癌症特异性靶点发现</li>
+                                    <li>生物标志物与耐药性预测</li>
+                                    <li>个性化治疗方案推荐</li>
+                                </ul>
+                            </div>
+                            <div class="platform-arrow">↓</div>
+                            <div class="card platform-step">
+                                <h5>🤖 AI 药物设计</h5>
+                                <ul>
+                                    <li>大规模虚拟筛选</li>
+                                    <li>AI 分子生成与优化</li>
+                                    <li>多靶点药物理性设计</li>
+                                </ul>
+                            </div>
+                            <div class="platform-arrow">↓</div>
+                            <div class="card platform-step">
+                                <h5>🧪 临床前评价</h5>
+                                <ul>
+                                    <li>基于肿瘤类器官的药效评价</li>
+                                    <li>基于器官芯片的 ADMET 评价</li>
+                                    <li>自动化类器官培养与检测体系</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
+
                     <p style="margin-top:16px;"><span class="tag">平台优势</span> 可覆盖药物研发全流程，也可根据实际研发阶段按需组合，实现“效率 + 精度”双保障；耗时 <strong style="color:#fff;">7–10 天</strong>，核心成本 <strong style="color:#fff;">2000–3500 元</strong> 即可筛选出苗头分子候选清单（可直接用于体外实验）。</p>
                 </div>
 
@@ -444,65 +450,136 @@
                     </div>
                 </div>
 
-                <div class="card" style="margin-bottom: 24px;">
+                <div class="card vs-card" style="margin-bottom: 24px;">
                     <h4>🔍 VS-MegaScreen · 亿级虚拟筛选平台</h4>
                     <p>从 PDB 或序列出发，结合同源建模、分子对接、基于配体的 AI 建模、骨架与子结构搜索，从百万至数十亿量级的商用库中快速聚焦候选化合物。</p>
 
-                    <div class="grid-2" style="margin-top:16px;">
-                        <figure class="about-figure">
-                            <img src="images/about/vs-funnel.png" alt="虚拟筛选漏斗" class="about-img">
-                            <figcaption class="img-caption">从 Structure/Ligand 到 Hit Candidates 的筛选漏斗</figcaption>
+                    <!-- 第一行：漏斗图 + 工作流 + 活性验证表 -->
+                    <div class="grid-2 vs-layout-row vs-layout-row-top">
+                        <figure class="about-figure vs-funnel-figure">
+                            <img src="images/about/vs-funnel.png" alt="虚拟筛选漏斗" class="about-img vs-funnel-img">
+                            <figcaption class="img-caption">从 Structure / Ligand 到 Hit Candidates</figcaption>
                         </figure>
-                        <figure class="about-figure">
-                            <img src="images/about/md-simulation.jpg" alt="分子动力学模拟" class="about-img">
-                            <figcaption class="img-caption">分子动力学模拟辅助优化候选分子</figcaption>
-                        </figure>
+
+                        <div class="vs-col">
+                            <div class="vs-flow" style="margin-top: 0;">
+                                <div class="vs-flow-header">Virtual Screening Workflow</div>
+                                <div class="vs-flow-main">
+                                    <div class="vs-flow-track vs-flow-track-4">
+                                        <div class="vs-flow-stage">
+                                            <div class="vs-flow-line">PDB or Sequence</div>
+                                            <div class="vs-flow-line">+</div>
+                                            <div class="vs-flow-line">Available inhibitors</div>
+                                        </div>
+                                        <span class="vs-flow-arrow">→</span>
+                                        <div class="vs-flow-stage vs-flow-stage-bulleted">
+                                            <div class="vs-flow-line">Homology modeling</div>
+                                            <div class="vs-flow-line">Molecular docking</div>
+                                            <div class="vs-flow-line">Ligand-based AI modeling</div>
+                                            <div class="vs-flow-line">Ligand-based scaffold &amp; substructure search</div>
+                                        </div>
+                                        <span class="vs-flow-arrow">→</span>
+                                        <div class="vs-flow-stage">
+                                            <div class="vs-flow-line">Manual</div>
+                                            <div class="vs-flow-line">screening</div>
+                                        </div>
+                                        <span class="vs-flow-arrow">→</span>
+                                        <div class="vs-flow-stage">
+                                            <div class="vs-flow-line">Focused</div>
+                                            <div class="vs-flow-line">library</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="vs-library-line">
+                                        <div class="vs-line-track">
+                                            <div class="vs-line-bar"></div>
+                                            <div class="vs-line-node vs-line-node-start">
+                                                <div class="vs-line-dot vs-line-dot-light"></div>
+                                                <div class="vs-line-label">~10M Commercial libraries</div>
+                                            </div>
+                                            <div class="vs-line-node vs-line-node-end">
+                                                <div class="vs-line-dot vs-line-dot-dark"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="data-table-wrapper" style="margin-top: 16px;">
+                                <div class="vs-table-title">Activity verification of compounds obtained by virtual screening：</div>
+                                <table class="data-table vs-table-center">
+                                    <thead>
+                                        <tr><th>Target</th><th>测试化合物数</th><th>Hits (I% > 50% @ 100μM)</th><th>Hit rate</th><th>最优化合物 IC50</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>A</td><td>286</td><td>25</td><td>8.7%</td><td>1.35 μM</td></tr>
+                                        <tr><td>B</td><td>216</td><td>26</td><td>12.04%</td><td>9.64 μM</td></tr>
+                                        <tr><td>C</td><td>270</td><td>14</td><td>6.60%</td><td>1.32 μM</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="grid-2" style="margin-top:16px;">
-                        <div>
-                            <strong style="color:#fff;">平台优势</strong>
-                            <ul>
+                    <!-- 第二行：方法对比表 + 分子动力学模拟 -->
+                    <div class="grid-2 vs-layout-row">
+                        <div class="data-table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>方法</th><th>Chemical Space</th><th>Time Consuming</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Docking</td><td>Millions</td><td>Days</td></tr>
+                                    <tr><td>Pharmacophore</td><td>Millions</td><td>Days</td></tr>
+                                    <tr><td>Shape</td><td>Millions</td><td>Hours</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="vs-md-block">
+                            <h5 class="vs-subheading">分子动力学模拟（Molecular Dynamics Simulation, MD）</h5>
+                            <div class="vs-md-inner">
+                                <figure class="about-figure vs-md-figure">
+                                    <img src="images/about/md-simulation.jpg" alt="分子动力学模拟" class="about-img vs-md-img">
+                                </figure>
+                                <ul class="vs-list vs-md-list">
+                                    <li>Structural optimization</li>
+                                    <li>Binding model analysis</li>
+                                    <li>Conformational transition</li>
+                                    <li>Free energy perturbation</li>
+                                    <li>Protein-protein interaction</li>
+                                    <li>...</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 第三行：平台优势 + 代谢预测 -->
+                    <div class="grid-2 vs-layout-row">
+                        <div class="vs-advantages">
+                            <h5 class="vs-subheading">平台优势</h5>
+                            <ul class="vs-list">
                                 <li>海量化合物的智能筛选（百万至数十亿量级）</li>
                                 <li>高效筛选，高成功率</li>
                                 <li>明确研发起点，指导苗头化合物识别与先导优化</li>
                                 <li>降本增效，加速新药发现</li>
                             </ul>
                         </div>
-                        <div>
-                            <strong style="color:#fff;">扩展能力</strong>
-                            <ul>
-                                <li>分子动力学模拟（Molecular Dynamics Simulation, MD）</li>
-                                <li>Phase I / Phase II 代谢预测</li>
-                                <li>预测药物代谢反应（Metabolic prediction）</li>
-                            </ul>
+
+                        <div class="vs-metabolism">
+                            <div class="vs-metabolism-item">
+                                <div class="vs-metabolism-title">预测药物代谢反应（Metabolic prediction）</div>
+                                <img src="images/about/metabolic-prediction.png" alt="Metabolic prediction" class="vs-metabolism-img">
+                            </div>
+                            <div class="vs-metabolism-item">
+                                <div class="vs-metabolism-title">Phase I Metabolism</div>
+                                <img src="images/about/phase1-metabolism.png" alt="Phase I metabolism" class="vs-metabolism-img">
+                            </div>
+                            <div class="vs-metabolism-item">
+                                <div class="vs-metabolism-title">Phase II Metabolism</div>
+                                <img src="images/about/phase2-metabolism.png" alt="Phase II metabolism" class="vs-metabolism-img">
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="data-table-wrapper" style="margin-top:16px;">
-                        <table class="data-table">
-                            <thead>
-                                <tr><th>方法</th><th>化学空间</th><th>耗时</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>Docking</td><td>Millions</td><td>Days</td></tr>
-                                <tr><td>Pharmacophore</td><td>Millions</td><td>Days</td></tr>
-                                <tr><td>Shape</td><td>Millions</td><td>Hours</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="data-table-wrapper" style="margin-top:16px;">
-                        <table class="data-table">
-                            <thead>
-                                <tr><th>Target</th><th>测试化合物数</th><th>Hits (I% > 50% @ 100μM)</th><th>Hit rate</th><th>最优化合物 IC50</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>A</td><td>286</td><td>25</td><td>8.7%</td><td>1.35 μM</td></tr>
-                                <tr><td>B</td><td>216</td><td>26</td><td>12.04%</td><td>9.64 μM</td></tr>
-                                <tr><td>C</td><td>270</td><td>14</td><td>6.60%</td><td>1.32 μM</td></tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
 
@@ -538,8 +615,88 @@
 
                 <div class="card">
                     <h4>🧪 完善的湿实验平台与 AI + 湿实验研发管线</h4>
-                    <figure class="about-figure" style="max-width:950px; margin:16px auto;">
-                        <img src="images/about/wetlab-pipeline.png" alt="湿实验研发管线" class="about-img">
+                    <figure class="about-figure" style="max-width:100%; margin:16px 0;">
+                        <div class="wetlab-flow">
+                            <div class="wetlab-banner">
+                                <div class="wetlab-banner-title">我们拥有设备完善的湿实验平台</div>
+                                <div class="wetlab-banner-track">
+                                    <span>Evidence-based medicine</span>
+                                    <span class="banner-arrow">→</span>
+                                    <span class="stage-italic">In vitro</span>
+                                    <span class="banner-arrow">→</span>
+                                    <span class="stage-italic">Ex-vivo</span>
+                                    <span class="banner-arrow">→</span>
+                                    <span class="stage-italic">In-vivo</span>
+                                </div>
+                            </div>
+
+                            <div class="wetlab-stages">
+                                <div class="wetlab-stage">
+                                    <div class="stage-header">Patient cohort</div>
+                                    <div class="stage-header">Sample collection</div>
+                                    <div class="stage-header">Data analysis</div>
+                                    <div class="stage-visual stage-visual-1">
+                                        <img src="images/about/cancer patient.png" alt="Cancer patients" class="stage-img">
+                                    </div>
+                                    <ul class="stage-list">
+                                        <li>Genetic profiling</li>
+                                        <li>Risk stratification</li>
+                                        <li>Clinical association</li>
+                                        <li>Novel targets and biomarkers identification</li>
+                                    </ul>
+                                </div>
+
+                                <div class="stage-connector">➜</div>
+
+                                <div class="wetlab-stage">
+                                    <div class="stage-header stage-header-legend">
+                                        <span class="stage-legend"><span class="legend-dot sample"></span> Sample</span>
+                                        <span class="stage-legend"><span class="legend-dot negative"></span> Negative control</span>
+                                        <span class="stage-legend"><span class="legend-dot positive"></span> Positive control</span>
+                                    </div>
+                                    <div class="stage-visual stage-visual-2">
+                                        <img src="images/about/96well.png" alt="96-well plate" class="stage-img">
+                                    </div>
+                                    <ul class="stage-list">
+                                        <li>Target validation</li>
+                                        <li>Synergism analysis</li>
+                                        <li>Biology based on assays</li>
+                                        <li>Decipher the mechanism</li>
+                                    </ul>
+                                </div>
+
+                                <div class="stage-connector">➜</div>
+
+                                <div class="wetlab-stage">
+                                    <div class="stage-header">3D culture of tumor cells (Organoids)</div>
+                                    <div class="stage-visual stage-visual-3">
+                                        <img src="images/about/organoids.png" alt="Organoids" class="stage-img">
+                                    </div>
+                                    <ul class="stage-list">
+                                        <li>Therapeutics evaluation</li>
+                                        <li>Function identification</li>
+                                        <li>Mechanism validation</li>
+                                        <li>Personalized therapeutic</li>
+                                    </ul>
+                                </div>
+
+                                <div class="stage-connector">➜</div>
+
+                                <div class="wetlab-stage">
+                                    <div class="stage-header">Tumor</div>
+                                    <div class="stage-visual stage-visual-4">
+                                        <img src="images/about/tumor.png" alt="Tumor in vivo" class="stage-img">
+                                    </div>
+                                    <ul class="stage-list">
+                                        <li>Target validation</li>
+                                        <li>Therapeutics evaluation</li>
+                                        <li>Pharmacology analysis (PK/PD/Toxicity)</li>
+                                        <li>Drug delivery mechanism</li>
+                                        <li>Precision medicine</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                         <figcaption class="img-caption">从体外细胞到类器官再到体内水平的完整验证体系</figcaption>
                     </figure>
                     <p>我们拥有设备完善的湿实验平台，涵盖 In vitro、Ex-vivo、In-vivo 多层次评价体系，支持靶点验证、功能鉴定、机制验证、药效评价、PK/PD/毒理学分析、精准医学与生物标志物发现。</p>
@@ -737,6 +894,21 @@
 
         window.addEventListener('resize', function () {
             charts.forEach(function (chart) { chart.resize(); });
+        });
+    })();
+    </script>
+
+    <script>
+    (function () {
+        const photoImg = document.querySelector('.profile-photo .team-lead-img');
+        const cards = document.querySelectorAll('.highlight-cards .metric[data-hover-img]');
+        if (!photoImg || !cards.length) return;
+
+        cards.forEach(function (card) {
+            const hoverSrc = card.getAttribute('data-hover-img');
+            card.addEventListener('mouseenter', function () {
+                photoImg.src = hoverSrc;
+            });
         });
     })();
     </script>
