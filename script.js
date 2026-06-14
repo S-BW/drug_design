@@ -592,6 +592,7 @@ document.querySelectorAll('.phase').forEach(phase => {
 
     // 显示结果
     function displayResults(data) {
+        console.log('[DEBUG] displayResults called with:', data);
         document.getElementById('result-title').textContent =
             data.gene + ' / ' + data.cancerType + ' - OS生存分析';
 
@@ -675,8 +676,10 @@ document.querySelectorAll('.phase').forEach(phase => {
 
     // 使用事件委托绑定点击事件（兼容 lockStepBottoms / unlockStepBottoms 的DOM替换）
     document.addEventListener('click', function(e) {
+        console.log('[DEBUG] Click detected, target:', e.target.id || e.target.tagName, 'clickedElement:', e.target);
         // 确认分析按钮
         if (e.target && e.target.id === 'confirm-analysis-btn') {
+            console.log('[DEBUG] Confirm button clicked!');
             e.preventDefault();
             const cancerSelect = document.getElementById('cancer-type-select');
             const geneInput = document.getElementById('gene-input');
