@@ -7,22 +7,42 @@
     <title>SIN004 - 智药寻踪</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="inner-page">
     <div class="container">
-        <header class="page-header">
-            <div class="header-titles">
-                <h1>🧬 SIN004</h1>
-                <p class="subtitle">药物详情介绍页</p>
-            </div>
-            <a href="pipeline.html" class="login-trigger">⬅ 返回在研管线</a>
+        <header class="page-header home-header">
+            <a href="index.html" class="header-logo">
+                <img src="images/sinotar.png" alt="Sinotar Biopharm">
+            </a>
+            <nav class="main-nav">
+                <a href="index.html">首页</a>
+                <a href="platforms.html">研发平台</a>
+                <a href="pipeline.html" class="active">在研管线</a>
+                <a href="vision.html">企业愿景</a>
+                <a href="services.html">技术服务</a>
+                <a href="about.html">关于我们</a>
+                <a href="contact.html">联系我们</a>
+            </nav>
         </header>
 
-        <div class="site-footer" style="margin-top: 40px;">
-            <div class="footer-inner">
-                <h3>SIN004 介绍</h3>
-                <p>此处待补充 SIN004 的详细介绍内容。</p>
+        <!-- 全局提示框 -->
+        <div class="tooltip" id="global-tooltip"></div>
+
+        <main class="home-content">
+            <section class="home-section">
+                <h3 class="section-title">🧬 SIN004</h3>
+                <p class="lead">药物详情介绍页</p>
+                <a href="pipeline.html" class="login-trigger">⬅ 返回在研管线</a>
+            </section>
+
+            <div class="site-footer" style="margin-top: 40px;">
+                <div class="footer-inner">
+                    <h3>SIN004 介绍</h3>
+                    <p>此处待补充 SIN004 的详细介绍内容。</p>
+                </div>
             </div>
-        </div>
+        </main>
     </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
