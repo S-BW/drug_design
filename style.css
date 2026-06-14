@@ -1490,19 +1490,6 @@ html {
     margin: 0 0 20px;
 }
 
-.about-figure img[src*="oncotarget.png"],
-.about-figure img[src*="protein-structure.png"] {
-    height: 280px;
-    object-fit: contain;
-}
-
-@media (max-width: 768px) {
-    .about-figure img[src*="oncotarget.png"],
-    .about-figure img[src*="protein-structure.png"] {
-        height: 250px;
-    }
-}
-
 /* 湿实验流程图（HTML/CSS 替代图片） */
 .wetlab-flow {
     background: rgba(255, 255, 255, 0.04);
