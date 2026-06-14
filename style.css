@@ -2145,6 +2145,16 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.vs-col > .vs-flow,
+.vs-col > .vs-activity-table {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 /* Funnel image */
@@ -2328,19 +2338,11 @@ h1 {
     .vs-bottom-align-row .vs-metabolic-block {
         order: 1;
     }
-
-    .vs-layout-row .data-table-wrapper {
-        height: auto !important;
-    }
-
-    .vs-md-block {
-        margin-top: 0 !important;
-    }
 }
 
 /* ================= VS-MegaScreen Workflow v2 ================= */
 .vs-layout-row-top {
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1fr 1fr;
     margin-bottom: 60px;
 }
 
@@ -2535,6 +2537,28 @@ h1 {
     .vs-flow-stage-bulleted .vs-flow-line {
         text-align: center;
     }
+
+    .vs-activity-table {
+        overflow-x: auto;
+    }
+
+    .vs-activity-table .data-table {
+        min-width: 520px;
+        width: 100%;
+    }
+
+    .vs-activity-table .data-table th,
+    .vs-activity-table .data-table td {
+        white-space: nowrap;
+    }
+
+    .vs-layout-row .data-table-wrapper {
+        height: auto !important;
+    }
+
+    .vs-md-block {
+        margin-top: 0 !important;
+    }
 }
 
 @media (max-width: 768px) {
@@ -2542,12 +2566,19 @@ h1 {
         grid-template-columns: 1fr;
     }
 
+    .vs-flow-header {
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
     .vs-flow-main {
         display: grid;
-        grid-template-columns: 1fr 30px auto;
+        grid-template-columns: 1fr 24px auto;
         grid-template-rows: repeat(7, auto);
-        gap: 0 8px;
+        gap: 0 4px;
         align-items: center;
+        width: 100%;
     }
 
     .vs-flow-track-4,
@@ -2564,11 +2595,24 @@ h1 {
     .vs-flow-track-4 .vs-flow-arrow:nth-child(6) { grid-column: 1; grid-row: 6; justify-self: center; }
     .vs-flow-track-4 .vs-flow-stage:nth-child(7) { grid-column: 1; grid-row: 7; }
 
+    .vs-flow-track-4 .vs-flow-stage {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        padding: 12px 8px;
+        justify-self: center;
+    }
+
     .vs-flow-track-4 .vs-flow-arrow {
         display: block;
         transform: rotate(90deg);
         font-size: 1.1em;
         align-self: center;
+    }
+
+    .vs-flow-line {
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .vs-line-bar {
@@ -2617,12 +2661,36 @@ h1 {
         text-orientation: mixed;
         font-size: 0.75em;
         color: #a8b2d1;
-        max-width: none;
+        max-width: 1.4em;
         width: auto;
         text-align: center;
         line-height: 1.3;
         white-space: nowrap;
-        margin-left: 8px;
+        margin-left: 0;
+    }
+
+    .vs-table-triangle {
+        height: 70px;
+        bottom: -20px;
+        clip-path: polygon(95% 0%, 80% 100%, 100% 100%);
+    }
+
+    .vs-md-inner {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .vs-md-img {
+        height: auto !important;
+        max-height: 180px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .vs-md-list {
+        padding-left: 18px;
+        width: 100%;
+        box-sizing: border-box;
     }
 }
 

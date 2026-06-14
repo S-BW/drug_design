@@ -32,7 +32,7 @@ function closeLoginModal() {
 function getAccounts() {
     try {
         return JSON.parse(localStorage.getItem('pharmatrace_accounts') || '{}');
-    } catch {
+    } catch (e) {
         return {};
     }
 }
@@ -60,7 +60,7 @@ function setLoginState(username) {
     if (loginTrigger) loginTrigger.style.display = 'none';
     if (userBar) {
         userBar.style.display = 'flex';
-        userNameEl.textContent = `👤 ${username}`;
+        if (userNameEl) userNameEl.textContent = '👤 ' + username;
     }
 }
 
@@ -352,7 +352,7 @@ function closeApplyModal() {
 
 function resetApplyFormView() {
     if (applyForm) applyForm.style.display = 'block';
-    const existingSuccess = applyOverlay?.querySelector('.apply-success');
+    const existingSuccess = applyOverlay ? applyOverlay.querySelector('.apply-success') : null;
     if (existingSuccess) existingSuccess.remove();
 }
 
@@ -393,12 +393,17 @@ if (applyForm) {
     applyForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
+        const applyNameEl = document.getElementById('apply-name');
+        const applyEmailEl = document.getElementById('apply-email');
+        const applyFieldEl = document.getElementById('apply-field');
+        const applyDescEl = document.getElementById('apply-desc');
+
         const data = {
-            type: applyTypeInput?.value === 'person' ? '个人申请' : '机构注册',
-            name: document.getElementById('apply-name')?.value.trim(),
-            email: document.getElementById('apply-email')?.value.trim(),
-            field: document.getElementById('apply-field')?.value,
-            description: document.getElementById('apply-desc')?.value.trim(),
+            type: applyTypeInput && applyTypeInput.value === 'person' ? '个人申请' : '机构注册',
+            name: applyNameEl ? applyNameEl.value.trim() : '',
+            email: applyEmailEl ? applyEmailEl.value.trim() : '',
+            field: applyFieldEl ? applyFieldEl.value : '',
+            description: applyDescEl ? applyDescEl.value.trim() : '',
             time: new Date().toLocaleString('zh-CN')
         };
 
@@ -422,8 +427,10 @@ if (applyForm) {
             <p>感谢您的申请，平台管理员将在 3-5 个工作日内与您联系。请留意您的邮箱。 </p>
             <button type="button" class="login-btn" id="apply-back" style="margin-top: 24px;">返回</button>
         `;
-        applyOverlay.querySelector('.apply-box').appendChild(successDiv);
-
-        successDiv.querySelector('#apply-back').addEventListener('click', closeApplyModal);
+        const applyBox = applyOverlay ? applyOverlay.querySelector('.apply-box') : null;
+        if (applyBox) {
+            applyBox.appendChild(successDiv);
+            successDiv.querySelector('#apply-back').addEventListener('click', closeApplyModal);
+        }
     });
 }

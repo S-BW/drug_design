@@ -564,19 +564,21 @@
                                 if (block && wrapper) {
                                     wrapper.style.height = block.getBoundingClientRect().height + 'px';
                                 }
-                                const img = block?.querySelector('.vs-md-img');
-                                const list = block?.querySelector('.vs-md-list');
-                                if (img && list) {
-                                    img.style.height = list.getBoundingClientRect().height + 'px';
-                                }
-                                const heading = block?.querySelector('.vs-subheading');
-                                if (heading && block) {
-                                    const headingRect = heading.getBoundingClientRect();
-                                    const headingStyle = window.getComputedStyle(heading);
-                                    const marginBottom = parseFloat(headingStyle.marginBottom) || 0;
-                                    const blockStyle = window.getComputedStyle(block);
-                                    const paddingTop = parseFloat(blockStyle.paddingTop) || 0;
-                                    block.style.marginTop = -(headingRect.height + marginBottom + paddingTop) + 'px';
+                                if (block) {
+                                    const img = block.querySelector('.vs-md-img');
+                                    const list = block.querySelector('.vs-md-list');
+                                    if (img && list) {
+                                        img.style.height = list.getBoundingClientRect().height + 'px';
+                                    }
+                                    const heading = block.querySelector('.vs-subheading');
+                                    if (heading) {
+                                        const headingRect = heading.getBoundingClientRect();
+                                        const headingStyle = window.getComputedStyle(heading);
+                                        const marginBottom = parseFloat(headingStyle.marginBottom) || 0;
+                                        const blockStyle = window.getComputedStyle(block);
+                                        const paddingTop = parseFloat(blockStyle.paddingTop) || 0;
+                                        block.style.marginTop = -(headingRect.height + marginBottom + paddingTop) + 'px';
+                                    }
                                 }
                             }
                             window.addEventListener('load', updateMdBlock);
