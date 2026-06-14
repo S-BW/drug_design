@@ -412,12 +412,13 @@ document.querySelectorAll('.phase').forEach(phase => {
     }
 
     // 从后端API获取真实生存分析数据
-    async function fetchSurvivalData(gene, cancerType) {
+    async function fetchSurvivalData(gene, cancerType, survivalType) {
+        survivalType = survivalType || 'OS';
         try {
             const resp = await fetch(API_BASE + '/api/survival/forward', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ gene: gene, cancer_type: cancerType, survival_type: 'OS', cutoff: 50 })
+                body: JSON.stringify({ gene: gene, cancer_type: cancerType, survival_type: survivalType, cutoff: 50 })
             });
             if (!resp.ok) {
                 const err = await resp.json();
@@ -709,8 +710,10 @@ document.querySelectorAll('.phase').forEach(phase => {
     window.runSurvivalAnalysis = async function() {
         const cancerSelect = document.getElementById('cancer-type-select');
         const geneInput = document.getElementById('gene-input');
+        const survivalSelect = document.getElementById('fw-survival-type');
         const cancer = cancerSelect ? cancerSelect.value : '';
         const gene = geneInput ? geneInput.value.trim() : '';
+        const survivalType = survivalSelect ? survivalSelect.value : 'OS';
 
         if (!cancer) {
             alert('请选择一个癌种');
@@ -734,7 +737,7 @@ document.querySelectorAll('.phase').forEach(phase => {
         if (resultContent) resultContent.style.display = 'none';
 
         // 调用后端API获取真实数据
-        currentResult = await fetchSurvivalData(gene, cancer);
+        currentResult = await fetchSurvivalData(gene, cancer, survivalType);
         displayResults(currentResult);
     };
 
@@ -866,7 +869,7 @@ document.querySelectorAll('.phase').forEach(phase => {
             var resp = await fetch(API_BASE + '/api/survival/reverse', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cancer_type: cancer, survival_type: survivalType, cutoff: cutoff, max_genes: 68 })
+                body: JSON.stringify({ cancer_type: cancer, survival_type: survivalType, cutoff: cutoff, max_genes: 500 })
             });
             if (!resp.ok) {
                 var err = await resp.json();

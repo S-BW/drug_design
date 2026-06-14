@@ -127,69 +127,56 @@
                             <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
                                 <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">📝 分析参数设置 <span style="font-size: 0.8em; font-weight: 400; color: #a0c4e8;">(数据来源: cBioPortal/TCGA)</span></div>
                                 <div class="form-group" style="margin-bottom: 8px;">
-                                    <label for="cancer-type-select" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">选择癌种 (TCGA/GEO)</label>
+                                    <label for="cancer-type-select" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">选择癌种 (TCGA 33种)</label>
                                     <select id="cancer-type-select" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; cursor: pointer;">
                                         <option value="" disabled selected>请选择一个癌种</option>
-                                        <optgroup label="TCGA 癌种" style="background: #0f172a;">
-                                            <option value="BRCA">BRCA - 乳腺浸润癌</option>
-                                            <option value="LUAD">LUAD - 肺腺癌</option>
-                                            <option value="LUSC">LUSC - 肺鳞癌</option>
-                                            <option value="COAD">COAD - 结肠腺癌</option>
-                                            <option value="READ">READ - 直肠腺癌</option>
-                                            <option value="STAD">STAD - 胃癌</option>
-                                            <option value="HNSC">HNSC - 头颈鳞癌</option>
-                                            <option value="BLCA">BLCA - 膀胱尿路上皮癌</option>
-                                            <option value="KIRC">KIRC - 肾透明细胞癌</option>
-                                            <option value="KIRP">KIRP - 肾乳头状细胞癌</option>
-                                            <option value="LIHC">LIHC - 肝细胞癌</option>
-                                            <option value="CHOL">CHOL - 胆管癌</option>
-                                            <option value="PAAD">PAAD - 胰腺腺癌</option>
-                                            <option value="ESCA">ESCA - 食管癌</option>
-                                            <option value="CESC">CESC - 宫颈鳞癌</option>
-                                            <option value="OV">OV - 卵巢浆液性囊腺癌</option>
-                                            <option value="UCEC">UCEC - 子宫内膜癌</option>
-                                            <option value="THCA">THCA - 甲状腺癌</option>
-                                            <option value="PRAD">PRAD - 前列腺腺癌</option>
-                                            <option value="SKCM">SKCM - 皮肤黑色素瘤</option>
-                                            <option value="SARC">SARC - 肉瘤</option>
-                                            <option value="LGG">LGG - 低级别胶质瘤</option>
-                                            <option value="GBM">GBM - 胶质母细胞瘤</option>
-                                            <option value="UVM">UVM - 葡萄膜黑色素瘤</option>
-                                            <option value="ACC">ACC - 肾上腺皮质癌</option>
-                                            <option value="PCPG">PCPG - 嗜铬细胞瘤和副神经节瘤</option>
-                                            <option value="MESO">MESO - 间皮瘤</option>
-                                            <option value="UCS">UCS - 子宫癌肉瘤</option>
-                                            <option value="TGCT">TGCT - 睾丸生殖细胞肿瘤</option>
-                                            <option value="DLBC">DLBC - 弥漫性大B细胞淋巴瘤</option>
-                                            <option value="THYM">THYM - 胸腺瘤</option>
-                                            <option value="LAML">LAML - 急性髓系白血病</option>
-                                            <option value="PANCAN">PANCAN - 泛癌分析</option>
-                                        </optgroup>
-                                        <optgroup label="GEO 常见数据集" style="background: #0f172a;">
-                                            <option value="GSE42568">GSE42568 - 乳腺癌</option>
-                                            <option value="GSE30219">GSE30219 - 非小细胞肺癌</option>
-                                            <option value="GSE31210">GSE31210 - 肺腺癌</option>
-                                            <option value="GSE28735">GSE28735 - 胰腺癌</option>
-                                            <option value="GSE14520">GSE14520 - 肝癌</option>
-                                            <option value="GSE22138">GSE22138 - 结直肠癌</option>
-                                            <option value="GSE53625">GSE53625 - 食管癌</option>
-                                            <option value="GSE25066">GSE25066 - 三阴性乳腺癌</option>
-                                            <option value="GSE37967">GSE37967 - 胃癌</option>
-                                            <option value="GSE46517">GSE46517 - 肾细胞癌</option>
-                                            <option value="GSE54218">GSE54218 - 前列腺癌</option>
-                                            <option value="GSE63805">GSE63805 - 卵巢癌</option>
-                                            <option value="GSE68086">GSE68086 - 胶质瘤</option>
-                                            <option value="GSE72094">GSE72094 - 头颈癌</option>
-                                            <option value="GSE74706">GSE74706 - 膀胱癌</option>
-                                            <option value="GSE89777">GSE89777 - 黑色素瘤</option>
-                                            <option value="GSE102349">GSE102349 - 急性髓系白血病</option>
-                                            <option value="GSE104836">GSE104836 - 子宫内膜癌</option>
-                                        </optgroup>
+                                        <option value="BRCA">BRCA - 乳腺浸润癌</option>
+                                        <option value="LUAD">LUAD - 肺腺癌</option>
+                                        <option value="LUSC">LUSC - 肺鳞癌</option>
+                                        <option value="COAD">COAD - 结肠腺癌</option>
+                                        <option value="READ">READ - 直肠腺癌</option>
+                                        <option value="STAD">STAD - 胃癌</option>
+                                        <option value="HNSC">HNSC - 头颈鳞癌</option>
+                                        <option value="BLCA">BLCA - 膀胱尿路上皮癌</option>
+                                        <option value="KIRC">KIRC - 肾透明细胞癌</option>
+                                        <option value="KIRP">KIRP - 肾乳头状细胞癌</option>
+                                        <option value="KICH">KICH - 肾嫌色细胞癌</option>
+                                        <option value="LIHC">LIHC - 肝细胞癌</option>
+                                        <option value="CHOL">CHOL - 胆管癌</option>
+                                        <option value="PAAD">PAAD - 胰腺腺癌</option>
+                                        <option value="ESCA">ESCA - 食管癌</option>
+                                        <option value="CESC">CESC - 宫颈鳞癌</option>
+                                        <option value="OV">OV - 卵巢浆液性囊腺癌</option>
+                                        <option value="UCEC">UCEC - 子宫内膜癌</option>
+                                        <option value="UCS">UCS - 子宫癌肉瘤</option>
+                                        <option value="THCA">THCA - 甲状腺癌</option>
+                                        <option value="PRAD">PRAD - 前列腺腺癌</option>
+                                        <option value="SKCM">SKCM - 皮肤黑色素瘤</option>
+                                        <option value="SARC">SARC - 肉瘤</option>
+                                        <option value="LGG">LGG - 低级别胶质瘤</option>
+                                        <option value="GBM">GBM - 胶质母细胞瘤</option>
+                                        <option value="UVM">UVM - 葡萄膜黑色素瘤</option>
+                                        <option value="ACC">ACC - 肾上腺皮质癌</option>
+                                        <option value="PCPG">PCPG - 嗜铬细胞瘤和副神经节瘤</option>
+                                        <option value="MESO">MESO - 间皮瘤</option>
+                                        <option value="TGCT">TGCT - 睾丸生殖细胞肿瘤</option>
+                                        <option value="DLBC">DLBC - 弥漫性大B细胞淋巴瘤</option>
+                                        <option value="THYM">THYM - 胸腺瘤</option>
+                                        <option value="LAML">LAML - 急性髓系白血病</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="fw-survival-type" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">生存指标</label>
+                                    <select id="fw-survival-type" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; cursor: pointer;">
+                                        <option value="OS" selected>OS - 总生存期</option>
+                                        <option value="DFS">DFS - 无病生存期</option>
+                                        <option value="PFS">PFS - 无进展生存期</option>
+                                        <option value="DSS">DSS - 疾病特异性生存期</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="gene-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">基因 ID 或基因名</label>
-                                    <input type="text" id="gene-input" placeholder="例如: TP53, EGFR, BRCA1..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                    <label for="gene-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">基因名 (如 TP53, EGFR, BRCA1)</label>
+                                    <input type="text" id="gene-input" placeholder="输入基因名..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
                                 </div>
                                 <button type="button" id="confirm-analysis-btn" onclick="runSurvivalAnalysis()" style="width: 100%; margin-top: 10px; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #33ddff 0%, #00aadd 100%)';this.style.boxShadow='0 4px 12px rgba(0,212,255,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)';this.style.boxShadow='0 2px 8px rgba(0,212,255,0.3)';">✅ 确认分析</button>
                             </div>
@@ -305,28 +292,42 @@
                             <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
                                 <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">📝 反向筛选参数 <span style="font-size: 0.8em; font-weight: 400; color: #a0c4e8;">(数据来源: cBioPortal/TCGA)</span></div>
                                 <div class="form-group" style="margin-bottom: 8px;">
-                                    <label for="rev-cancer-select" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">选择癌种 (TCGA)</label>
+                                    <label for="rev-cancer-select" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">选择癌种 (TCGA 33种)</label>
                                     <select id="rev-cancer-select" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; cursor: pointer;">
                                         <option value="" disabled selected>请选择一个癌种</option>
                                         <option value="BRCA">BRCA - 乳腺浸润癌</option>
                                         <option value="LUAD">LUAD - 肺腺癌</option>
                                         <option value="LUSC">LUSC - 肺鳞癌</option>
                                         <option value="COAD">COAD - 结肠腺癌</option>
+                                        <option value="READ">READ - 直肠腺癌</option>
                                         <option value="STAD">STAD - 胃癌</option>
                                         <option value="HNSC">HNSC - 头颈鳞癌</option>
                                         <option value="BLCA">BLCA - 膀胱尿路上皮癌</option>
                                         <option value="KIRC">KIRC - 肾透明细胞癌</option>
+                                        <option value="KIRP">KIRP - 肾乳头状细胞癌</option>
+                                        <option value="KICH">KICH - 肾嫌色细胞癌</option>
                                         <option value="LIHC">LIHC - 肝细胞癌</option>
+                                        <option value="CHOL">CHOL - 胆管癌</option>
                                         <option value="PAAD">PAAD - 胰腺腺癌</option>
                                         <option value="ESCA">ESCA - 食管癌</option>
                                         <option value="CESC">CESC - 宫颈鳞癌</option>
-                                        <option value="OV">OV - 卵巢癌</option>
+                                        <option value="OV">OV - 卵巢浆液性囊腺癌</option>
                                         <option value="UCEC">UCEC - 子宫内膜癌</option>
-                                        <option value="PRAD">PRAD - 前列腺癌</option>
+                                        <option value="UCS">UCS - 子宫癌肉瘤</option>
+                                        <option value="THCA">THCA - 甲状腺癌</option>
+                                        <option value="PRAD">PRAD - 前列腺腺癌</option>
                                         <option value="SKCM">SKCM - 皮肤黑色素瘤</option>
+                                        <option value="SARC">SARC - 肉瘤</option>
+                                        <option value="LGG">LGG - 低级别胶质瘤</option>
                                         <option value="GBM">GBM - 胶质母细胞瘤</option>
+                                        <option value="UVM">UVM - 葡萄膜黑色素瘤</option>
+                                        <option value="ACC">ACC - 肾上腺皮质癌</option>
+                                        <option value="PCPG">PCPG - 嗜铬细胞瘤和副神经节瘤</option>
+                                        <option value="MESO">MESO - 间皮瘤</option>
+                                        <option value="TGCT">TGCT - 睾丸生殖细胞肿瘤</option>
+                                        <option value="DLBC">DLBC - 弥漫性大B细胞淋巴瘤</option>
+                                        <option value="THYM">THYM - 胸腺瘤</option>
                                         <option value="LAML">LAML - 急性髓系白血病</option>
-                                        <option value="PANCAN">PANCAN - 泛癌分析</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin-bottom: 8px;">

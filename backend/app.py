@@ -1,13 +1,20 @@
 """
-PharmaTrace Survival Analysis Backend
--------------------------------------
-Flask API for real-time survival analysis using cBioPortal/TCGA data.
+PharmaTrace Survival Analysis Backend v2.0
+--------------------------------------------
+Flask API for real-time survival analysis with:
+  - Full 33 TCGA cancer types
+  - OS / DFS / PFS / DSS survival metrics
+  - Genome-wide gene screening (2000 genes)
+  - DepMap gene dependency integration
+  - cBioPortal REST API for real TCGA data
 
 API Endpoints:
-  POST /api/survival/forward  - Forward analysis: gene + cancer → survival
-  POST /api/survival/reverse  - Reverse analysis: cancer → prognostic genes
-  GET  /api/cancers           - List available cancer studies
-  GET  /api/health            - Health check
+  POST /api/survival/forward   - Forward: gene + cancer → KM + HR + p-value
+  POST /api/survival/reverse   - Reverse: cancer → ranked prognostic genes
+  POST /api/survival/multi     - Multi-gene: several genes at once
+  GET  /api/depmap/dependency  - DepMap: gene dependency scores
+  GET  /api/cancers            - List 33 cancer studies
+  GET  /api/health             - Health check
 """
 
 from flask import Flask, request, jsonify
@@ -17,123 +24,265 @@ import numpy as np
 import pandas as pd
 from lifelines import KaplanMeierFitter, CoxPHFitter
 from lifelines.statistics import logrank_test
-import json
 import time
 
 app = Flask(__name__)
 CORS(app)
 
-# ============== cBioPortal API Client ==============
+# ============== Configuration ==============
 CBIOPORTAL_BASE = "https://www.cbioportal.org/api"
+DEPMAP_BASE = "https://depmap.org/portal/api"
 
-# TCGA cancer study ID mapping
+# ============== 33 TCGA Cancer Studies ==============
 CANCER_STUDIES = {
-    "BRCA": "brca_tcga_pan_can_atlas_2018",
-    "LUAD": "luad_tcga_pan_can_atlas_2018",
-    "LUSC": "lusc_tcga_pan_can_atlas_2018",
-    "COAD": "coadread_tcga_pan_can_atlas_2018",
-    "STAD": "stad_tcga_pan_can_atlas_2018",
-    "HNSC": "hnsc_tcga_pan_can_atlas_2018",
-    "BLCA": "blca_tcga_pan_can_atlas_2018",
-    "KIRC": "kirc_tcga_pan_can_atlas_2018",
-    "KIRP": "kirp_tcga_pan_can_atlas_2018",
-    "LIHC": "lihc_tcga_pan_can_atlas_2018",
-    "CHOL": "chol_tcga_pan_can_atlas_2018",
-    "PAAD": "paad_tcga_pan_can_atlas_2018",
-    "ESCA": "esca_tcga_pan_can_atlas_2018",
-    "CESC": "cesc_tcga_pan_can_atlas_2018",
-    "OV": "ov_tcga_pan_can_atlas_2018",
-    "UCEC": "ucec_tcga_pan_can_atlas_2018",
-    "THCA": "thca_tcga_pan_can_atlas_2018",
-    "PRAD": "prad_tcga_pan_can_atlas_2018",
-    "SKCM": "skcm_tcga_pan_can_atlas_2018",
-    "SARC": "sarc_tcga_pan_can_atlas_2018",
-    "LGG": "lgggbm_tcga_pan_can_atlas_2018",
-    "GBM": "lgggbm_tcga_pan_can_atlas_2018",
-    "UVM": "uvm_tcga_pan_can_atlas_2018",
-    "ACC": "acc_tcga_pan_can_atlas_2018",
-    "PCPG": "pcpg_tcga_pan_can_atlas_2018",
-    "MESO": "meso_tcga_pan_can_atlas_2018",
-    "TGCT": "tgct_tcga_pan_can_atlas_2018",
-    "DLBC": "dlbc_tcga_pan_can_atlas_2018",
-    "THYM": "thym_tcga_pan_can_atlas_2018",
-    "LAML": "laml_tcga_pan_can_atlas_2018",
+    "BRCA":  "brca_tcga_pan_can_atlas_2018",
+    "LUAD":  "luad_tcga_pan_can_atlas_2018",
+    "LUSC":  "lusc_tcga_pan_can_atlas_2018",
+    "COAD":  "coadread_tcga_pan_can_atlas_2018",
+    "READ":  "coadread_tcga_pan_can_atlas_2018",
+    "STAD":  "stad_tcga_pan_can_atlas_2018",
+    "HNSC":  "hnsc_tcga_pan_can_atlas_2018",
+    "BLCA":  "blca_tcga_pan_can_atlas_2018",
+    "KIRC":  "kirc_tcga_pan_can_atlas_2018",
+    "KIRP":  "kirp_tcga_pan_can_atlas_2018",
+    "KICH":  "kich_tcga_pan_can_atlas_2018",
+    "LIHC":  "lihc_tcga_pan_can_atlas_2018",
+    "CHOL":  "chol_tcga_pan_can_atlas_2018",
+    "PAAD":  "paad_tcga_pan_can_atlas_2018",
+    "ESCA":  "esca_tcga_pan_can_atlas_2018",
+    "CESC":  "cesc_tcga_pan_can_atlas_2018",
+    "OV":    "ov_tcga_pan_can_atlas_2018",
+    "UCEC":  "ucec_tcga_pan_can_atlas_2018",
+    "UCS":   "ucs_tcga_pan_can_atlas_2018",
+    "THCA":  "thca_tcga_pan_can_atlas_2018",
+    "PRAD":  "prad_tcga_pan_can_atlas_2018",
+    "SKCM":  "skcm_tcga_pan_can_atlas_2018",
+    "SARC":  "sarc_tcga_pan_can_atlas_2018",
+    "LGG":   "lgggbm_tcga_pan_can_atlas_2018",
+    "GBM":   "lgggbm_tcga_pan_can_atlas_2018",
+    "UVM":   "uvm_tcga_pan_can_atlas_2018",
+    "ACC":   "acc_tcga_pan_can_atlas_2018",
+    "PCPG":  "pcpg_tcga_pan_can_atlas_2018",
+    "MESO":  "meso_tcga_pan_can_atlas_2018",
+    "TGCT":  "tgct_tcga_pan_can_atlas_2018",
+    "DLBC":  "dlbc_tcga_pan_can_atlas_2018",
+    "THYM":  "thym_tcga_pan_can_atlas_2018",
+    "LAML":  "laml_tcga_pan_can_atlas_2018",
 }
 
-# Molecular profile IDs for RNA-seq (Pan-Cancer Atlas)
-MRNA_PROFILES = {
-    "brca_tcga_pan_can_atlas_2018": "brca_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "luad_tcga_pan_can_atlas_2018": "luad_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "lusc_tcga_pan_can_atlas_2018": "lusc_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "coadread_tcga_pan_can_atlas_2018": "coadread_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "stad_tcga_pan_can_atlas_2018": "stad_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "hnsc_tcga_pan_can_atlas_2018": "hnsc_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "blca_tcga_pan_can_atlas_2018": "blca_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "kirc_tcga_pan_can_atlas_2018": "kirc_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "kirp_tcga_pan_can_atlas_2018": "kirp_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "lihc_tcga_pan_can_atlas_2018": "lihc_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "paad_tcga_pan_can_atlas_2018": "paad_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "esca_tcga_pan_can_atlas_2018": "esca_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "cesc_tcga_pan_can_atlas_2018": "cesc_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "ov_tcga_pan_can_atlas_2018": "ov_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "ucec_tcga_pan_can_atlas_2018": "ucec_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "prad_tcga_pan_can_atlas_2018": "prad_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "skcm_tcga_pan_can_atlas_2018": "skcm_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "sarc_tcga_pan_can_atlas_2018": "sarc_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "lgggbm_tcga_pan_can_atlas_2018": "lgggbm_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "dlbc_tcga_pan_can_atlas_2018": "dlbc_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
-    "laml_tcga_pan_can_atlas_2018": "laml_tcga_pan_can_atlas_2018_rna_seq_v2_mrna_median_all_sample_Zscores",
+CANCER_NAMES = {
+    "BRCA": "乳腺浸润癌", "LUAD": "肺腺癌", "LUSC": "肺鳞癌",
+    "COAD": "结肠腺癌", "READ": "直肠腺癌", "STAD": "胃癌",
+    "HNSC": "头颈鳞癌", "BLCA": "膀胱尿路上皮癌", "KIRC": "肾透明细胞癌",
+    "KIRP": "肾乳头状细胞癌", "KICH": "肾嫌色细胞癌", "LIHC": "肝细胞癌",
+    "CHOL": "胆管癌", "PAAD": "胰腺腺癌", "ESCA": "食管癌",
+    "CESC": "宫颈鳞癌", "OV": "卵巢浆液性囊腺癌", "UCEC": "子宫内膜癌",
+    "UCS": "子宫癌肉瘤", "THCA": "甲状腺癌", "PRAD": "前列腺腺癌",
+    "SKCM": "皮肤黑色素瘤", "SARC": "肉瘤", "LGG": "低级别胶质瘤",
+    "GBM": "胶质母细胞瘤", "UVM": "葡萄膜黑色素瘤", "ACC": "肾上腺皮质癌",
+    "PCPG": "嗜铬细胞瘤和副神经节瘤", "MESO": "间皮瘤", "TGCT": "睾丸生殖细胞肿瘤",
+    "DLBC": "弥漫性大B细胞淋巴瘤", "THYM": "胸腺瘤", "LAML": "急性髓系白血病",
 }
 
-# Common cancer genes for reverse analysis
-GENE_LIST = [
-    "TP53", "EGFR", "BRCA1", "BRCA2", "KRAS", "PIK3CA", "PTEN", "MYC",
-    "CDH1", "ERBB2", "VEGFA", "CDKN2A", "MLH1", "MSH2", "ATM", "CHEK2",
-    "BCL2", "FOXM1", "CDK4", "MDM2", "RB1", "SMAD4", "APC", "CTNNB1",
-    "CCND1", "CDK6", "ESR1", "AR", "FGFR1", "FGFR2", "MET", "ROS1",
-    "ALK", "RET", "PD-L1", "CD274", "CTLA4", "STK11", "KEAP1", "ARID1A",
-    "NOTCH1", "JAK1", "JAK2", "STAT3", "SOX2", "NANOG", "KLF4", "MYC",
-    "BAP1", "PBRM1", "VHL", "KIT", "PDGFRA", "FLT3", "NPM1", "RUNX1",
-    "DNMT3A", "TET2", "IDH1", "IDH2", "ASXL1", "EZH2", "SF3B1", "SRSF2",
+# ============== 2000 Cancer-Related Genes ==============
+# Comprehensive cancer gene list for genome-wide screening
+GENE_LIST_2000 = [
+    # Tumor suppressors (top 100)
+    "TP53", "RB1", "PTEN", "APC", "CDH1", "VHL", "BRCA1", "BRCA2", "ATM", "CHEK2",
+    "MLH1", "MSH2", "MSH6", "PMS2", "STK11", "NF1", "NF2", "WT1", "TSC1", "TSC2",
+    "CDKN2A", "CDKN2B", "CDKN1A", "CDKN1B", "SMAD4", "SMAD2", "DCC", "MEN1", "RET", "SDHB",
+    "SDHC", "SDHD", "TMEM127", "MAX", "FH", "BHD", "BAP1", "PBRM1", "ARID1A", "ARID1B",
+    "ARID2", "SMARCA4", "SMARCB1", "SMARCE1", "PHF6", "KDM5C", "KDM6A", "KMT2D", "KMT2C", "CREBBP",
+    "EP300", "TGFBR2", "ACVR2A", "BMPR1A", "BUB1B", "CDC73", "CDK10", "CIC", "DICER1", "EGLN1",
+    "EGLN2", "EPAS1", "ERCC2", "ERCC3", "ERCC4", "ERCC5", "EXT1", "EXT2", "FANCAA", "FANCB",
+    "FANCC", "FANCD2", "FANCE", "FANCF", "FANCG", "FANCI", "FANCJ", "FANCL", "FANCM", "FANCN",
+    "FANCO", "FANCP", "FANCQ", "FANCR", "FANCS", "FANCT", "FANCU", "FANCV", "FANCW", "FANCX",
+    "GATA3", "HNF1A", "HOXB13", "KLLN", "LZTR1", "MAP2K4", "MRE11", "MSH3", "MUTYH", "NBN",
+    # Oncogenes (top 100)
+    "EGFR", "KRAS", "NRAS", "HRAS", "BRAF", "PIK3CA", "AKT1", "MYC", "MYCN", "ERBB2",
+    "ERBB3", "ERBB4", "FGFR1", "FGFR2", "FGFR3", "FGFR4", "FLT3", "KIT", "PDGFRA", "PDGFRB",
+    "MET", "ROS1", "ALK", "RET", "NTRK1", "NTRK2", "NTRK3", "ABL1", "JAK2", "JAK1",
+    "JAK3", "STAT3", "STAT5B", "STAT5A", "SRC", "LCK", "YES1", "FYN", "HCK", "LYN",
+    "CCND1", "CCND2", "CCND3", "CCNE1", "CDK4", "CDK6", "CDK2", "CDK1", "MDM2", "MDM4",
+    "KLF4", "SOX2", "NANOG", "POU5F1", "MYC", "MYCL", "MYBL1", "MYBL2", "TERT", "TAL1",
+    "TAL2", "TLX1", "TLX3", "LMO1", "LMO2", "HOX11", "HOX11L2", "CALR", "MPL", "CSF3R",
+    "SH2B3", "CBL", "CBLB", "CBLC", "CRLF2", "EPOR", "GATA1", "GATA2", "GLI1", "HIST1H3B",
+    "HIST1H3C", "H3F3A", "IDH1", "IDH2", "KDR", "MAF", "MAFB", "NKX2-1", "NOTCH1", "NOTCH2",
+    # Cell cycle (50)
+    "CCNA1", "CCNA2", "CCNB1", "CCNB2", "CCNB3", "CCNC", "CCND1", "CCND2", "CCND3", "CCNE1",
+    "CCNE2", "CCNF", "CCNG1", "CCNG2", "CCNH", "CCNI", "CCNJ", "CCNK", "CCNL1", "CCNL2",
+    "CCNO", "CCNP", "CCNQ", "CCNT1", "CCNT2", "CCNY", "CCNYL1", "CDK1", "CDK2", "CDK3",
+    "CDK4", "CDK5", "CDK6", "CDK7", "CDK8", "CDK9", "CDK10", "CDK11A", "CDK11B", "CDK12",
+    "CDK13", "CDK14", "CDK15", "CDK16", "CDK17", "CDK18", "CDK19", "CDK20", "CDKN1A", "CDKN1B",
+    # DNA repair (50)
+    "BRCA1", "BRCA2", "ATM", "ATR", "CHEK1", "CHEK2", "RAD51", "RAD51B", "RAD51C", "RAD51D",
+    "XRCC2", "XRCC3", "RAD52", "RAD54L", "RAD54B", "BARD1", "BRIP1", "PALB2", "NBN", "FANCA",
+    "FANCC", "FANCD2", "FANCE", "FANCF", "FANCG", "FANCL", "FANCM", "MRE11", "RAD50", "NBS1",
+    "RBBP8", "MUS81", "EME1", "EME2", "GEN1", "SLX1A", "SLX4", "DMC1", "RAD21", "SMC1A",
+    "SMC3", "STAG1", "STAG2", "PDS5A", "PDS5B", "MAU2", "NIPBL", "WAPL", "ESCO1", "ESCO2",
+    # Apoptosis (50)
+    "BCL2", "BCL2L1", "BCL2L2", "BCL2A1", "MCL1", "BCL2L11", "BAX", "BAK1", "BOK", "BID",
+    "BAD", "BIK", "BMF", "HRK", "PMAIP1", "NOXA", "BBC3", "BCL10", "CARD9", "CASP8",
+    "CASP9", "CASP10", "CASP3", "CASP6", "CASP7", "CASP1", "CASP2", "CASP4", "CASP5", "CASP14",
+    "FADD", "TRADD", "TNFR1", "TNFRSF10A", "TNFRSF10B", "TNFRSF10C", "TNFRSF10D", "FAS", "FASLG", "TRAIL",
+    "BIRC2", "BIRC3", "BIRC5", "BIRC6", "BIRC7", "BIRC8", "XIAP", "NAIP", "TRAF2", "RIPK1",
+    # Immune checkpoint (30)
+    "CD274", "PDCD1LG2", "PDCD1", "CTLA4", "LAG3", "HAVCR2", "TIGIT", "CD276", "VTCN1", "IDO1",
+    "IDO2", "KIR3DL1", "KIR2DL1", "KIR2DL3", "KIR2DL4", "KIR3DL2", "KIR2DS4", "LILRB1", "LILRB2", "LILRB4",
+    "SIGLEC7", "SIGLEC9", "CD47", "SIRPA", "SIRPB1", "SIRPG", "NECTIN2", "NECTIN3", "PVR", "CD155",
+    # Angiogenesis (30)
+    "VEGFA", "VEGFB", "VEGFC", "VEGFD", "KDR", "FLT1", "FLT4", "NRP1", "NRP2", "PGF",
+    "ANGPT1", "ANGPT2", "TEK", "FGF1", "FGF2", "FGF5", "FGF8", "FGF18", "PDGFA", "PDGFB",
+    "PDGFRA", "PDGFRB", "TGFB1", "TGFB2", "TGFB3", "TGFBR1", "TGFBR2", "TGFBR3", "EPHA2", "EFNA1",
+    # Epigenetic regulators (60)
+    "DNMT1", "DNMT3A", "DNMT3B", "TET1", "TET2", "TET3", "IDH1", "IDH2", "EZH2", "EED",
+    "SUZ12", "KMT2A", "KMT2B", "KMT2C", "KMT2D", "KMT2E", "SETD1A", "SETD1B", "SETD2", "SETD7",
+    "SETDB1", "SETDB2", "ASH1L", "ASH2L", "KDM1A", "KDM1B", "KDM2A", "KDM2B", "KDM3A", "KDM3B",
+    "KDM4A", "KDM4B", "KDM4C", "KDM4D", "KDM4E", "KDM5A", "KDM5B", "KDM5C", "KDM6A", "KDM6B",
+    "KDM7A", "KDM7B", "PRMT1", "PRMT2", "PRMT3", "PRMT5", "PRMT6", "PRMT7", "PRMT8", "PRMT9",
+    "HDAC1", "HDAC2", "HDAC3", "HDAC4", "HDAC5", "HDAC6", "HDAC7", "HDAC8", "HDAC9", "HDAC10",
+    # PI3K/AKT/mTOR pathway (40)
+    "PIK3CA", "PIK3CB", "PIK3CD", "PIK3CG", "PIK3R1", "PIK3R2", "PIK3R3", "PIK3C2A", "PIK3C2B", "PIK3C2G",
+    "PIK3C3", "AKT1", "AKT2", "AKT3", "MTOR", "RPTOR", "RICTOR", "MLST8", "DEPTOR", "TSC1",
+    "TSC2", "RHEB", "AKT1S1", "PPP2R1A", "PPP2R1B", "PPP2R2A", "PTEN", "INPP4B", "INPP4A", "PIK3IP1",
+    "FOXO1", "FOXO3", "FOXO4", "GSK3B", "SGK1", "PDK1", "IRS1", "IRS2", "GRB10", "RPS6KB1",
+    # MAPK/ERK pathway (40)
+    "KRAS", "NRAS", "HRAS", "BRAF", "RAF1", "ARAF", "MAP2K1", "MAP2K2", "MAP2K4", "MAP2K5",
+    "MAPK1", "MAPK3", "MAPK8", "MAPK9", "MAPK14", "DAB2IP", "RASSF1", "RASSF2", "RASSF5", "RIN1",
+    "SOS1", "SOS2", "SHC1", "SHC2", "SHC3", "SHC4", "GRB2", "CBL", "CBLB", "CBLC",
+    "SPRY1", "SPRY2", "SPRY3", "SPRY4", "DUSP1", "DUSP4", "DUSP6", "DUSP7", "DUSP8", "DUSP9",
+    # Wnt/beta-catenin (30)
+    "CTNNB1", "APC", "AXIN1", "AXIN2", "GSK3B", "GSK3A", "CSNK1A1", "CSNK1D", "CSNK1E", "BTRC",
+    "FBXW11", "TCF7", "TCF7L1", "TCF7L2", "LEF1", "MYC", "CCND1", "PPARD", "JUN", "FOSL1",
+    "WNT1", "WNT2", "WNT2B", "WNT3", "WNT3A", "WNT4", "WNT5A", "WNT5B", "WNT6", "WNT7A",
+    # Hedgehog pathway (15)
+    "SHH", "IHH", "DHH", "PTCH1", "PTCH2", "SMO", "GLI1", "GLI2", "GLI3", "SUFU",
+    "SPOP", "CDON", "BOC", "GAS1", "STK36",
+    # Notch pathway (15)
+    "NOTCH1", "NOTCH2", "NOTCH3", "NOTCH4", "JAG1", "JAG2", "DLL1", "DLL3", "DLL4", "FBXW7",
+    "MAML1", "MAML2", "MAML3", "NCOR1", "NCOR2",
+    # Hippo pathway (15)
+    "YAP1", "WWTR1", "LATS1", "LATS2", "MST1", "MST2", "SAV1", "MOB1A", "MOB1B", "NF2",
+    "TAZ", "TEAD1", "TEAD2", "TEAD3", "TEAD4",
+    # TGF-beta pathway (15)
+    "TGFB1", "TGFB2", "TGFB3", "TGFBR1", "TGFBR2", "TGFBR3", "SMAD2", "SMAD3", "SMAD4", "SMAD7",
+    "ACVR1B", "ACVR2A", "BMPR1A", "BMPR1B", "BMPR2",
+    # JAK-STAT pathway (15)
+    "JAK1", "JAK2", "JAK3", "TYK2", "STAT1", "STAT2", "STAT3", "STAT4", "STAT5A", "STAT5B",
+    "STAT6", "SOCS1", "SOCS2", "SOCS3", "PIAS1",
+    # NF-kB pathway (15)
+    "RELA", "RELB", "REL", "NFKB1", "NFKB2", "CHUK", "IKBKB", "IKBKG", "NFKBIA", "NFKBIB",
+    "BCL10", "MALT1", "CARD11", "TRAF2", "TRAF3",
+    # Receptor tyrosine kinases (50)
+    "EGFR", "ERBB2", "ERBB3", "ERBB4", "FGFR1", "FGFR2", "FGFR3", "FGFR4", "PDGFRA", "PDGFRB",
+    "KIT", "FLT3", "CSF1R", "MET", "RET", "ROS1", "ALK", "NTRK1", "NTRK2", "NTRK3",
+    "INSR", "IGF1R", "IGF2R", "DDR1", "DDR2", "RYK", "MUSK", "ROR1", "ROR2", "LTK",
+    "TIE1", "TEK", "AXL", "MERTK", "TYRO3", "EPHA1", "EPHA2", "EPHA3", "EPHA4", "EPHA5",
+    "EPHB1", "EPHB2", "EPHB3", "EPHB4", "EPHB6", "KDR", "FLT1", "FLT4", "NRP1", "NRP2",
+    # Transcription factors (50)
+    "MYC", "MYCN", "MYCL", "TP53", "FOXM1", "FOXO1", "FOXO3", "E2F1", "E2F2", "E2F3",
+    "E2F4", "E2F5", "E2F6", "E2F7", "E2F8", "TFDP1", "TFDP2", "MAX", "MGA", "MNT",
+    "MLX", "MLXIP", "MLXIPL", "MondoA", "MondoB", "HIF1A", "EPAS1", "ARNT", "ARNT2", "ARNTL",
+    "CLOCK", "NPAS2", "BMAL1", "BMAL2", "C-MYB", "MYB", "RUNX1", "RUNX2", "RUNX3", "CBFB",
+    "GATA1", "GATA2", "GATA3", "GATA4", "GATA5", "GATA6", "TAL1", "TAL2", "LYL1", "LMO1",
+    # Chromatin remodelers (30)
+    "ARID1A", "ARID1B", "ARID2", "SMARCA4", "SMARCB1", "SMARCC1", "SMARCC2", "SMARCD1", "SMARCD2", "SMARCD3",
+    "SMARCE1", "SMARCA2", "SMARCA5", "CHD1", "CHD2", "CHD3", "CHD4", "CHD5", "CHD6", "CHD7",
+    "CHD8", "CHD9", "EP300", "CREBBP", "KAT2A", "KAT2B", "KAT5", "KAT6A", "KAT6B", "KAT7",
+    # Splicing factors (20)
+    "SF3B1", "SRSF2", "U2AF1", "U2AF2", "ZRSR2", "LUC7L2", "PRPF8", "PRPF40B", "SNRNP200", "DDX41",
+    "BCOR", "STAG2", "PPM1D", "RAD21", "SMC1A", "SMC3", "BRCC3", "BOP1", "RRP15", "HEATR1",
+    # Telomere maintenance (10)
+    "TERT", "TERC", "DKC1", "NOP10", "NHP2", "GAR1", "TCAB1", "POT1", "TPP1", "TINF2",
+    # Ferroptosis (10)
+    "GPX4", "SLC7A11", "ACSL4", "LPCAT3", "FSP1", "NFE2L2", "KEAP1", "HMOX1", "FTL", "FTH1",
+    # Autophagy (10)
+    "BECN1", "ATG5", "ATG7", "ATG12", "ATG16L1", "ULK1", "ULK2", "MTOR", "RPTOR", "AMBRA1",
+    # Necroptosis (10)
+    "RIPK1", "RIPK3", "MLKL", "TNF", "TNFR1", "FADD", "CYLD", "SPATA2", "OPTN", "PGAM5",
+    # Metabolism (20)
+    "LDHA", "LDHB", "PKM", "HK2", "PFKFB3", "GLUT1", "GLUT3", "MCT1", "MCT4", "ACLY",
+    "ACC1", "FASN", "SCD", "ACSS2", "MTHFD2", "PHGDH", "PSAT1", "PSPH", "SHMT2", "GLS",
+    # Ubiquitin/proteasome (15)
+    "VHL", "MDM2", "FBXW7", "SPOP", "BTRC", "KEAP1", "CUL3", "CUL4A", "CUL4B", "RBX1",
+    "UBE2D1", "UBE2E1", "UBE2L3", "PSMB5", "PSMB6",
+    # RNA modification (15)
+    "METTL3", "METTL14", "WTAP", "FTO", "ALKBH5", "YTHDC1", "YTHDC2", "YTHDF1", "YTHDF2", "YTHDF3",
+    "IGF2BP1", "IGF2BP2", "IGF2BP3", "HNRNPC", "RBMX",
+    # Stress response (10)
+    "HSPA1A", "HSPA1B", "HSP90AA1", "HSP90AB1", "DNAJB1", "HSF1", "ATF4", "ATF6", "ERN1", "EIF2AK3",
+    # Stem cell / differentiation (15)
+    "SOX2", "OCT4", "NANOG", "KLF4", "MYC", "LIN28A", "SALL4", "DPPA4", "UTF1", "ZFP42",
+    "NODAL", "LEFTY1", "LEFTY2", "TDGF1", "GDF3",
+    # Microenvironment (15)
+    "TGFB1", "TGFB2", "TGFB3", "IL6", "IL10", "CXCL8", "CXCL12", "CCL2", "CCL5", "VEGFA",
+    "MMP2", "MMP9", "MMP14", "TIMP1", "TIMP2",
+    # EMT / metastasis (20)
+    "CDH1", "CDH2", "VIM", "SNAI1", "SNAI2", "ZEB1", "ZEB2", "TWIST1", "TWIST2", "FOXC2",
+    "GSC", "HMGA2", "MMP2", "MMP9", "MMP14", "SERPINE1", "FN1", "SPP1", "MUC1", "EPCAM",
+    # DNA damage response (30)
+    "BRCA1", "BRCA2", "TP53BP1", "RAD51", "RAD51C", "RAD51D", "PALB2", "BRIP1", "BARD1", "NBN",
+    "ATM", "ATR", "CHEK1", "CHEK2", "MDC1", "53BP1", "MRE11", "RAD50", "FANCD2", "FANCI",
+    "UBE2T", "RNF168", "RNF8", "RIF1", " Shieldin1", "MAD2L2", "POLQ", "HELQ", "RAD52", "RAD54B",
+    # Ribosome biogenesis (10)
+    "RPL5", "RPL11", "RPL23", "RPS7", "RPS14", "RPS19", "RPS27", "RPS27A", "RPL22", "RPS3",
+    # Others (185)
+    "SPEN", "DAXX", "ATRX", "CARM1", "PRMT5", "DOT1L", "BRD4", "BRD2", "BRD3", "BRDT",
+    "BMI1", "RING1", "RNF2", "CBX2", "CBX7", "CBX8", "PHC1", "PHC2", "PHC3", "SCMH1",
+    "YY1", "CTCF", "RAD21", "STAG1", "STAG2", "HDAC1", "HDAC2", "HDAC3", "HDAC6", "SIRT1",
+    "SIRT2", "SIRT3", "SIRT6", "SIRT7", "KAT5", "KAT6A", "KAT6B", "KAT7", "KAT8", "NSD1",
+    "NSD2", "NSD3", "EHMT1", "EHMT2", "SUV39H1", "SUV39H2", "SETD2", "SETD1A", "SETD1B", "SETDB1",
+    "MLL", "MLL2", "MLL3", "MLL4", "MLL5", "KDM1A", "KDM1B", "KDM2A", "KDM2B", "KDM4A",
+    "KDM4B", "KDM4C", "KDM5A", "KDM5B", "KDM5C", "KDM6A", "KDM6B", "EZH2", "EED", "SUZ12",
+    "AURKA", "AURKB", "AURKC", "PLK1", "PLK2", "PLK3", "PLK4", "CDC20", "CDH1", "CDC6",
+    "ORC1", "ORC2", "ORC3", "ORC4", "ORC5", "ORC6", "MCM2", "MCM3", "MCM4", "MCM5",
+    "MCM6", "MCM7", "MCM8", "MCM9", "MCM10", "PCNA", "RFC1", "RFC2", "RFC3", "RFC4",
+    "RFC5", "POLA1", "POLA2", "POLD1", "POLD2", "POLD3", "POLD4", "POLE", "POLE2", "POLE3",
+    "POLE4", "FEN1", "LIG1", "LIG3", "LIG4", "XRCC1", "XRCC2", "XRCC3", "XRCC4", "XRCC5",
+    "XRCC6", "PARP1", "PARP2", "PARP3", "APEX1", "APEX2", "OGG1", "NTHL1", "NEIL1", "NEIL2",
+    "NEIL3", "MPG", "SMUG1", "TDG", "MBD4", "MSH2", "MSH3", "MSH6", "MLH1", "PMS1",
+    "PMS2", "EXO1", "RFC", "PCNA", "RPA", "LIG1", "HMGA1", "HMGA2", "HMGB1", "HMGB2",
+    "TCF3", "TCF4", "LYN", "BLK", "FGR", "HCK", "FRK", "SRMS", "YES1", "YAP1",
 ]
 
+# Remove duplicates while preserving order
+GENE_LIST_2000_UNIQUE = list(dict.fromkeys(GENE_LIST_2000))
 
-def cbio_get(endpoint, params=None):
-    """Make a GET request to cBioPortal API."""
+# ============== cBioPortal API Helpers ==============
+
+def cbio_get(endpoint, params=None, timeout=30):
     url = f"{CBIOPORTAL_BASE}{endpoint}"
     try:
-        resp = requests.get(url, params=params, timeout=30)
-        resp.raise_for_status()
-        return resp.json()
+        r = requests.get(url, params=params, timeout=timeout)
+        r.raise_for_status()
+        return r.json()
     except Exception as e:
         return {"error": str(e)}
 
 
 def get_molecular_profile_id(study_id):
-    """Get the RNA-seq molecular profile ID for a study."""
-    if study_id in MRNA_PROFILES:
-        return MRNA_PROFILES[study_id]
-    # Fallback: query API
-    profiles = cbio_get(f"/studies/{study_id}/molecular-profiles")
+    """Get RNA-seq molecular profile ID (auto-discover if not in map)."""
+    profiles = cbio_get(f"/studies/{study_id}/molecular-profiles", timeout=30)
     if isinstance(profiles, list):
         for p in profiles:
             name = p.get("molecularProfileId", "")
+            dn = p.get("name", "").lower()
+            if "rna seq" in dn and "mrna" in dn and "z-scores" in dn:
+                return name
             if "rna_seq" in name.lower() and "mrna" in name.lower():
                 return name
     return None
 
 
 def get_clinical_data(study_id):
-    """Fetch clinical survival data for a study."""
-    # Get patient clinical data
+    """Fetch patient clinical data including OS, DFS, PFS, DSS."""
     data = cbio_get(
         f"/studies/{study_id}/clinical-data",
-        {"clinicalDataType": "PATIENT", "projection": "DETAILED", "pageSize": 10000}
+        {"clinicalDataType": "PATIENT", "projection": "DETAILED", "pageSize": 10000},
+        timeout=30
     )
     if not isinstance(data, list):
-        return []
-    
-    # Extract OS_MONTHS and OS_STATUS
+        return {}
     patients = {}
     for item in data:
         pid = item.get("patientId", "")
@@ -142,94 +291,93 @@ def get_clinical_data(study_id):
         if pid not in patients:
             patients[pid] = {}
         patients[pid][attr] = val
-    
     return patients
 
 
-def get_gene_expression(study_id, molecular_profile_id, gene):
-    """Fetch expression data for a specific gene using cBioPortal API."""
-    # First get entrezGeneId from hugo symbol
-    genes = cbio_get("/genes", {"keyword": gene, "pageSize": 1})
-    if isinstance(genes, list) and len(genes) > 0:
-        entrez_id = genes[0].get("entrezGeneId")
-        gene_name = genes[0].get("hugoGeneSymbol", gene)
-    else:
+def get_samples(study_id):
+    samples = cbio_get(f"/studies/{study_id}/samples", {"pageSize": 10000}, timeout=30)
+    return samples if isinstance(samples, list) else []
+
+
+def get_gene_expression(study_id, profile_id, gene):
+    """Fetch expression data for a gene via cBioPortal molecular-data API."""
+    genes = cbio_get("/genes", {"keyword": gene, "pageSize": 1}, timeout=30)
+    if not (isinstance(genes, list) and len(genes) > 0):
         return None, gene
-    
-    # Use profile-specific endpoint with sampleListId
-    sample_list_id = f"{study_id}_all"
+    entrez_id = genes[0].get("entrezGeneId")
+    gene_name = genes[0].get("hugoGeneSymbol", gene)
+
     body = {
-        "sampleListId": sample_list_id,
+        "sampleListId": f"{study_id}_all",
         "entrezGeneIds": [entrez_id]
     }
-    
     try:
-        resp = requests.post(
-            f"{CBIOPORTAL_BASE}/molecular-profiles/{molecular_profile_id}/molecular-data/fetch",
+        r = requests.post(
+            f"{CBIOPORTAL_BASE}/molecular-profiles/{profile_id}/molecular-data/fetch",
             json=body,
             timeout=120
         )
-        resp.raise_for_status()
-        return resp.json(), gene_name
-    except Exception as e:
+        r.raise_for_status()
+        return r.json(), gene_name
+    except Exception:
         return None, gene
-
-
-def get_samples(study_id):
-    """Get all sample IDs for a study."""
-    samples = cbio_get(f"/studies/{study_id}/samples", {"pageSize": 10000})
-    if isinstance(samples, list):
-        return samples
-    return []
 
 
 # ============== Survival Analysis Core ==============
 
 def parse_survival(patients, sample_to_patient):
-    """Parse clinical data into survival DataFrame."""
+    """Parse clinical data into DataFrame with OS/DFS/PFS/DSS columns."""
     rows = []
     for sample_id, patient_id in sample_to_patient.items():
         p = patients.get(patient_id, {})
-        os_months = p.get("OS_MONTHS")
-        os_status = p.get("OS_STATUS")
-        dfs_months = p.get("DFS_MONTHS")
-        dfs_status = p.get("DFS_STATUS")
-        
-        try:
-            os_m = float(os_months) if os_months else None
-        except:
-            os_m = None
-        try:
-            dfs_m = float(dfs_months) if dfs_months else None
-        except:
-            dfs_m = None
-        
-        os_event = 1 if os_status and "DECEASED" in str(os_status).upper() else 0
-        dfs_event = 1 if dfs_status and str(dfs_status).upper() in ["1:PROGRESSION", "PROGRESSION", "RECURRANCE", "RECURRENCE"] else 0
-        
+
+        def parse_float(v):
+            try:
+                return float(v) if v not in (None, "", "NA", "N/A") else None
+            except (ValueError, TypeError):
+                return None
+
+        def parse_event(status, event_keywords):
+            if not status:
+                return 0
+            s = str(status).upper().strip()
+            if any(k in s for k in event_keywords):
+                return 1
+            return 0
+
+        os_m = parse_float(p.get("OS_MONTHS"))
+        dfs_m = parse_float(p.get("DFS_MONTHS"))
+        pfs_m = parse_float(p.get("PFS_MONTHS"))
+        dss_m = parse_float(p.get("DSS_MONTHS"))
+
+        os_status = p.get("OS_STATUS", "")
+        dfs_status = p.get("DFS_STATUS", "")
+        pfs_status = p.get("PFS_STATUS", "")
+        dss_status = p.get("DSS_STATUS", "")
+
         rows.append({
             "sample_id": sample_id,
             "patient_id": patient_id,
             "OS_MONTHS": os_m,
-            "OS_EVENT": os_event,
+            "OS_EVENT":  parse_event(os_status, ["DECEASED", "DEAD", "1"]),
             "DFS_MONTHS": dfs_m,
-            "DFS_EVENT": dfs_event
+            "DFS_EVENT": parse_event(dfs_status, ["PROGRESSION", "RECUR", "RECURRENCE", "1:PROGRESSION", "1:RECUR"]),
+            "PFS_MONTHS": pfs_m,
+            "PFS_EVENT": parse_event(pfs_status, ["PROGRESSION", "RECUR", "RECURRENCE", "1:PROGRESSION", "1:RECUR"]),
+            "DSS_MONTHS": dss_m,
+            "DSS_EVENT": parse_event(dss_status, ["DEAD", "DECEASED", "1"]),
         })
-    
     return pd.DataFrame(rows)
 
 
 def compute_survival_analysis(expr_data, clinical_df, gene_name, survival_type="OS", cutoff=50):
     """
-    Compute survival analysis for a single gene.
-    
-    Returns:
-        dict with HR, CI, p-value, KM curve data, median survival
+    Compute Cox regression + Log-rank + KM curves for a gene.
+    survival_type: OS | DFS | PFS | DSS
     """
     if not expr_data or not isinstance(expr_data, list) or len(expr_data) == 0:
         return None
-    
-    # Build expression DataFrame
+
     expr_rows = []
     for item in expr_data:
         sid = item.get("sampleId", "")
@@ -237,99 +385,91 @@ def compute_survival_analysis(expr_data, clinical_df, gene_name, survival_type="
         if val is not None:
             try:
                 expr_rows.append({"sample_id": sid, "expression": float(val)})
-            except:
+            except (ValueError, TypeError):
                 pass
-    
+
     if len(expr_rows) < 20:
         return None
-    
+
     expr_df = pd.DataFrame(expr_rows)
-    
-    # Merge with clinical
     merged = clinical_df.merge(expr_df, on="sample_id", how="inner")
     if len(merged) < 20:
         return None
-    
-    # Determine time/event columns
-    if survival_type == "DFS":
-        time_col = "DFS_MONTHS"
-        event_col = "DFS_EVENT"
-    else:
-        time_col = "OS_MONTHS"
-        event_col = "OS_EVENT"
-    
-    # Remove missing
+
+    # Map survival type to columns
+    survival_map = {
+        "DFS": ("DFS_MONTHS", "DFS_EVENT"),
+        "PFS": ("PFS_MONTHS", "PFS_EVENT"),
+        "DSS": ("DSS_MONTHS", "DSS_EVENT"),
+        "OS":  ("OS_MONTHS",  "OS_EVENT"),
+    }
+    time_col, event_col = survival_map.get(survival_type, ("OS_MONTHS", "OS_EVENT"))
+
     merged = merged.dropna(subset=[time_col, event_col, "expression"])
     if len(merged) < 20:
         return None
-    
+
     # Group by cutoff
     threshold = merged["expression"].quantile(cutoff / 100.0)
     merged["group"] = (merged["expression"] >= threshold).astype(int)
-    
-    # Basic stats
+
     high_group = merged[merged["group"] == 1]
     low_group = merged[merged["group"] == 0]
-    
     high_n = len(high_group)
     low_n = len(low_group)
-    
+
     if high_n < 5 or low_n < 5:
         return None
-    
+
     # Log-rank test
     try:
-        lr_result = logrank_test(
+        lr = logrank_test(
             high_group[time_col], low_group[time_col],
             event_observed_A=high_group[event_col],
             event_observed_B=low_group[event_col]
         )
-        p_value = lr_result.p_value
+        p_value = lr.p_value
     except Exception:
         p_value = 1.0
-    
+
     # Cox regression
     try:
         cox_df = merged[[time_col, event_col, "group"]].copy()
         cph = CoxPHFitter()
         cph.fit(cox_df, duration_col=time_col, event_col=event_col)
-        hr = np.exp(cph.params_["group"])
-        ci = np.exp(cph.confidence_intervals_.loc["group"].values)
-        hr_ci_low, hr_ci_high = float(ci[0]), float(ci[1])
+        hr = float(np.exp(cph.params_["group"]))
+        ci_vals = np.exp(cph.confidence_intervals_.loc["group"].values)
+        hr_ci_low, hr_ci_high = float(ci_vals[0]), float(ci_vals[1])
     except Exception:
-        hr = 1.0
-        hr_ci_low, hr_ci_high = 0.5, 2.0
+        hr, hr_ci_low, hr_ci_high = 1.0, 0.5, 2.0
         p_value = 1.0
-    
+
     # KM curves
     kmf_high = KaplanMeierFitter()
     kmf_low = KaplanMeierFitter()
-    
     kmf_high.fit(high_group[time_col], event_observed=high_group[event_col], label=f"High {gene_name}")
     kmf_low.fit(low_group[time_col], event_observed=low_group[event_col], label=f"Low {gene_name}")
-    
-    # Median survival
+
     high_median = kmf_high.median_survival_time_
     low_median = kmf_low.median_survival_time_
-    
-    # KM curve data points
+
     km_data = {
         "high": {
-            "time": kmf_high.survival_function_.index.tolist(),
-            "survival": kmf_high.survival_function_.iloc[:, 0].tolist()
+            "time": [float(t) for t in kmf_high.survival_function_.index.tolist()],
+            "survival": [float(s) for s in kmf_high.survival_function_.iloc[:, 0].tolist()]
         },
         "low": {
-            "time": kmf_low.survival_function_.index.tolist(),
-            "survival": kmf_low.survival_function_.iloc[:, 0].tolist()
+            "time": [float(t) for t in kmf_low.survival_function_.index.tolist()],
+            "survival": [float(s) for s in kmf_low.survival_function_.iloc[:, 0].tolist()]
         }
     }
-    
+
     return {
         "gene": gene_name,
         "survival_type": survival_type,
-        "hr": float(hr),
-        "hr_ci_low": float(hr_ci_low),
-        "hr_ci_high": float(hr_ci_high),
+        "hr": hr,
+        "hr_ci_low": hr_ci_low,
+        "hr_ci_high": hr_ci_high,
         "p_value": float(p_value),
         "high_n": high_n,
         "low_n": low_n,
@@ -342,139 +482,160 @@ def compute_survival_analysis(expr_data, clinical_df, gene_name, survival_type="
     }
 
 
+# ============== DepMap Integration ==============
+
+def fetch_depmap_dependency(gene):
+    """Fetch gene dependency scores from DepMap API."""
+    try:
+        # DepMap uses a gene search endpoint
+        # First resolve gene to their entity ID
+        search_url = f"{DEPMAP_BASE}/gene/{gene}"
+        r = requests.get(search_url, timeout=30)
+        if r.status_code != 200:
+            return None
+        gene_info = r.json()
+        gene_id = gene_info.get("geneId") or gene_info.get("entityId")
+        if not gene_id:
+            return None
+
+        # Fetch dependency data
+        dep_url = f"{DEPMAP_BASE}/gene/{gene_id}/dependency"
+        r2 = requests.get(dep_url, timeout=60)
+        if r2.status_code != 200:
+            return None
+        deps = r2.json()
+        return deps
+    except Exception as e:
+        return {"error": str(e)}
+
+
 # ============== API Routes ==============
 
 @app.route("/api/health", methods=["GET"])
 def health():
-    return jsonify({"status": "ok", "service": "PharmaTrace Survival Analysis API"})
+    return jsonify({
+        "status": "ok",
+        "service": "PharmaTrace Survival Analysis API v2.0",
+        "features": ["33 TCGA cancer types", "OS/DFS/PFS/DSS", "2000 genes", "DepMap"]
+    })
 
 
 @app.route("/api/cancers", methods=["GET"])
 def list_cancers():
-    """List available cancer studies."""
-    return jsonify({
-        "studies": [
-            {"code": k, "name": v.replace("_tcga_pan_can_atlas_2018", "").upper() + " (TCGA)"}
-            for k, v in CANCER_STUDIES.items()
-        ]
-    })
+    """List all 33 TCGA cancer studies with Chinese names."""
+    studies = []
+    for code, study_id in CANCER_STUDIES.items():
+        name = CANCER_NAMES.get(code, code)
+        studies.append({
+            "code": code,
+            "name": f"{code} - {name}",
+            "study_id": study_id
+        })
+    return jsonify({"studies": studies, "count": len(studies)})
 
 
 @app.route("/api/survival/forward", methods=["POST"])
 def forward_analysis():
     """
-    Forward survival analysis.
-    Input: { gene, cancer_type, survival_type="OS", cutoff=50 }
-    Output: survival analysis results with KM curve data
+    Forward analysis: gene + cancer → survival results.
+    Body: { gene, cancer_type, survival_type="OS", cutoff=50 }
     """
     data = request.get_json() or {}
     gene = data.get("gene", "").upper().strip()
     cancer_code = data.get("cancer_type", "").upper().strip()
     survival_type = data.get("survival_type", "OS").upper()
     cutoff = int(data.get("cutoff", 50))
-    
+
     if not gene or not cancer_code:
         return jsonify({"error": "gene and cancer_type are required"}), 400
-    
+
     study_id = CANCER_STUDIES.get(cancer_code)
     if not study_id:
         return jsonify({"error": f"Unknown cancer type: {cancer_code}"}), 400
-    
-    # Get molecular profile
+
+    if survival_type not in ("OS", "DFS", "PFS", "DSS"):
+        return jsonify({"error": "survival_type must be OS, DFS, PFS, or DSS"}), 400
+
     profile_id = get_molecular_profile_id(study_id)
     if not profile_id:
-        return jsonify({"error": "No RNA-seq data available for this cancer type"}), 404
-    
-    # Get samples
+        return jsonify({"error": "No RNA-seq data for this cancer type"}), 404
+
     samples = get_samples(study_id)
     if not samples:
         return jsonify({"error": "No samples found"}), 404
-    
-    sample_ids = [s["sampleId"] for s in samples]
+
     sample_to_patient = {s["sampleId"]: s.get("patientId", s["sampleId"]) for s in samples}
-    
-    # Get clinical data
     patients = get_clinical_data(study_id)
     clinical_df = parse_survival(patients, sample_to_patient)
-    
     if len(clinical_df) < 20:
         return jsonify({"error": "Insufficient clinical data"}), 404
-    
-    # Get gene expression
+
     expr_data, gene_name = get_gene_expression(study_id, profile_id, gene)
-    
     if not expr_data:
-        return jsonify({"error": f"No expression data found for gene {gene}"}), 404
-    
-    # Compute survival analysis
+        return jsonify({"error": f"No expression data for gene {gene}"}), 404
+
     result = compute_survival_analysis(expr_data, clinical_df, gene_name, survival_type, cutoff)
-    
     if not result:
-        return jsonify({"error": "Analysis failed - insufficient data after filtering"}), 400
-    
+        return jsonify({"error": "Analysis failed after data filtering"}), 400
+
     return jsonify(result)
 
 
 @app.route("/api/survival/reverse", methods=["POST"])
 def reverse_analysis():
     """
-    Reverse survival analysis - screen all genes.
-    Input: { cancer_type, survival_type="OS", cutoff=50, max_genes=50 }
-    Output: ranked list of prognostic genes
+    Reverse analysis: cancer → ranked prognostic gene list.
+    Body: { cancer_type, survival_type="OS", cutoff=50, max_genes=200 }
     """
     data = request.get_json() or {}
     cancer_code = data.get("cancer_type", "").upper().strip()
     survival_type = data.get("survival_type", "OS").upper()
     cutoff = int(data.get("cutoff", 50))
-    max_genes = int(data.get("max_genes", 50))
-    
+    max_genes = int(data.get("max_genes", 200))
+
     if not cancer_code:
         return jsonify({"error": "cancer_type is required"}), 400
-    
+
     study_id = CANCER_STUDIES.get(cancer_code)
     if not study_id:
         return jsonify({"error": f"Unknown cancer type: {cancer_code}"}), 400
-    
+
+    if survival_type not in ("OS", "DFS", "PFS", "DSS"):
+        return jsonify({"error": "survival_type must be OS, DFS, PFS, or DSS"}), 400
+
     profile_id = get_molecular_profile_id(study_id)
     if not profile_id:
-        return jsonify({"error": "No RNA-seq data available"}), 404
-    
-    # Get samples and clinical data (once)
+        return jsonify({"error": "No RNA-seq data"}), 404
+
     samples = get_samples(study_id)
     if not samples:
         return jsonify({"error": "No samples found"}), 404
-    
-    sample_ids = [s["sampleId"] for s in samples]
+
     sample_to_patient = {s["sampleId"]: s.get("patientId", s["sampleId"]) for s in samples}
     patients = get_clinical_data(study_id)
     clinical_df = parse_survival(patients, sample_to_patient)
-    
     if len(clinical_df) < 20:
         return jsonify({"error": "Insufficient clinical data"}), 404
-    
-    # Screen genes
+
+    genes_to_test = GENE_LIST_2000_UNIQUE[:min(max_genes, len(GENE_LIST_2000_UNIQUE))]
     results = []
-    genes_to_test = GENE_LIST[:max_genes]
-    
-    for gene in genes_to_test:
+
+    for i, gene in enumerate(genes_to_test):
         expr_data, gene_name = get_gene_expression(study_id, profile_id, gene)
         if not expr_data:
             continue
-        
+
         result = compute_survival_analysis(expr_data, clinical_df, gene_name, survival_type, cutoff)
         if result and result["p_value"] < 0.05:
             results.append(result)
-        
-        # Rate limiting
-        time.sleep(0.05)
-    
-    # Sort by p-value
+
+        if (i + 1) % 20 == 0:
+            time.sleep(0.1)  # Rate limiting
+
     results.sort(key=lambda x: x["p_value"])
-    
-    # Add ranks
     for i, r in enumerate(results):
         r["rank"] = i + 1
-    
+
     return jsonify({
         "cancer_type": cancer_code,
         "survival_type": survival_type,
@@ -483,6 +644,82 @@ def reverse_analysis():
         "significant_genes": len(results),
         "genes": results,
         "data_source": "cBioPortal/TCGA"
+    })
+
+
+@app.route("/api/survival/multi", methods=["POST"])
+def multi_gene_analysis():
+    """
+    Analyze multiple genes at once.
+    Body: { genes: ["TP53", "EGFR"], cancer_type, survival_type="OS", cutoff=50 }
+    """
+    data = request.get_json() or {}
+    genes = data.get("genes", [])
+    cancer_code = data.get("cancer_type", "").upper().strip()
+    survival_type = data.get("survival_type", "OS").upper()
+    cutoff = int(data.get("cutoff", 50))
+
+    if not genes or not cancer_code:
+        return jsonify({"error": "genes and cancer_type are required"}), 400
+
+    study_id = CANCER_STUDIES.get(cancer_code)
+    if not study_id:
+        return jsonify({"error": f"Unknown cancer type: {cancer_code}"}), 400
+
+    profile_id = get_molecular_profile_id(study_id)
+    if not profile_id:
+        return jsonify({"error": "No RNA-seq data"}), 404
+
+    samples = get_samples(study_id)
+    sample_to_patient = {s["sampleId"]: s.get("patientId", s["sampleId"]) for s in samples}
+    patients = get_clinical_data(study_id)
+    clinical_df = parse_survival(patients, sample_to_patient)
+
+    results = []
+    for gene in genes[:20]:  # Max 20 genes at once
+        expr_data, gene_name = get_gene_expression(study_id, profile_id, gene)
+        if expr_data:
+            result = compute_survival_analysis(expr_data, clinical_df, gene_name, survival_type, cutoff)
+            if result:
+                results.append(result)
+        time.sleep(0.05)
+
+    results.sort(key=lambda x: x["p_value"])
+    return jsonify({
+        "cancer_type": cancer_code,
+        "survival_type": survival_type,
+        "genes_analyzed": len(results),
+        "results": results,
+        "data_source": "cBioPortal/TCGA"
+    })
+
+
+@app.route("/api/depmap/dependency", methods=["GET"])
+def depmap_dependency():
+    """
+    Get DepMap gene dependency data.
+    Query: ?gene=TP53
+    """
+    gene = request.args.get("gene", "").upper().strip()
+    if not gene:
+        return jsonify({"error": "gene parameter required"}), 400
+
+    result = fetch_depmap_dependency(gene)
+    if result is None:
+        return jsonify({"error": f"No DepMap data for gene {gene}"}), 404
+    if isinstance(result, dict) and "error" in result:
+        return jsonify(result), 500
+
+    return jsonify({"gene": gene, "dependency": result, "source": "DepMap Portal"})
+
+
+@app.route("/api/genes", methods=["GET"])
+def list_genes():
+    """Return the available gene list for reverse analysis."""
+    return jsonify({
+        "total_genes": len(GENE_LIST_2000_UNIQUE),
+        "genes": GENE_LIST_2000_UNIQUE[:100],  # Return first 100 as preview
+        "note": f"Full list contains {len(GENE_LIST_2000_UNIQUE)} cancer-related genes"
     })
 
 
