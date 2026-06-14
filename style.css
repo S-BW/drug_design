@@ -3058,6 +3058,13 @@ h1 {
     margin: 0;
 }
 
+.contact-tip {
+    margin-top: 18px;
+    color: #a8b2d1;
+    font-size: 0.88em;
+    line-height: 1.5;
+}
+
 @media (max-width: 768px) {
     .contact-email {
         font-size: 1.2em;

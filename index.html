@@ -35,14 +35,15 @@
             <button type="button" class="apply-close" id="contact-close" aria-label="关闭">×</button>
             <div class="apply-header">
                 <h2>联系我们</h2>
-                <p>如有合作意向，欢迎发送邮件或复制邮箱</p>
+                <p>如有合作意向，欢迎发送邮件</p>
             </div>
             <div class="contact-body">
                 <div class="contact-email">sinotarzhangx@126.com</div>
                 <div class="contact-actions">
-                    <a href="mailto:sinotarzhangx@126.com" class="footer-btn primary">发送邮件</a>
-                    <button type="button" class="footer-btn" id="copy-email">复制邮箱</button>
+                    <button type="button" class="footer-btn primary" id="copy-email">复制邮箱</button>
+                    <a href="mailto:sinotarzhangx@126.com" class="footer-btn" id="send-email-link" target="_blank" rel="noopener">打开邮件客户端</a>
                 </div>
+                <p class="contact-tip">如果未安装邮件客户端，请直接复制邮箱地址后粘贴发送</p>
             </div>
         </div>
     </div>
@@ -312,6 +313,7 @@
         var overlay = document.getElementById('contact-overlay');
         var closeBtn = document.getElementById('contact-close');
         var copyBtn = document.getElementById('copy-email');
+        var sendLink = document.getElementById('send-email-link');
 
         function openOverlay() {
             if (overlay) overlay.classList.remove('hidden');
@@ -333,6 +335,10 @@
             overlay.addEventListener('click', function (e) {
                 if (e.target === overlay) closeOverlay();
             });
+        }
+
+        if (sendLink) {
+            sendLink.addEventListener('click', closeOverlay);
         }
 
         if (copyBtn) {
