@@ -1,17 +1,20 @@
 """
-PharmaTrace Survival Analysis Backend v2.0
+PharmaTrace Survival Analysis Backend v2.1
 --------------------------------------------
 Flask API for real-time survival analysis with:
   - Full 33 TCGA cancer types
   - OS / DFS / PFS / DSS survival metrics
-  - Genome-wide gene screening (2000 genes)
+  - MSigDB gene set integration (13,085 cancer genes from C6+H+C2)
   - DepMap gene dependency integration
   - cBioPortal REST API for real TCGA data
 
 API Endpoints:
   POST /api/survival/forward   - Forward: gene + cancer → KM + HR + p-value
-  POST /api/survival/reverse   - Reverse: cancer → ranked prognostic genes
+  POST /api/survival/reverse   - Reverse: cancer + MSigDB set → prognostic genes
   POST /api/survival/multi     - Multi-gene: several genes at once
+  GET  /api/msigdb/categories  - List MSigDB categories
+  GET  /api/msigdb/genes       - Get genes from MSigDB category
+  GET  /api/msigdb/search      - Search MSigDB gene sets
   GET  /api/depmap/dependency  - DepMap: gene dependency scores
   GET  /api/cancers            - List 33 cancer studies
   GET  /api/health             - Health check
@@ -25,6 +28,11 @@ import pandas as pd
 from lifelines import KaplanMeierFitter, CoxPHFitter
 from lifelines.statistics import logrank_test
 import time
+from msigdb_direct import (
+    get_gene_sets, get_all_genes, get_genes_for_reverse,
+    get_master_cancer_gene_list, get_categories_info, search_sets,
+    CATEGORY_INFO
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -84,172 +92,7 @@ CANCER_NAMES = {
     "DLBC": "弥漫性大B细胞淋巴瘤", "THYM": "胸腺瘤", "LAML": "急性髓系白血病",
 }
 
-# ============== 2000 Cancer-Related Genes ==============
-# Comprehensive cancer gene list for genome-wide screening
-GENE_LIST_2000 = [
-    # Tumor suppressors (top 100)
-    "TP53", "RB1", "PTEN", "APC", "CDH1", "VHL", "BRCA1", "BRCA2", "ATM", "CHEK2",
-    "MLH1", "MSH2", "MSH6", "PMS2", "STK11", "NF1", "NF2", "WT1", "TSC1", "TSC2",
-    "CDKN2A", "CDKN2B", "CDKN1A", "CDKN1B", "SMAD4", "SMAD2", "DCC", "MEN1", "RET", "SDHB",
-    "SDHC", "SDHD", "TMEM127", "MAX", "FH", "BHD", "BAP1", "PBRM1", "ARID1A", "ARID1B",
-    "ARID2", "SMARCA4", "SMARCB1", "SMARCE1", "PHF6", "KDM5C", "KDM6A", "KMT2D", "KMT2C", "CREBBP",
-    "EP300", "TGFBR2", "ACVR2A", "BMPR1A", "BUB1B", "CDC73", "CDK10", "CIC", "DICER1", "EGLN1",
-    "EGLN2", "EPAS1", "ERCC2", "ERCC3", "ERCC4", "ERCC5", "EXT1", "EXT2", "FANCAA", "FANCB",
-    "FANCC", "FANCD2", "FANCE", "FANCF", "FANCG", "FANCI", "FANCJ", "FANCL", "FANCM", "FANCN",
-    "FANCO", "FANCP", "FANCQ", "FANCR", "FANCS", "FANCT", "FANCU", "FANCV", "FANCW", "FANCX",
-    "GATA3", "HNF1A", "HOXB13", "KLLN", "LZTR1", "MAP2K4", "MRE11", "MSH3", "MUTYH", "NBN",
-    # Oncogenes (top 100)
-    "EGFR", "KRAS", "NRAS", "HRAS", "BRAF", "PIK3CA", "AKT1", "MYC", "MYCN", "ERBB2",
-    "ERBB3", "ERBB4", "FGFR1", "FGFR2", "FGFR3", "FGFR4", "FLT3", "KIT", "PDGFRA", "PDGFRB",
-    "MET", "ROS1", "ALK", "RET", "NTRK1", "NTRK2", "NTRK3", "ABL1", "JAK2", "JAK1",
-    "JAK3", "STAT3", "STAT5B", "STAT5A", "SRC", "LCK", "YES1", "FYN", "HCK", "LYN",
-    "CCND1", "CCND2", "CCND3", "CCNE1", "CDK4", "CDK6", "CDK2", "CDK1", "MDM2", "MDM4",
-    "KLF4", "SOX2", "NANOG", "POU5F1", "MYC", "MYCL", "MYBL1", "MYBL2", "TERT", "TAL1",
-    "TAL2", "TLX1", "TLX3", "LMO1", "LMO2", "HOX11", "HOX11L2", "CALR", "MPL", "CSF3R",
-    "SH2B3", "CBL", "CBLB", "CBLC", "CRLF2", "EPOR", "GATA1", "GATA2", "GLI1", "HIST1H3B",
-    "HIST1H3C", "H3F3A", "IDH1", "IDH2", "KDR", "MAF", "MAFB", "NKX2-1", "NOTCH1", "NOTCH2",
-    # Cell cycle (50)
-    "CCNA1", "CCNA2", "CCNB1", "CCNB2", "CCNB3", "CCNC", "CCND1", "CCND2", "CCND3", "CCNE1",
-    "CCNE2", "CCNF", "CCNG1", "CCNG2", "CCNH", "CCNI", "CCNJ", "CCNK", "CCNL1", "CCNL2",
-    "CCNO", "CCNP", "CCNQ", "CCNT1", "CCNT2", "CCNY", "CCNYL1", "CDK1", "CDK2", "CDK3",
-    "CDK4", "CDK5", "CDK6", "CDK7", "CDK8", "CDK9", "CDK10", "CDK11A", "CDK11B", "CDK12",
-    "CDK13", "CDK14", "CDK15", "CDK16", "CDK17", "CDK18", "CDK19", "CDK20", "CDKN1A", "CDKN1B",
-    # DNA repair (50)
-    "BRCA1", "BRCA2", "ATM", "ATR", "CHEK1", "CHEK2", "RAD51", "RAD51B", "RAD51C", "RAD51D",
-    "XRCC2", "XRCC3", "RAD52", "RAD54L", "RAD54B", "BARD1", "BRIP1", "PALB2", "NBN", "FANCA",
-    "FANCC", "FANCD2", "FANCE", "FANCF", "FANCG", "FANCL", "FANCM", "MRE11", "RAD50", "NBS1",
-    "RBBP8", "MUS81", "EME1", "EME2", "GEN1", "SLX1A", "SLX4", "DMC1", "RAD21", "SMC1A",
-    "SMC3", "STAG1", "STAG2", "PDS5A", "PDS5B", "MAU2", "NIPBL", "WAPL", "ESCO1", "ESCO2",
-    # Apoptosis (50)
-    "BCL2", "BCL2L1", "BCL2L2", "BCL2A1", "MCL1", "BCL2L11", "BAX", "BAK1", "BOK", "BID",
-    "BAD", "BIK", "BMF", "HRK", "PMAIP1", "NOXA", "BBC3", "BCL10", "CARD9", "CASP8",
-    "CASP9", "CASP10", "CASP3", "CASP6", "CASP7", "CASP1", "CASP2", "CASP4", "CASP5", "CASP14",
-    "FADD", "TRADD", "TNFR1", "TNFRSF10A", "TNFRSF10B", "TNFRSF10C", "TNFRSF10D", "FAS", "FASLG", "TRAIL",
-    "BIRC2", "BIRC3", "BIRC5", "BIRC6", "BIRC7", "BIRC8", "XIAP", "NAIP", "TRAF2", "RIPK1",
-    # Immune checkpoint (30)
-    "CD274", "PDCD1LG2", "PDCD1", "CTLA4", "LAG3", "HAVCR2", "TIGIT", "CD276", "VTCN1", "IDO1",
-    "IDO2", "KIR3DL1", "KIR2DL1", "KIR2DL3", "KIR2DL4", "KIR3DL2", "KIR2DS4", "LILRB1", "LILRB2", "LILRB4",
-    "SIGLEC7", "SIGLEC9", "CD47", "SIRPA", "SIRPB1", "SIRPG", "NECTIN2", "NECTIN3", "PVR", "CD155",
-    # Angiogenesis (30)
-    "VEGFA", "VEGFB", "VEGFC", "VEGFD", "KDR", "FLT1", "FLT4", "NRP1", "NRP2", "PGF",
-    "ANGPT1", "ANGPT2", "TEK", "FGF1", "FGF2", "FGF5", "FGF8", "FGF18", "PDGFA", "PDGFB",
-    "PDGFRA", "PDGFRB", "TGFB1", "TGFB2", "TGFB3", "TGFBR1", "TGFBR2", "TGFBR3", "EPHA2", "EFNA1",
-    # Epigenetic regulators (60)
-    "DNMT1", "DNMT3A", "DNMT3B", "TET1", "TET2", "TET3", "IDH1", "IDH2", "EZH2", "EED",
-    "SUZ12", "KMT2A", "KMT2B", "KMT2C", "KMT2D", "KMT2E", "SETD1A", "SETD1B", "SETD2", "SETD7",
-    "SETDB1", "SETDB2", "ASH1L", "ASH2L", "KDM1A", "KDM1B", "KDM2A", "KDM2B", "KDM3A", "KDM3B",
-    "KDM4A", "KDM4B", "KDM4C", "KDM4D", "KDM4E", "KDM5A", "KDM5B", "KDM5C", "KDM6A", "KDM6B",
-    "KDM7A", "KDM7B", "PRMT1", "PRMT2", "PRMT3", "PRMT5", "PRMT6", "PRMT7", "PRMT8", "PRMT9",
-    "HDAC1", "HDAC2", "HDAC3", "HDAC4", "HDAC5", "HDAC6", "HDAC7", "HDAC8", "HDAC9", "HDAC10",
-    # PI3K/AKT/mTOR pathway (40)
-    "PIK3CA", "PIK3CB", "PIK3CD", "PIK3CG", "PIK3R1", "PIK3R2", "PIK3R3", "PIK3C2A", "PIK3C2B", "PIK3C2G",
-    "PIK3C3", "AKT1", "AKT2", "AKT3", "MTOR", "RPTOR", "RICTOR", "MLST8", "DEPTOR", "TSC1",
-    "TSC2", "RHEB", "AKT1S1", "PPP2R1A", "PPP2R1B", "PPP2R2A", "PTEN", "INPP4B", "INPP4A", "PIK3IP1",
-    "FOXO1", "FOXO3", "FOXO4", "GSK3B", "SGK1", "PDK1", "IRS1", "IRS2", "GRB10", "RPS6KB1",
-    # MAPK/ERK pathway (40)
-    "KRAS", "NRAS", "HRAS", "BRAF", "RAF1", "ARAF", "MAP2K1", "MAP2K2", "MAP2K4", "MAP2K5",
-    "MAPK1", "MAPK3", "MAPK8", "MAPK9", "MAPK14", "DAB2IP", "RASSF1", "RASSF2", "RASSF5", "RIN1",
-    "SOS1", "SOS2", "SHC1", "SHC2", "SHC3", "SHC4", "GRB2", "CBL", "CBLB", "CBLC",
-    "SPRY1", "SPRY2", "SPRY3", "SPRY4", "DUSP1", "DUSP4", "DUSP6", "DUSP7", "DUSP8", "DUSP9",
-    # Wnt/beta-catenin (30)
-    "CTNNB1", "APC", "AXIN1", "AXIN2", "GSK3B", "GSK3A", "CSNK1A1", "CSNK1D", "CSNK1E", "BTRC",
-    "FBXW11", "TCF7", "TCF7L1", "TCF7L2", "LEF1", "MYC", "CCND1", "PPARD", "JUN", "FOSL1",
-    "WNT1", "WNT2", "WNT2B", "WNT3", "WNT3A", "WNT4", "WNT5A", "WNT5B", "WNT6", "WNT7A",
-    # Hedgehog pathway (15)
-    "SHH", "IHH", "DHH", "PTCH1", "PTCH2", "SMO", "GLI1", "GLI2", "GLI3", "SUFU",
-    "SPOP", "CDON", "BOC", "GAS1", "STK36",
-    # Notch pathway (15)
-    "NOTCH1", "NOTCH2", "NOTCH3", "NOTCH4", "JAG1", "JAG2", "DLL1", "DLL3", "DLL4", "FBXW7",
-    "MAML1", "MAML2", "MAML3", "NCOR1", "NCOR2",
-    # Hippo pathway (15)
-    "YAP1", "WWTR1", "LATS1", "LATS2", "MST1", "MST2", "SAV1", "MOB1A", "MOB1B", "NF2",
-    "TAZ", "TEAD1", "TEAD2", "TEAD3", "TEAD4",
-    # TGF-beta pathway (15)
-    "TGFB1", "TGFB2", "TGFB3", "TGFBR1", "TGFBR2", "TGFBR3", "SMAD2", "SMAD3", "SMAD4", "SMAD7",
-    "ACVR1B", "ACVR2A", "BMPR1A", "BMPR1B", "BMPR2",
-    # JAK-STAT pathway (15)
-    "JAK1", "JAK2", "JAK3", "TYK2", "STAT1", "STAT2", "STAT3", "STAT4", "STAT5A", "STAT5B",
-    "STAT6", "SOCS1", "SOCS2", "SOCS3", "PIAS1",
-    # NF-kB pathway (15)
-    "RELA", "RELB", "REL", "NFKB1", "NFKB2", "CHUK", "IKBKB", "IKBKG", "NFKBIA", "NFKBIB",
-    "BCL10", "MALT1", "CARD11", "TRAF2", "TRAF3",
-    # Receptor tyrosine kinases (50)
-    "EGFR", "ERBB2", "ERBB3", "ERBB4", "FGFR1", "FGFR2", "FGFR3", "FGFR4", "PDGFRA", "PDGFRB",
-    "KIT", "FLT3", "CSF1R", "MET", "RET", "ROS1", "ALK", "NTRK1", "NTRK2", "NTRK3",
-    "INSR", "IGF1R", "IGF2R", "DDR1", "DDR2", "RYK", "MUSK", "ROR1", "ROR2", "LTK",
-    "TIE1", "TEK", "AXL", "MERTK", "TYRO3", "EPHA1", "EPHA2", "EPHA3", "EPHA4", "EPHA5",
-    "EPHB1", "EPHB2", "EPHB3", "EPHB4", "EPHB6", "KDR", "FLT1", "FLT4", "NRP1", "NRP2",
-    # Transcription factors (50)
-    "MYC", "MYCN", "MYCL", "TP53", "FOXM1", "FOXO1", "FOXO3", "E2F1", "E2F2", "E2F3",
-    "E2F4", "E2F5", "E2F6", "E2F7", "E2F8", "TFDP1", "TFDP2", "MAX", "MGA", "MNT",
-    "MLX", "MLXIP", "MLXIPL", "MondoA", "MondoB", "HIF1A", "EPAS1", "ARNT", "ARNT2", "ARNTL",
-    "CLOCK", "NPAS2", "BMAL1", "BMAL2", "C-MYB", "MYB", "RUNX1", "RUNX2", "RUNX3", "CBFB",
-    "GATA1", "GATA2", "GATA3", "GATA4", "GATA5", "GATA6", "TAL1", "TAL2", "LYL1", "LMO1",
-    # Chromatin remodelers (30)
-    "ARID1A", "ARID1B", "ARID2", "SMARCA4", "SMARCB1", "SMARCC1", "SMARCC2", "SMARCD1", "SMARCD2", "SMARCD3",
-    "SMARCE1", "SMARCA2", "SMARCA5", "CHD1", "CHD2", "CHD3", "CHD4", "CHD5", "CHD6", "CHD7",
-    "CHD8", "CHD9", "EP300", "CREBBP", "KAT2A", "KAT2B", "KAT5", "KAT6A", "KAT6B", "KAT7",
-    # Splicing factors (20)
-    "SF3B1", "SRSF2", "U2AF1", "U2AF2", "ZRSR2", "LUC7L2", "PRPF8", "PRPF40B", "SNRNP200", "DDX41",
-    "BCOR", "STAG2", "PPM1D", "RAD21", "SMC1A", "SMC3", "BRCC3", "BOP1", "RRP15", "HEATR1",
-    # Telomere maintenance (10)
-    "TERT", "TERC", "DKC1", "NOP10", "NHP2", "GAR1", "TCAB1", "POT1", "TPP1", "TINF2",
-    # Ferroptosis (10)
-    "GPX4", "SLC7A11", "ACSL4", "LPCAT3", "FSP1", "NFE2L2", "KEAP1", "HMOX1", "FTL", "FTH1",
-    # Autophagy (10)
-    "BECN1", "ATG5", "ATG7", "ATG12", "ATG16L1", "ULK1", "ULK2", "MTOR", "RPTOR", "AMBRA1",
-    # Necroptosis (10)
-    "RIPK1", "RIPK3", "MLKL", "TNF", "TNFR1", "FADD", "CYLD", "SPATA2", "OPTN", "PGAM5",
-    # Metabolism (20)
-    "LDHA", "LDHB", "PKM", "HK2", "PFKFB3", "GLUT1", "GLUT3", "MCT1", "MCT4", "ACLY",
-    "ACC1", "FASN", "SCD", "ACSS2", "MTHFD2", "PHGDH", "PSAT1", "PSPH", "SHMT2", "GLS",
-    # Ubiquitin/proteasome (15)
-    "VHL", "MDM2", "FBXW7", "SPOP", "BTRC", "KEAP1", "CUL3", "CUL4A", "CUL4B", "RBX1",
-    "UBE2D1", "UBE2E1", "UBE2L3", "PSMB5", "PSMB6",
-    # RNA modification (15)
-    "METTL3", "METTL14", "WTAP", "FTO", "ALKBH5", "YTHDC1", "YTHDC2", "YTHDF1", "YTHDF2", "YTHDF3",
-    "IGF2BP1", "IGF2BP2", "IGF2BP3", "HNRNPC", "RBMX",
-    # Stress response (10)
-    "HSPA1A", "HSPA1B", "HSP90AA1", "HSP90AB1", "DNAJB1", "HSF1", "ATF4", "ATF6", "ERN1", "EIF2AK3",
-    # Stem cell / differentiation (15)
-    "SOX2", "OCT4", "NANOG", "KLF4", "MYC", "LIN28A", "SALL4", "DPPA4", "UTF1", "ZFP42",
-    "NODAL", "LEFTY1", "LEFTY2", "TDGF1", "GDF3",
-    # Microenvironment (15)
-    "TGFB1", "TGFB2", "TGFB3", "IL6", "IL10", "CXCL8", "CXCL12", "CCL2", "CCL5", "VEGFA",
-    "MMP2", "MMP9", "MMP14", "TIMP1", "TIMP2",
-    # EMT / metastasis (20)
-    "CDH1", "CDH2", "VIM", "SNAI1", "SNAI2", "ZEB1", "ZEB2", "TWIST1", "TWIST2", "FOXC2",
-    "GSC", "HMGA2", "MMP2", "MMP9", "MMP14", "SERPINE1", "FN1", "SPP1", "MUC1", "EPCAM",
-    # DNA damage response (30)
-    "BRCA1", "BRCA2", "TP53BP1", "RAD51", "RAD51C", "RAD51D", "PALB2", "BRIP1", "BARD1", "NBN",
-    "ATM", "ATR", "CHEK1", "CHEK2", "MDC1", "53BP1", "MRE11", "RAD50", "FANCD2", "FANCI",
-    "UBE2T", "RNF168", "RNF8", "RIF1", " Shieldin1", "MAD2L2", "POLQ", "HELQ", "RAD52", "RAD54B",
-    # Ribosome biogenesis (10)
-    "RPL5", "RPL11", "RPL23", "RPS7", "RPS14", "RPS19", "RPS27", "RPS27A", "RPL22", "RPS3",
-    # Others (185)
-    "SPEN", "DAXX", "ATRX", "CARM1", "PRMT5", "DOT1L", "BRD4", "BRD2", "BRD3", "BRDT",
-    "BMI1", "RING1", "RNF2", "CBX2", "CBX7", "CBX8", "PHC1", "PHC2", "PHC3", "SCMH1",
-    "YY1", "CTCF", "RAD21", "STAG1", "STAG2", "HDAC1", "HDAC2", "HDAC3", "HDAC6", "SIRT1",
-    "SIRT2", "SIRT3", "SIRT6", "SIRT7", "KAT5", "KAT6A", "KAT6B", "KAT7", "KAT8", "NSD1",
-    "NSD2", "NSD3", "EHMT1", "EHMT2", "SUV39H1", "SUV39H2", "SETD2", "SETD1A", "SETD1B", "SETDB1",
-    "MLL", "MLL2", "MLL3", "MLL4", "MLL5", "KDM1A", "KDM1B", "KDM2A", "KDM2B", "KDM4A",
-    "KDM4B", "KDM4C", "KDM5A", "KDM5B", "KDM5C", "KDM6A", "KDM6B", "EZH2", "EED", "SUZ12",
-    "AURKA", "AURKB", "AURKC", "PLK1", "PLK2", "PLK3", "PLK4", "CDC20", "CDH1", "CDC6",
-    "ORC1", "ORC2", "ORC3", "ORC4", "ORC5", "ORC6", "MCM2", "MCM3", "MCM4", "MCM5",
-    "MCM6", "MCM7", "MCM8", "MCM9", "MCM10", "PCNA", "RFC1", "RFC2", "RFC3", "RFC4",
-    "RFC5", "POLA1", "POLA2", "POLD1", "POLD2", "POLD3", "POLD4", "POLE", "POLE2", "POLE3",
-    "POLE4", "FEN1", "LIG1", "LIG3", "LIG4", "XRCC1", "XRCC2", "XRCC3", "XRCC4", "XRCC5",
-    "XRCC6", "PARP1", "PARP2", "PARP3", "APEX1", "APEX2", "OGG1", "NTHL1", "NEIL1", "NEIL2",
-    "NEIL3", "MPG", "SMUG1", "TDG", "MBD4", "MSH2", "MSH3", "MSH6", "MLH1", "PMS1",
-    "PMS2", "EXO1", "RFC", "PCNA", "RPA", "LIG1", "HMGA1", "HMGA2", "HMGB1", "HMGB2",
-    "TCF3", "TCF4", "LYN", "BLK", "FGR", "HCK", "FRK", "SRMS", "YES1", "YAP1",
-]
-
-# Remove duplicates while preserving order
-GENE_LIST_2000_UNIQUE = list(dict.fromkeys(GENE_LIST_2000))
-
-# ============== cBioPortal API Helpers ==============
-
+# ============== MSigDB Gene Sets ==============
 def cbio_get(endpoint, params=None, timeout=30):
     url = f"{CBIOPORTAL_BASE}{endpoint}"
     try:
@@ -585,13 +428,15 @@ def forward_analysis():
 def reverse_analysis():
     """
     Reverse analysis: cancer → ranked prognostic gene list.
-    Body: { cancer_type, survival_type="OS", cutoff=50, max_genes=200 }
+    Body: { cancer_type, survival_type="OS", cutoff=50, max_genes=200, msigdb_category="C6" }
+    msigdb_category: H/C2/C3/C5/C6/C7/C8 (default: C6 Oncogenic)
     """
     data = request.get_json() or {}
     cancer_code = data.get("cancer_type", "").upper().strip()
     survival_type = data.get("survival_type", "OS").upper()
     cutoff = int(data.get("cutoff", 50))
     max_genes = int(data.get("max_genes", 200))
+    msigdb_category = data.get("msigdb_category", "C6").upper()
 
     if not cancer_code:
         return jsonify({"error": "cancer_type is required"}), 400
@@ -617,7 +462,20 @@ def reverse_analysis():
     if len(clinical_df) < 20:
         return jsonify({"error": "Insufficient clinical data"}), 404
 
-    genes_to_test = GENE_LIST_2000_UNIQUE[:min(max_genes, len(GENE_LIST_2000_UNIQUE))]
+    # Get gene list from MSigDB
+    msigdb_result = get_genes_for_reverse(
+        category=msigdb_category,
+        max_sets=200 if msigdb_category in ("C2", "C5", "C7", "C8") else None
+    )
+    if "error" in msigdb_result:
+        return jsonify({"error": msigdb_result["error"]}), 500
+    
+    all_genes = msigdb_result.get("genes", [])
+    if not all_genes:
+        return jsonify({"error": f"No genes found in MSigDB category {msigdb_category}"}), 404
+    
+    # Limit to max_genes
+    genes_to_test = all_genes[:min(max_genes, len(all_genes))]
     results = []
 
     for i, gene in enumerate(genes_to_test):
@@ -640,10 +498,13 @@ def reverse_analysis():
         "cancer_type": cancer_code,
         "survival_type": survival_type,
         "cutoff": cutoff,
+        "msigdb_category": msigdb_category,
+        "msigdb_category_name": CATEGORY_INFO.get(msigdb_category, {}).get("name", msigdb_category),
         "total_tested": len(genes_to_test),
         "significant_genes": len(results),
         "genes": results,
-        "data_source": "cBioPortal/TCGA"
+        "data_source": "cBioPortal/TCGA + MSigDB",
+        "gene_source": msigdb_result.get("source", "MSigDB")
     })
 
 
@@ -713,13 +574,76 @@ def depmap_dependency():
     return jsonify({"gene": gene, "dependency": result, "source": "DepMap Portal"})
 
 
+@app.route("/api/msigdb/categories", methods=["GET"])
+def msigdb_categories():
+    """List available MSigDB categories with gene counts."""
+    info = get_categories_info()
+    return jsonify({
+        "categories": info,
+        "available": list(CATEGORY_INFO.keys()),
+        "default": "C6",
+        "note": "Use category code (e.g., C6, H) in /api/survival/reverse as msigdb_category"
+    })
+
+
+@app.route("/api/msigdb/genes", methods=["GET"])
+def msigdb_genes():
+    """
+    Get all genes from an MSigDB category.
+    Query: ?category=C6&max_sets=50
+    """
+    category = request.args.get("category", "C6").upper()
+    max_sets = request.args.get("max_sets", type=int)
+    
+    if category not in CATEGORY_INFO:
+        return jsonify({"error": f"Unknown category: {category}. Use: {list(CATEGORY_INFO.keys())}"}), 400
+    
+    result = get_genes_for_reverse(category=category, max_sets=max_sets)
+    if "error" in result:
+        return jsonify(result), 500
+    
+    return jsonify({
+        "category": category,
+        "category_name": result["category_name"],
+        "total_genes": result["total_genes"],
+        "num_sets": result["num_sets_used"],
+        "sample_genes": result["genes"][:50],
+        "source": result["source"]
+    })
+
+
+@app.route("/api/msigdb/search", methods=["GET"])
+def msigdb_search():
+    """
+    Search MSigDB gene sets by keyword.
+    Query: ?keyword=CANCER&category=C2
+    """
+    keyword = request.args.get("keyword", "").strip()
+    category = request.args.get("category", "C6").upper()
+    
+    if not keyword:
+        return jsonify({"error": "keyword parameter required"}), 400
+    
+    matches = search_sets(keyword, category)
+    return jsonify({
+        "keyword": keyword,
+        "category": category,
+        "matches_found": len(matches),
+        "matches": matches,
+        "source": "MSigDB"
+    })
+
+
 @app.route("/api/genes", methods=["GET"])
 def list_genes():
-    """Return the available gene list for reverse analysis."""
+    """Return the master cancer gene list from MSigDB."""
+    master = get_master_cancer_gene_list()
     return jsonify({
-        "total_genes": len(GENE_LIST_2000_UNIQUE),
-        "genes": GENE_LIST_2000_UNIQUE[:100],  # Return first 100 as preview
-        "note": f"Full list contains {len(GENE_LIST_2000_UNIQUE)} cancer-related genes"
+        "total_genes": master["total_genes"],
+        "sample_genes": master["genes"][:100],
+        "sources": master["sources"],
+        "source": master["source"],
+        "note": f"Full list: {master['total_genes']} genes from {len(master['sources'])} MSigDB sources"
     })
 
 
