@@ -2135,6 +2135,277 @@ html {
     font-size: 0.85em;
 }
 
+/* SIN 详情页：返回在研管线按钮与研发平台登录按钮位置一致 */
+.sin-page .home-header .header-actions {
+    position: absolute;
+    top: 50%;
+    right: 28px;
+    transform: translateY(-50%);
+    z-index: 101;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: auto;
+}
+
+.sin-page .home-header .header-actions .login-trigger {
+    background: rgba(0, 212, 255, 0.12);
+    border: 1px solid rgba(0, 212, 255, 0.35);
+    color: #fff;
+    padding: 7px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.84em;
+    transition: all 0.3s ease;
+}
+
+.sin-page .home-header .header-actions .login-trigger:hover {
+    background: rgba(0, 212, 255, 0.25);
+    border-color: rgba(0, 212, 255, 0.6);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
+@media (max-width: 900px) {
+    .sin-page .home-header .header-actions {
+        position: relative;
+        top: auto;
+        right: auto;
+        transform: none;
+        order: 2;
+        width: 100%;
+        justify-content: center;
+        margin-top: 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sin-page .home-header .header-actions .login-trigger {
+        padding: 5px 10px;
+        font-size: 0.75em;
+    }
+}
+
+/* SIN 详情页：药物标题、占位文字 */
+.drug-hero {
+    text-align: left;
+}
+
+.sin-title {
+    font-size: 3em;
+    font-weight: 700;
+    margin-bottom: 12px;
+    background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.sin-divider {
+    border: 0;
+    height: 2px;
+    background: rgba(0, 212, 255, 0.6);
+    margin: 16px auto 24px;
+    width: 100%;
+    max-width: 200px;
+}
+
+.drug-header {
+    align-items: center;
+    gap: 30px;
+}
+
+.drug-header-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.drug-header-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.drug-header-image img {
+    max-width: 100%;
+    max-height: 360px;
+    width: auto;
+    height: auto;
+    border-radius: 16px;
+}
+
+.drug-name {
+    font-size: 2.2em;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.drug-code {
+    color: #8892b0;
+    font-size: 1.15em;
+    letter-spacing: 2px;
+}
+
+.placeholder-text {
+    color: #8892b0;
+    font-style: italic;
+}
+
+/* Target Rationale / Indication 左右分栏 */
+.info-split {
+    align-items: stretch;
+    gap: 30px;
+}
+
+.info-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-block .section-title {
+    text-align: left;
+    margin-bottom: 16px;
+}
+
+.info-content {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 24px;
+    flex-grow: 1;
+}
+
+.info-text {
+    color: #c5cee0;
+    font-size: 0.95em;
+    line-height: 1.8;
+    text-align: justify;
+    margin-bottom: 0;
+}
+
+.status-footer {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 212, 255, 0.25);
+    text-align: right;
+    color: #00d4ff;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.indication-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.indication-tags .tag {
+    padding: 6px 14px;
+    font-size: 0.9em;
+    border-radius: 20px;
+}
+
+@media (max-width: 768px) {
+    .info-split {
+        gap: 24px;
+    }
+
+    .info-content {
+        padding: 20px;
+    }
+
+    .info-text {
+        font-size: 0.9em;
+        line-height: 1.75;
+    }
+}
+
+/* Assays Completed 卡片：图片 + 文字 */
+.section-subtitle {
+    text-align: center;
+    color: #8892b0;
+    font-size: 1.05em;
+    margin-bottom: 24px;
+}
+
+.assay-grid {
+    align-items: stretch;
+}
+
+.assay-card {
+    text-align: center;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.assay-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+}
+
+.assay-card h4 {
+    font-size: 1em;
+    line-height: 1.35;
+    margin-bottom: 8px;
+}
+
+.assay-card p {
+    font-size: 0.9em;
+    line-height: 1.5;
+    color: #8892b0;
+}
+
+/* Publications 卡片 */
+.publication-grid {
+    align-items: stretch;
+}
+
+.publication-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.publication-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 0 30px rgba(0, 212, 255, 0.08);
+}
+
+.publication-card .publication-journal {
+    font-size: 0.9em;
+    color: #00d4ff;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.publication-card h4 {
+    font-size: 1.1em;
+    line-height: 1.45;
+    margin-bottom: 0;
+    flex-grow: 1;
+}
+
+.publication-card .publication-date {
+    font-size: 0.85em;
+    color: #8892b0;
+    margin-top: auto;
+}
+
 .home-hero {
     position: relative;
     padding: 64px 30px;
