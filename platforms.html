@@ -858,6 +858,94 @@
                             <span class="tools-badge">对接计算</span>
                         </div>
                         <div class="step-bottom step-bottom-public">
+                            <!-- 分子对接输入表单 -->
+                            <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
+                                <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">🔗 蛋白-配体分子对接</div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="dock-protein-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">蛋白 ID 或蛋白名</label>
+                                    <input type="text" id="dock-protein-input" placeholder="例如: EGFR, TP53, KRAS..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    <label for="dock-ligand-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">分子 CAS号 或 SMILES</label>
+                                    <input type="text" id="dock-ligand-input" placeholder="例如: 71-43-2 或 c1ccccc1..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button type="button" id="dock-vina-btn" onclick="runDocking('vina')" style="flex: 1; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.75em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #33ddff 0%, #00aadd 100%)';this.style.boxShadow='0 4px 12px rgba(0,212,255,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)';this.style.boxShadow='0 2px 8px rgba(0,212,255,0.3)';">⚡ AutoDock Vina 对接</button>
+                                    <button type="button" id="dock-af3-btn" onclick="runDocking('alphafold3')" style="flex: 1; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); color: #fff; font-size: 0.75em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(162,155,254,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #b8b0ff 0%, #7c6bf0 100%)';this.style.boxShadow='0 4px 12px rgba(162,155,254,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%)';this.style.boxShadow='0 2px 8px rgba(162,155,254,0.3)';">🤖 AlphaFold3 预测</button>
+                                </div>
+                            </div>
+
+                            <!-- 分子对接结果面板 -->
+                            <div id="dock-result-panel" style="display: none; margin-bottom: 12px; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border: 1px solid rgba(0,212,255,0.2);">
+                                <div id="dock-loading" style="display: none; text-align: center; padding: 20px;">
+                                    <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(0,212,255,0.2); border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p id="dock-loading-text" style="color: #a0c4e8; font-size: 0.75em; margin-top: 10px;">正在进行分子对接计算...</p>
+                                </div>
+                                <div id="dock-result-content" style="display: none;">
+                                    <div style="font-size: 0.8em; color: #00d4ff; font-weight: 600; text-align: left; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,0.2);">
+                                        🔗 <span id="dock-result-title">分子对接结果</span>
+                                        <span id="dock-method-badge" style="float: right; padding: 2px 8px; border-radius: 10px; font-size: 0.75em;"></span>
+                                    </div>
+                                    <!-- 对接分数概要 -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">结合能 (kcal/mol)</div>
+                                            <div id="dock-binding-energy" style="font-size: 0.9em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">Ki (估算)</div>
+                                            <div id="dock-ki" style="font-size: 0.85em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">对接质量</div>
+                                            <div id="dock-quality" style="font-size: 0.85em; font-weight: 600;">--</div>
+                                        </div>
+                                    </div>
+                                    <!-- 相互作用可视化 -->
+                                    <div style="margin-bottom: 12px; text-align: center;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">🧬 蛋白-配体相互作用图</div>
+                                        <canvas id="dock-canvas" width="360" height="240" style="width: 100%; border-radius: 8px; background: rgba(15,23,42,0.8);"></canvas>
+                                    </div>
+                                    <!-- 相互作用详情表 -->
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">🔑 关键相互作用 (Top 8)</div>
+                                        <table style="width: 100%; border-collapse: collapse; font-size: 0.68em; color: #e0e8ff;">
+                                            <thead>
+                                                <tr style="background: rgba(0,212,255,0.1);">
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">类型</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: left;">配体原子</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: left;">蛋白残基</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">距离(Å)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="dock-interactions-body">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Pose信息 -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+                                        <div style="background: rgba(0,212,255,0.05); border-radius: 6px; padding: 8px;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8; margin-bottom: 4px;">📐 RMSD (参考)</div>
+                                            <div id="dock-rmsd" style="font-size: 0.8em; color: #e0e8ff;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.05); border-radius: 6px; padding: 8px;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8; margin-bottom: 4px;">📊 构象数量</div>
+                                            <div id="dock-poses" style="font-size: 0.8em; color: #e0e8ff;">--</div>
+                                        </div>
+                                    </div>
+                                    <!-- 结果解读 -->
+                                    <div id="dock-interpretation" style="background: rgba(255,193,7,0.08); border-left: 3px solid #ffc107; border-radius: 0 6px 6px 0; padding: 10px; margin-bottom: 12px; text-align: left;">
+                                        <div style="font-size: 0.7em; color: #ffc107; font-weight: 600; margin-bottom: 4px;">💡 对接分析</div>
+                                        <div id="dock-interpretation-text" style="font-size: 0.7em; color: #e0e8ff; line-height: 1.5;">--</div>
+                                    </div>
+                                    <!-- 操作按钮 -->
+                                    <div style="display: flex; gap: 8px;">
+                                        <button type="button" id="dock-download-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">📥 下载图片</button>
+                                        <button type="button" id="dock-close-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(255,107,107,0.4); background: rgba(255,107,107,0.1); color: #ff6b6b; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">✕ 关闭</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="website-links">
                                 <a href="https://vina.scripps.edu/" class="website-link" target="_blank" data-tooltip="AutoDock Vina: 快速准确的分子对接程序，开源免费，广泛使用">
                                     <span class="link-icon">🔗</span> AutoDock Vina

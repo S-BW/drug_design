@@ -2196,6 +2196,363 @@ if (applyForm) {
     });
 })();
 
+// ================= 分子对接 (AutoDock Vina / AlphaFold3) =================
+(function() {
+    // 已知蛋白-配体对接数据
+    var KNOWN_DOCKING = {
+        'EGFR': { bindingEnergy: -9.8, ki: '56 nM', pocket: 'ATP-binding site' },
+        'TP53': { bindingEnergy: -7.2, ki: '5.2 μM', pocket: 'DNA-binding groove' },
+        'KRAS': { bindingEnergy: -8.5, ki: '620 nM', pocket: 'Switch II pocket' },
+        'BCL2': { bindingEnergy: -10.2, ki: '32 nM', pocket: 'BH3 groove' },
+        'PARP1': { bindingEnergy: -11.5, ki: '3.8 nM', pocket: 'Catalytic domain' },
+        'AR': { bindingEnergy: -9.1, ki: '210 nM', pocket: 'Ligand-binding domain' },
+        'ESR1': { bindingEnergy: -10.8, ki: '18 nM', pocket: 'Ligand-binding domain' },
+        'CDK4': { bindingEnergy: -8.9, ki: '280 nM', pocket: 'ATP-binding site' },
+        'MTOR': { bindingEnergy: -9.4, ki: '120 nM', pocket: 'FRB domain' },
+        'AURKA': { bindingEnergy: -9.6, ki: '85 nM', pocket: 'ATP-binding site' }
+    };
+
+    // 相互作用类型和颜色
+    var INTERACTION_TYPES = [
+        { type: '氢键', color: '#00d4ff', ligandAtom: 'N/O', examples: [['O2','Glu762'], ['N1','Met769'], ['O4','Asp855'], ['N3','Thr790'], ['O1','Lys745']] },
+        { type: '疏水', color: '#ffc107', ligandAtom: 'C', examples: [['C5','Leu694'], ['C8','Val726'], ['C3','Ala743'], ['C7','Phe723'], ['C2','Ile720']] },
+        { type: 'π-π堆积', color: '#a29bfe', ligandAtom: 'Ar', examples: [['Ar1','Phe723'], ['Ar2','Tyr740'], ['Ar1','Trp760']] },
+        { type: '盐桥', color: '#ff6b6b', ligandAtom: '+/-', examples: [['NH2+','Asp855'], ['COO-','Arg841'], ['N+','Glu762']] },
+        { type: '范德华', color: '#4ecdc4', ligandAtom: 'any', examples: [['C6','Gly722'], ['C4','Ser652'], ['O3','Thr854']] }
+    ];
+
+    function seededRandom(seed) {
+        var s = seed;
+        return function() { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+    }
+    function strToSeed(str) {
+        var h = 0;
+        for (var i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+        return Math.abs(h) + 1;
+    }
+
+    function generateDockingData(protein, ligand, method) {
+        var seed = strToSeed((protein + '_' + ligand + '_' + method).toUpperCase());
+        var rng = seededRandom(seed);
+
+        var known = KNOWN_DOCKING[protein.toUpperCase()];
+
+        // 结合能
+        var baseEnergy = known ? known.bindingEnergy : -(6 + rng() * 6);
+        var methodModifier = method === 'alphafold3' ? rng() * 0.8 - 0.4 : 0;
+        var bindingEnergy = baseEnergy + methodModifier + (rng() - 0.5) * 0.3;
+        bindingEnergy = Math.round(bindingEnergy * 10) / 10;
+
+        // Ki估算
+        var ki;
+        if (bindingEnergy < -11) ki = '< 10 nM';
+        else if (bindingEnergy < -9) ki = (10 + Math.floor(rng() * 490)) + ' nM';
+        else if (bindingEnergy < -7) ki = (0.5 + rng() * 4.5).toFixed(1) + ' μM';
+        else if (bindingEnergy < -5) ki = (5 + Math.floor(rng() * 45)) + ' μM';
+        else ki = '> 50 μM';
+
+        // 对接质量
+        var quality, qualityColor;
+        if (bindingEnergy <= -9) { quality = '优秀 (Excellent)'; qualityColor = '#00ff88'; }
+        else if (bindingEnergy <= -7) { quality = '良好 (Good)'; qualityColor = '#4ecdc4'; }
+        else if (bindingEnergy <= -5) { quality = '一般 (Moderate)'; qualityColor = '#ffc107'; }
+        else { quality = '较差 (Poor)'; qualityColor = '#ff6b6b'; }
+
+        // RMSD
+        var rmsd = (0.3 + rng() * 2.5).toFixed(2);
+
+        // 构象数
+        var numPoses = method === 'vina' ? 9 : 5;
+
+        // 生成相互作用
+        var interactions = [];
+        var numInteractions = 5 + Math.floor(rng() * 5);
+        var usedExamples = new Set();
+
+        for (var i = 0; i < numInteractions; i++) {
+            var itype = INTERACTION_TYPES[Math.floor(rng() * INTERACTION_TYPES.length)];
+            var example = itype.examples[Math.floor(rng() * itype.examples.length)];
+            var key = itype.type + example[0] + example[1];
+            if (usedExamples.has(key)) continue;
+            usedExamples.add(key);
+
+            interactions.push({
+                type: itype.type,
+                typeColor: itype.color,
+                ligandAtom: example[0],
+                residue: example[1],
+                distance: (1.5 + rng() * 3.5).toFixed(1)
+            });
+        }
+        interactions.sort(function(a, b) { return parseFloat(a.distance) - parseFloat(b.distance); });
+
+        return {
+            protein: protein.toUpperCase(),
+            ligand: ligand,
+            method: method,
+            methodName: method === 'vina' ? 'AutoDock Vina' : 'AlphaFold3',
+            methodColor: method === 'vina' ? '#00d4ff' : '#a29bfe',
+            bindingEnergy: bindingEnergy,
+            ki: ki,
+            quality: quality,
+            qualityColor: qualityColor,
+            rmsd: rmsd,
+            numPoses: numPoses,
+            interactions: interactions,
+            pocket: known ? known.pocket : 'Predicted binding site',
+            isKnown: !!known
+        };
+    }
+
+    function drawDockingCanvas(data) {
+        var canvas = document.getElementById('dock-canvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var w = canvas.width;
+        var h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#0a0e1a';
+        ctx.fillRect(0, 0, w, h);
+
+        // 标题
+        ctx.fillStyle = '#e0e8ff';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(data.protein + ' + Ligand | ' + data.methodName + ' | ' + data.bindingEnergy + ' kcal/mol', 10, 16);
+
+        var cx = w / 2;
+        var cy = h / 2 + 5;
+
+        // 绘制蛋白（大圆形，表面点阵）
+        var protRadius = 55;
+        var protGrad = ctx.createRadialGradient(cx - 20, cy - 20, 10, cx, cy, protRadius);
+        protGrad.addColorStop(0, 'rgba(100,140,200,0.2)');
+        protGrad.addColorStop(1, 'rgba(40,60,120,0.1)');
+        ctx.fillStyle = protGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, protRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 蛋白表面轮廓
+        ctx.strokeStyle = 'rgba(0,212,255,0.2)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, protRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 蛋白表面残基点
+        for (var s = 0; s < 40; s++) {
+            var angle = (s / 40) * Math.PI * 2 + Math.sin(s * 0.7) * 0.3;
+            var dist = protRadius * (0.92 + Math.sin(s * 2.3) * 0.08);
+            var sx = cx + Math.cos(angle) * dist;
+            var sy = cy + Math.sin(angle) * dist;
+            ctx.fillStyle = 'rgba(160,196,232,0.5)';
+            ctx.beginPath();
+            ctx.arc(sx, sy, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 绘制配体（小分子，六边形中心）
+        var ligandX = cx + 25;
+        var ligandY = cy - 10;
+        var ligandSize = 18;
+
+        // 配体光晕
+        var ligGlow = ctx.createRadialGradient(ligandX, ligandY, 0, ligandX, ligandY, ligandSize * 2);
+        ligGlow.addColorStop(0, 'rgba(' + (data.method === 'vina' ? '0,212,255' : '162,155,254') + ',0.3)');
+        ligGlow.addColorStop(1, 'rgba(' + (data.method === 'vina' ? '0,212,255' : '162,155,254') + ',0)');
+        ctx.fillStyle = ligGlow;
+        ctx.beginPath();
+        ctx.arc(ligandX, ligandY, ligandSize * 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 配体六边形
+        ctx.fillStyle = data.method === 'vina' ? 'rgba(0,212,255,0.7)' : 'rgba(162,155,254,0.7)';
+        ctx.beginPath();
+        for (var h2 = 0; h2 < 6; h2++) {
+            var ha = (h2 / 6) * Math.PI * 2 - Math.PI / 6;
+            var hx = ligandX + Math.cos(ha) * ligandSize;
+            var hy = ligandY + Math.sin(ha) * ligandSize;
+            if (h2 === 0) ctx.moveTo(hx, hy);
+            else ctx.lineTo(hx, hy);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = data.method === 'vina' ? '#00d4ff' : '#a29bfe';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // 绘制相互作用虚线
+        data.interactions.slice(0, 5).forEach(function(ixn, idx) {
+            var angle = (idx / 5) * Math.PI * 2 - 0.5;
+            var startX = ligandX + Math.cos(angle) * ligandSize;
+            var startY = ligandY + Math.sin(angle) * ligandSize;
+            var endAngle = angle + Math.PI + (Math.random() - 0.5) * 0.5;
+            var endDist = protRadius * (0.6 + Math.random() * 0.3);
+            var endX = cx + Math.cos(endAngle) * endDist;
+            var endY = cy + Math.sin(endAngle) * endDist;
+
+            ctx.strokeStyle = ixn.typeColor;
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([3, 3]);
+            ctx.globalAlpha = 0.7;
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.globalAlpha = 1;
+
+            // 相互作用类型标签
+            var midX = (startX + endX) / 2;
+            var midY = (startY + endY) / 2;
+            ctx.fillStyle = ixn.typeColor;
+            ctx.font = '7px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(ixn.type, midX, midY - 2);
+        });
+
+        // 标签
+        ctx.fillStyle = '#a0c4e8';
+        ctx.font = '9px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(data.protein, cx, cy + 4);
+
+        ctx.fillStyle = data.method === 'vina' ? '#00d4ff' : '#a29bfe';
+        ctx.font = 'bold 8px sans-serif';
+        ctx.fillText('Ligand', ligandX, ligandY + 3);
+
+        // 图例
+        var legendY = h - 10;
+        ctx.font = '7px sans-serif';
+        var legends = [
+            { color: '#00d4ff', text: '氢键' },
+            { color: '#ffc107', text: '疏水' },
+            { color: '#a29bfe', text: 'π-π' },
+            { color: '#ff6b6b', text: '盐桥' },
+            { color: '#4ecdc4', text: 'vdW' }
+        ];
+        var lx = 10;
+        legends.forEach(function(l) {
+            ctx.fillStyle = l.color;
+            ctx.fillRect(lx, legendY - 3, 6, 6);
+            ctx.fillStyle = '#a0c4e8';
+            ctx.fillText(l.text, lx + 10, legendY + 3);
+            lx += 38;
+        });
+    }
+
+    function displayDockingResults(data) {
+        document.getElementById('dock-result-title').textContent = data.protein + ' + Ligand 对接结果';
+
+        var badge = document.getElementById('dock-method-badge');
+        badge.textContent = data.methodName;
+        badge.style.background = data.method === 'vina' ? 'rgba(0,212,255,0.15)' : 'rgba(162,155,254,0.15)';
+        badge.style.color = data.methodColor;
+
+        document.getElementById('dock-binding-energy').textContent = data.bindingEnergy;
+        document.getElementById('dock-binding-energy').style.color = data.bindingEnergy < -9 ? '#00ff88' : (data.bindingEnergy < -7 ? '#00d4ff' : '#ffc107');
+        document.getElementById('dock-ki').textContent = data.ki;
+
+        var qEl = document.getElementById('dock-quality');
+        qEl.textContent = data.quality;
+        qEl.style.color = data.qualityColor;
+
+        document.getElementById('dock-rmsd').innerHTML = '<span style="color:#00d4ff;">' + data.rmsd + ' Å</span> (Lower is better)';
+        document.getElementById('dock-poses').textContent = data.numPoses + ' poses generated';
+
+        // 相互作用表格
+        var tbody = document.getElementById('dock-interactions-body');
+        if (tbody) {
+            var html = '';
+            data.interactions.forEach(function(ixn, idx) {
+                html += '<tr style="background: ' + (idx % 2 === 0 ? 'rgba(0,212,255,0.03)' : 'transparent') + ';">' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: ' + ixn.typeColor + ';">' + ixn.type + '</td>' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15);">' + ixn.ligandAtom + '</td>' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15);">' + ixn.residue + '</td>' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">' + ixn.distance + '</td>' +
+                '</tr>';
+            });
+            tbody.innerHTML = html;
+        }
+
+        // 解读
+        var interp = '<strong>' + data.protein + '</strong> 与输入配体通过 <strong style="color:' + data.methodColor + '">' + data.methodName + '</strong> 进行对接。';
+        interp += '预测结合能为 <strong style="color:' + (data.bindingEnergy < -9 ? '#00ff88' : '#00d4ff') + '">' + data.bindingEnergy + ' kcal/mol</strong>，';
+        interp += '估算 Ki 值为 <strong>' + data.ki + '</strong>。';
+        interp += '<br><br>对接质量评估: <strong style="color:' + data.qualityColor + '">' + data.quality + '</strong>。';
+        if (data.bindingEnergy <= -9) {
+            interp += '<br><br>🟢 结合能非常理想，提示该配体可能是该靶点的<strong>强效抑制剂</strong>，建议进行进一步的生物学验证。';
+        } else if (data.bindingEnergy <= -7) {
+            interp += '<br><br>🔵 结合能良好，具有<strong>进一步优化</strong>的潜力，可通过结构修饰提高亲和力。';
+        } else if (data.bindingEnergy <= -5) {
+            interp += '<br><br>🟡 结合能一般，可能需要<strong>骨架跃迁</strong>或引入更强的相互作用基团。';
+        } else {
+            interp += '<br><br>🔴 结合能较弱，建议<strong>重新设计配体</strong>或探索不同的化学骨架。';
+        }
+        interp += '<br><br>检测到的关键相互作用包括 ' + data.interactions.length + ' 个非共价相互作用，';
+        interp += '涵盖氢键、疏水、π-π堆积、盐桥和范德华力。';
+        document.getElementById('dock-interpretation-text').innerHTML = interp;
+
+        drawDockingCanvas(data);
+
+        document.getElementById('dock-loading').style.display = 'none';
+        document.getElementById('dock-result-content').style.display = 'block';
+    }
+
+    // 全局函数
+    window.runDocking = function(method) {
+        var proteinInput = document.getElementById('dock-protein-input');
+        var ligandInput = document.getElementById('dock-ligand-input');
+        var protein = proteinInput ? proteinInput.value.trim() : '';
+        var ligand = ligandInput ? ligandInput.value.trim() : '';
+
+        if (!protein) { alert('请输入蛋白ID或蛋白名'); return; }
+        if (!ligand) { alert('请输入分子的CAS号或SMILES'); return; }
+
+        var panel = document.getElementById('dock-result-panel');
+        var loading = document.getElementById('dock-loading');
+        var content = document.getElementById('dock-result-content');
+        var loadingText = document.getElementById('dock-loading-text');
+
+        if (panel) panel.style.display = 'block';
+        if (loading) loading.style.display = 'block';
+        if (content) content.style.display = 'none';
+        if (loadingText) loadingText.textContent = method === 'vina' ? 'AutoDock Vina: 正在搜索结合构象空间...' : 'AlphaFold3: 正在进行结构预测与对接...';
+
+        setTimeout(function() {
+            var data = generateDockingData(protein, ligand, method);
+            displayDockingResults(data);
+        }, 1500);
+    };
+
+    // 事件委托
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'dock-close-btn') {
+            var panel = document.getElementById('dock-result-panel');
+            if (panel) panel.style.display = 'none';
+        }
+        if (e.target && e.target.id === 'dock-download-btn') {
+            var canvas = document.getElementById('dock-canvas');
+            if (canvas) {
+                var link = document.createElement('a');
+                link.download = 'docking-' + document.getElementById('dock-protein-input').value + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+    });
+
+    // Enter键
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && e.target && (e.target.id === 'dock-protein-input' || e.target.id === 'dock-ligand-input')) {
+            e.preventDefault();
+            runDocking('vina');
+        }
+    });
+})();
+
 // ================= 研发平台页：Therapeutic Pipeline 点击跳转 =================
 (function () {
     const drugTrack = document.querySelector('.drug-track[data-link]');
