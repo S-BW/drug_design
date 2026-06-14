@@ -592,7 +592,6 @@ document.querySelectorAll('.phase').forEach(phase => {
 
     // 显示结果
     function displayResults(data) {
-        console.log('[DEBUG] displayResults called with:', data);
         document.getElementById('result-title').textContent =
             data.gene + ' / ' + data.cancerType + ' - OS生存分析';
 
@@ -674,44 +673,47 @@ document.querySelectorAll('.phase').forEach(phase => {
     // 当前结果
     let currentResult = null;
 
+    // 核心分析函数 - 同时暴露为全局函数供内联onclick调用
+    window.runSurvivalAnalysis = function() {
+        const cancerSelect = document.getElementById('cancer-type-select');
+        const geneInput = document.getElementById('gene-input');
+        const cancer = cancerSelect ? cancerSelect.value : '';
+        const gene = geneInput ? geneInput.value.trim() : '';
+
+        if (!cancer) {
+            alert('请选择一个癌种');
+            return;
+        }
+        if (!gene) {
+            alert('请输入基因ID或基因名');
+            return;
+        }
+        if (!/^[a-zA-Z0-9\-_]+$/.test(gene)) {
+            alert('基因名只能包含字母、数字、下划线和横线');
+            return;
+        }
+
+        // 显示面板和加载动画
+        const resultPanel = document.getElementById('survival-result-panel');
+        const loadingDiv = document.getElementById('survival-loading');
+        const resultContent = document.getElementById('survival-result-content');
+        if (resultPanel) resultPanel.style.display = 'block';
+        if (loadingDiv) loadingDiv.style.display = 'block';
+        if (resultContent) resultContent.style.display = 'none';
+
+        // 模拟网络延迟后执行分析
+        setTimeout(function() {
+            currentResult = generateSurvivalData(gene, cancer);
+            displayResults(currentResult);
+        }, 1200);
+    };
+
     // 使用事件委托绑定点击事件（兼容 lockStepBottoms / unlockStepBottoms 的DOM替换）
     document.addEventListener('click', function(e) {
-        console.log('[DEBUG] Click detected, target:', e.target.id || e.target.tagName, 'clickedElement:', e.target);
         // 确认分析按钮
         if (e.target && e.target.id === 'confirm-analysis-btn') {
-            console.log('[DEBUG] Confirm button clicked!');
             e.preventDefault();
-            const cancerSelect = document.getElementById('cancer-type-select');
-            const geneInput = document.getElementById('gene-input');
-            const cancer = cancerSelect ? cancerSelect.value : '';
-            const gene = geneInput ? geneInput.value.trim() : '';
-
-            if (!cancer) {
-                alert('请选择一个癌种');
-                return;
-            }
-            if (!gene) {
-                alert('请输入基因ID或基因名');
-                return;
-            }
-            if (!/^[a-zA-Z0-9\-_]+$/.test(gene)) {
-                alert('基因名只能包含字母、数字、下划线和横线');
-                return;
-            }
-
-            // 显示面板和加载动画
-            const resultPanel = document.getElementById('survival-result-panel');
-            const loadingDiv = document.getElementById('survival-loading');
-            const resultContent = document.getElementById('survival-result-content');
-            if (resultPanel) resultPanel.style.display = 'block';
-            if (loadingDiv) loadingDiv.style.display = 'block';
-            if (resultContent) resultContent.style.display = 'none';
-
-            // 模拟网络延迟后执行分析
-            setTimeout(function() {
-                currentResult = generateSurvivalData(gene, cancer);
-                displayResults(currentResult);
-            }, 1200);
+            window.runSurvivalAnalysis();
             return;
         }
 
