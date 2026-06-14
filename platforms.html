@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="images/icon.png">
-    <title>研发平台 - 智药寻踪</title>
+    <title>研发平台 - 智药寻踪 PharmaTrace</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="platforms-page inner-page">
+<body class="inner-page">
     <!-- 登录遮罩 -->
     <div class="login-overlay hidden" id="login-overlay">
         <div class="login-box">
@@ -44,23 +44,11 @@
                 <a href="about.html">关于我们</a>
                 <a href="contact.html">联系我们</a>
             </nav>
-            <div class="header-actions">
-                <div class="user-bar" id="user-bar" style="display: none;">
-                    <span class="user-name" id="user-name"></span>
-                    <button class="logout-btn" id="logout-btn">退出</button>
-                </div>
-                <button class="login-trigger" id="login-trigger">🔐 登录</button>
-            </div>
         </header>
-
+        
         <!-- 全局提示框 -->
         <div class="tooltip" id="global-tooltip"></div>
-
-        <div class="page-title">
-            <h1>🧬 智药寻踪——肿瘤靶向原创新药研发平台</h1>
-            <p class="subtitle">PharmaTrace - Tumor-Targeted Innovative Drug Design Platform</p>
-        </div>
-
+        
         <!-- 干湿实验图例 -->
         <div class="experiment-legend">
             <div class="exp-type">
@@ -133,73 +121,146 @@
                         </div>
                         <div class="step-bottom">
                             <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
-                                <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">📝 分析参数设置</div>
+                                <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">📝 分析参数设置 <span style="font-size: 0.8em; font-weight: 400; color: #a0c4e8;">(数据来源: cBioPortal/TCGA)</span></div>
                                 <div class="form-group" style="margin-bottom: 8px;">
-                                    <label for="cancer-type-select" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">选择癌种 (TCGA/GEO)</label>
+                                    <label for="cancer-type-select" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">选择癌种 (TCGA 33种)</label>
                                     <select id="cancer-type-select" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; cursor: pointer;">
                                         <option value="" disabled selected>请选择一个癌种</option>
-                                        <optgroup label="TCGA 癌种" style="background: #0f172a;">
-                                            <option value="BRCA">BRCA - 乳腺浸润癌</option>
-                                            <option value="LUAD">LUAD - 肺腺癌</option>
-                                            <option value="LUSC">LUSC - 肺鳞癌</option>
-                                            <option value="COAD">COAD - 结肠腺癌</option>
-                                            <option value="READ">READ - 直肠腺癌</option>
-                                            <option value="STAD">STAD - 胃癌</option>
-                                            <option value="HNSC">HNSC - 头颈鳞癌</option>
-                                            <option value="BLCA">BLCA - 膀胱尿路上皮癌</option>
-                                            <option value="KIRC">KIRC - 肾透明细胞癌</option>
-                                            <option value="KIRP">KIRP - 肾乳头状细胞癌</option>
-                                            <option value="LIHC">LIHC - 肝细胞癌</option>
-                                            <option value="CHOL">CHOL - 胆管癌</option>
-                                            <option value="PAAD">PAAD - 胰腺腺癌</option>
-                                            <option value="ESCA">ESCA - 食管癌</option>
-                                            <option value="CESC">CESC - 宫颈鳞癌</option>
-                                            <option value="OV">OV - 卵巢浆液性囊腺癌</option>
-                                            <option value="UCEC">UCEC - 子宫内膜癌</option>
-                                            <option value="THCA">THCA - 甲状腺癌</option>
-                                            <option value="PRAD">PRAD - 前列腺腺癌</option>
-                                            <option value="SKCM">SKCM - 皮肤黑色素瘤</option>
-                                            <option value="SARC">SARC - 肉瘤</option>
-                                            <option value="LGG">LGG - 低级别胶质瘤</option>
-                                            <option value="GBM">GBM - 胶质母细胞瘤</option>
-                                            <option value="UVM">UVM - 葡萄膜黑色素瘤</option>
-                                            <option value="ACC">ACC - 肾上腺皮质癌</option>
-                                            <option value="PCPG">PCPG - 嗜铬细胞瘤和副神经节瘤</option>
-                                            <option value="MESO">MESO - 间皮瘤</option>
-                                            <option value="UCS">UCS - 子宫癌肉瘤</option>
-                                            <option value="TGCT">TGCT - 睾丸生殖细胞肿瘤</option>
-                                            <option value="DLBC">DLBC - 弥漫性大B细胞淋巴瘤</option>
-                                            <option value="THYM">THYM - 胸腺瘤</option>
-                                            <option value="LAML">LAML - 急性髓系白血病</option>
-                                            <option value="PANCAN">PANCAN - 泛癌分析</option>
-                                        </optgroup>
-                                        <optgroup label="GEO 常见数据集" style="background: #0f172a;">
-                                            <option value="GSE42568">GSE42568 - 乳腺癌</option>
-                                            <option value="GSE30219">GSE30219 - 非小细胞肺癌</option>
-                                            <option value="GSE31210">GSE31210 - 肺腺癌</option>
-                                            <option value="GSE28735">GSE28735 - 胰腺癌</option>
-                                            <option value="GSE14520">GSE14520 - 肝癌</option>
-                                            <option value="GSE22138">GSE22138 - 结直肠癌</option>
-                                            <option value="GSE53625">GSE53625 - 食管癌</option>
-                                            <option value="GSE25066">GSE25066 - 三阴性乳腺癌</option>
-                                            <option value="GSE37967">GSE37967 - 胃癌</option>
-                                            <option value="GSE46517">GSE46517 - 肾细胞癌</option>
-                                            <option value="GSE54218">GSE54218 - 前列腺癌</option>
-                                            <option value="GSE63805">GSE63805 - 卵巢癌</option>
-                                            <option value="GSE68086">GSE68086 - 胶质瘤</option>
-                                            <option value="GSE72094">GSE72094 - 头颈癌</option>
-                                            <option value="GSE74706">GSE74706 - 膀胱癌</option>
-                                            <option value="GSE89777">GSE89777 - 黑色素瘤</option>
-                                            <option value="GSE102349">GSE102349 - 急性髓系白血病</option>
-                                            <option value="GSE104836">GSE104836 - 子宫内膜癌</option>
-                                        </optgroup>
+                                        <option value="BRCA">BRCA - 乳腺浸润癌</option>
+                                        <option value="LUAD">LUAD - 肺腺癌</option>
+                                        <option value="LUSC">LUSC - 肺鳞癌</option>
+                                        <option value="COAD">COAD - 结肠腺癌</option>
+                                        <option value="READ">READ - 直肠腺癌</option>
+                                        <option value="STAD">STAD - 胃癌</option>
+                                        <option value="HNSC">HNSC - 头颈鳞癌</option>
+                                        <option value="BLCA">BLCA - 膀胱尿路上皮癌</option>
+                                        <option value="KIRC">KIRC - 肾透明细胞癌</option>
+                                        <option value="KIRP">KIRP - 肾乳头状细胞癌</option>
+                                        <option value="KICH">KICH - 肾嫌色细胞癌</option>
+                                        <option value="LIHC">LIHC - 肝细胞癌</option>
+                                        <option value="CHOL">CHOL - 胆管癌</option>
+                                        <option value="PAAD">PAAD - 胰腺腺癌</option>
+                                        <option value="ESCA">ESCA - 食管癌</option>
+                                        <option value="CESC">CESC - 宫颈鳞癌</option>
+                                        <option value="OV">OV - 卵巢浆液性囊腺癌</option>
+                                        <option value="UCEC">UCEC - 子宫内膜癌</option>
+                                        <option value="UCS">UCS - 子宫癌肉瘤</option>
+                                        <option value="THCA">THCA - 甲状腺癌</option>
+                                        <option value="PRAD">PRAD - 前列腺腺癌</option>
+                                        <option value="SKCM">SKCM - 皮肤黑色素瘤</option>
+                                        <option value="SARC">SARC - 肉瘤</option>
+                                        <option value="LGG">LGG - 低级别胶质瘤</option>
+                                        <option value="GBM">GBM - 胶质母细胞瘤</option>
+                                        <option value="UVM">UVM - 葡萄膜黑色素瘤</option>
+                                        <option value="ACC">ACC - 肾上腺皮质癌</option>
+                                        <option value="PCPG">PCPG - 嗜铬细胞瘤和副神经节瘤</option>
+                                        <option value="MESO">MESO - 间皮瘤</option>
+                                        <option value="TGCT">TGCT - 睾丸生殖细胞肿瘤</option>
+                                        <option value="DLBC">DLBC - 弥漫性大B细胞淋巴瘤</option>
+                                        <option value="THYM">THYM - 胸腺瘤</option>
+                                        <option value="LAML">LAML - 急性髓系白血病</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="fw-survival-type" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">生存指标</label>
+                                    <select id="fw-survival-type" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; cursor: pointer;">
+                                        <option value="OS" selected>OS - 总生存期</option>
+                                        <option value="DFS">DFS - 无病生存期</option>
+                                        <option value="PFS">PFS - 无进展生存期</option>
+                                        <option value="DSS">DSS - 疾病特异性生存期</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="gene-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">基因 ID 或基因名</label>
-                                    <input type="text" id="gene-input" placeholder="例如: TP53, EGFR, BRCA1..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                    <label for="gene-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">基因名 (如 TP53, EGFR, BRCA1)</label>
+                                    <input type="text" id="gene-input" placeholder="输入基因名..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <button type="button" id="confirm-analysis-btn" onclick="runSurvivalAnalysis()" style="width: 100%; margin-top: 10px; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #33ddff 0%, #00aadd 100%)';this.style.boxShadow='0 4px 12px rgba(0,212,255,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)';this.style.boxShadow='0 2px 8px rgba(0,212,255,0.3)';">✅ 确认分析</button>
+                            </div>
+
+                            <!-- 生存分析结果展示区域 -->
+                            <div id="survival-result-panel" style="display: none; margin-top: 12px; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border: 1px solid rgba(0,212,255,0.2);">
+                                <!-- 加载动画 -->
+                                <div id="survival-loading" style="display: none; text-align: center; padding: 20px;">
+                                    <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(0,212,255,0.2); border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p style="color: #a0c4e8; font-size: 0.75em; margin-top: 10px;">正在分析生存数据...</p>
+                                </div>
+
+                                <!-- 结果内容 -->
+                                <div id="survival-result-content" style="display: none;">
+                                    <!-- 分析标题 -->
+                                    <div style="font-size: 0.8em; color: #00d4ff; font-weight: 600; text-align: left; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,0.2);">
+                                        📊 <span id="result-title">生存分析结果</span>
+                                    </div>
+
+                                    <!-- KM曲线图 -->
+                                    <div style="position: relative; margin-bottom: 12px;">
+                                        <canvas id="km-canvas" width="360" height="240" style="width: 100%; border-radius: 8px; background: rgba(15,23,42,0.8);"></canvas>
+                                    </div>
+
+                                    <!-- 统计指标面板 -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">HR (95% CI)</div>
+                                            <div id="stat-hr" style="font-size: 0.85em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">Log-rank p-value</div>
+                                            <div id="stat-pvalue" style="font-size: 0.85em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">高表达中位OS</div>
+                                            <div id="stat-high-median" style="font-size: 0.85em; color: #ff6b6b; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">低表达中位OS</div>
+                                            <div id="stat-low-median" style="font-size: 0.85em; color: #4ecdc4; font-weight: 600;">--</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 样本信息表格 -->
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">📋 样本信息</div>
+                                        <table style="width: 100%; border-collapse: collapse; font-size: 0.7em; color: #e0e8ff;">
+                                            <thead>
+                                                <tr style="background: rgba(0,212,255,0.1);">
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: left;">分组</th>
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">样本数</th>
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">事件数</th>
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">中位OS(月)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15);"><span style="color: #ff6b6b;">●</span> 高表达</td>
+                                                    <td id="table-high-n" style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">--</td>
+                                                    <td id="table-high-events" style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">--</td>
+                                                    <td id="table-high-os" style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">--</td>
+                                                </tr>
+                                                <tr style="background: rgba(0,212,255,0.03);">
+                                                    <td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15);"><span style="color: #4ecdc4;">●</span> 低表达</td>
+                                                    <td id="table-low-n" style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">--</td>
+                                                    <td id="table-low-events" style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">--</td>
+                                                    <td id="table-low-os" style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">--</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- 结果解读 -->
+                                    <div id="result-interpretation" style="background: rgba(255,193,7,0.08); border-left: 3px solid #ffc107; border-radius: 0 6px 6px 0; padding: 10px; margin-bottom: 12px; text-align: left;">
+                                        <div style="font-size: 0.7em; color: #ffc107; font-weight: 600; margin-bottom: 4px;">💡 结果解读</div>
+                                        <div id="interpretation-text" style="font-size: 0.7em; color: #e0e8ff; line-height: 1.5;">--</div>
+                                    </div>
+
+                                    <!-- 操作按钮 -->
+                                    <div style="display: flex; gap: 8px;">
+                                        <button type="button" id="download-png-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">📥 下载图片</button>
+                                        <button type="button" id="download-csv-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">📄 导出CSV</button>
+                                        <button type="button" id="close-result-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(255,107,107,0.4); background: rgba(255,107,107,0.1); color: #ff6b6b; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">✕ 关闭</button>
+                                    </div>
                                 </div>
                             </div>
+
                             <div class="website-links">
                                 <a href="http://gepia2.cancer-pku.cn/" class="website-link" target="_blank" data-tooltip="GEPIA2: 输入基因+癌种，分析OS、DFS，可设置表达cutoff，输出最显著生存相关基因。支持多基因联合分析，基于TCGA数据">
                                     <span class="link-icon">🔗</span> GEPIA2
@@ -224,6 +285,116 @@
                             <span class="tools-badge">关联分析</span>
                         </div>
                         <div class="step-bottom">
+                            <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
+                                <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">📝 反向筛选参数 <span style="font-size: 0.8em; font-weight: 400; color: #a0c4e8;">(数据来源: cBioPortal/TCGA)</span></div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="rev-cancer-select" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">选择癌种 (TCGA 33种)</label>
+                                    <select id="rev-cancer-select" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; cursor: pointer;">
+                                        <option value="" disabled selected>请选择一个癌种</option>
+                                        <option value="BRCA">BRCA - 乳腺浸润癌</option>
+                                        <option value="LUAD">LUAD - 肺腺癌</option>
+                                        <option value="LUSC">LUSC - 肺鳞癌</option>
+                                        <option value="COAD">COAD - 结肠腺癌</option>
+                                        <option value="READ">READ - 直肠腺癌</option>
+                                        <option value="STAD">STAD - 胃癌</option>
+                                        <option value="HNSC">HNSC - 头颈鳞癌</option>
+                                        <option value="BLCA">BLCA - 膀胱尿路上皮癌</option>
+                                        <option value="KIRC">KIRC - 肾透明细胞癌</option>
+                                        <option value="KIRP">KIRP - 肾乳头状细胞癌</option>
+                                        <option value="KICH">KICH - 肾嫌色细胞癌</option>
+                                        <option value="LIHC">LIHC - 肝细胞癌</option>
+                                        <option value="CHOL">CHOL - 胆管癌</option>
+                                        <option value="PAAD">PAAD - 胰腺腺癌</option>
+                                        <option value="ESCA">ESCA - 食管癌</option>
+                                        <option value="CESC">CESC - 宫颈鳞癌</option>
+                                        <option value="OV">OV - 卵巢浆液性囊腺癌</option>
+                                        <option value="UCEC">UCEC - 子宫内膜癌</option>
+                                        <option value="UCS">UCS - 子宫癌肉瘤</option>
+                                        <option value="THCA">THCA - 甲状腺癌</option>
+                                        <option value="PRAD">PRAD - 前列腺腺癌</option>
+                                        <option value="SKCM">SKCM - 皮肤黑色素瘤</option>
+                                        <option value="SARC">SARC - 肉瘤</option>
+                                        <option value="LGG">LGG - 低级别胶质瘤</option>
+                                        <option value="GBM">GBM - 胶质母细胞瘤</option>
+                                        <option value="UVM">UVM - 葡萄膜黑色素瘤</option>
+                                        <option value="ACC">ACC - 肾上腺皮质癌</option>
+                                        <option value="PCPG">PCPG - 嗜铬细胞瘤和副神经节瘤</option>
+                                        <option value="MESO">MESO - 间皮瘤</option>
+                                        <option value="TGCT">TGCT - 睾丸生殖细胞肿瘤</option>
+                                        <option value="DLBC">DLBC - 弥漫性大B细胞淋巴瘤</option>
+                                        <option value="THYM">THYM - 胸腺瘤</option>
+                                        <option value="LAML">LAML - 急性髓系白血病</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="rev-survival-type" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">生存指标</label>
+                                    <select id="rev-survival-type" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; cursor: pointer;">
+                                        <option value="OS" selected>OS - 总生存期</option>
+                                        <option value="DFS">DFS - 无病生存期</option>
+                                        <option value="PFS">PFS - 无进展生存期</option>
+                                        <option value="DSS">DSS - 疾病特异性生存期</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="rev-cutoff" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">表达Cutoff (%)</label>
+                                    <input type="number" id="rev-cutoff" value="50" min="10" max="90" step="5" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <div class="form-group">
+                                    <label for="rev-msigdb-category" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">基因集来源 (MSigDB)</label>
+                                    <select id="rev-msigdb-category" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; cursor: pointer;">
+                                        <option value="C6" selected>C6 - 癌症特征基因集 (189套, ~10,932基因)</option>
+                                        <option value="H">H - Hallmark核心基因集 (50套, ~4,384基因)</option>
+                                        <option value="C2">C2 - 通路数据库 (KEGG/Reactome等)</option>
+                                        <option value="C3">C3 - 调控靶基因 (TF/miRNA靶点)</option>
+                                        <option value="C5">C5 - GO基因本体论</option>
+                                        <option value="C7">C7 - 免疫特征基因集</option>
+                                        <option value="C8">C8 - 细胞类型特征</option>
+                                    </select>
+                                </div>
+                                <button type="button" id="rev-confirm-btn" onclick="runReverseAnalysis()" style="width: 100%; margin-top: 10px; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #33ddff 0%, #00aadd 100%)';this.style.boxShadow='0 4px 12px rgba(0,212,255,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)';this.style.boxShadow='0 2px 8px rgba(0,212,255,0.3)';">✅ 确认筛选</button>
+                            </div>
+
+                            <!-- 反向分析结果面板 -->
+                            <div id="rev-result-panel" style="display: none; margin-top: 12px; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border: 1px solid rgba(0,212,255,0.2);">
+                                <div id="rev-loading" style="display: none; text-align: center; padding: 20px;">
+                                    <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(0,212,255,0.2); border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p style="color: #a0c4e8; font-size: 0.75em; margin-top: 10px;">正在筛选预后相关基因...</p>
+                                </div>
+                                <div id="rev-result-content" style="display: none;">
+                                    <div style="font-size: 0.8em; color: #00d4ff; font-weight: 600; text-align: left; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,0.2);">
+                                        📋 <span id="rev-result-title">预后相关基因列表</span>
+                                    </div>
+                                    <div style="font-size: 0.65em; color: #a0c4e8; text-align: left; margin-bottom: 8px;">
+                                        筛选条件: <span id="rev-filter-desc"></span> | 共找到 <span id="rev-gene-count" style="color: #00d4ff; font-weight: 600;">0</span> 个显著相关基因
+                                    </div>
+                                    <div style="max-height: 300px; overflow-y: auto;">
+                                        <table style="width: 100%; border-collapse: collapse; font-size: 0.7em; color: #e0e8ff;">
+                                            <thead>
+                                                <tr style="background: rgba(0,212,255,0.1); position: sticky; top: 0;">
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">排名</th>
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: left;">基因</th>
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">HR</th>
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">95% CI</th>
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">p-value</th>
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">中位OS(月)</th>
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">趋势</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="rev-gene-table-body">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div id="rev-interpretation" style="background: rgba(255,193,7,0.08); border-left: 3px solid #ffc107; border-radius: 0 6px 6px 0; padding: 10px; margin-top: 10px; text-align: left;">
+                                        <div style="font-size: 0.7em; color: #ffc107; font-weight: 600; margin-bottom: 4px;">💡 结果解读</div>
+                                        <div id="rev-interpretation-text" style="font-size: 0.7em; color: #e0e8ff; line-height: 1.5;"></div>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                                        <button type="button" id="rev-download-csv-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">📄 导出CSV</button>
+                                        <button type="button" id="rev-close-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(255,107,107,0.4); background: rgba(255,107,107,0.1); color: #ff6b6b; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">✕ 关闭</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="website-links">
                                 <a href="https://github.com/easygsea/cSurvival" class="website-link" target="_blank" data-tooltip="cSurvival: 识别预后生物标志物和遗传脆弱性，支持基因集、基因、位点和药物依赖性联合分析，可探索与生存相关的基因交互作用">
                                     <span class="link-icon">🔗</span> cSurvival
@@ -642,7 +813,7 @@
         </div><!-- .workflow -->
 
             <!-- 药物管线进度条 -->
-            <div class="drug-track" data-link="pipeline.html">
+            <div class="drug-track">
                 <div class="drug-track-title">Therapeutic Pipeline</div>
                 <div class="drug-track-lines">
                     <a href="sin001.html" class="drug-line completed" data-drug="SIN001" title="SIN001">
@@ -682,6 +853,52 @@
         </div>
     </div>
 
+    <!-- 申请入驻授权弹窗 -->
+    <div class="apply-overlay hidden" id="apply-overlay">
+        <div class="apply-box">
+            <button type="button" class="apply-close" id="apply-close" aria-label="关闭">×</button>
+            <div class="apply-header">
+                <h2>申请入驻授权</h2>
+                <p>填写以下信息，开始您的科研算力之旅</p>
+            </div>
+            <form id="apply-form" autocomplete="off">
+                <div class="apply-tabs">
+                    <button type="button" class="apply-tab active" data-tab="org">机构注册</button>
+                    <button type="button" class="apply-tab" data-tab="person">个人申请</button>
+                </div>
+                <input type="hidden" id="apply-type" value="org">
+
+                <div class="form-group">
+                    <label for="apply-name"><span id="name-label">机构全称</span><span class="required">*</span></label>
+                    <input type="text" id="apply-name" placeholder="请输入机构全称" required>
+                </div>
+                <div class="form-group">
+                    <label for="apply-email">单位邮箱<span class="required">*</span></label>
+                    <input type="email" id="apply-email" placeholder="name@institution.edu" required>
+                </div>
+                <div class="form-group">
+                    <label for="apply-field">研究领域<span class="required">*</span></label>
+                    <select id="apply-field" required>
+                        <option value="" disabled selected>请选择研究领域</option>
+                        <option value="靶点发现与验证">靶点发现与验证</option>
+                        <option value="苗头化合物发现">苗头化合物发现</option>
+                        <option value="先导化合物优化">先导化合物优化</option>
+                        <option value="分子动力学模拟">分子动力学模拟</option>
+                        <option value="ADMET 预测">ADMET 预测</option>
+                        <option value="药物重定位">药物重定位</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="apply-desc">需求说明<span class="required">*</span></label>
+                    <textarea id="apply-desc" rows="4" placeholder="请简要描述您的研究需求、预期算力规模及使用周期..." required></textarea>
+                </div>
+                <button type="submit" class="apply-submit">提交申请</button>
+                <p class="apply-note">提交即表示您同意我们的服务条款与隐私政策。您的信息将受到端到端加密保护。</p>
+            </form>
+        </div>
+    </div>
+
     <!-- 底部入驻引导 -->
     <footer class="site-footer" id="site-footer">
         <div class="footer-inner">
@@ -689,9 +906,9 @@
             <h3>联系我们获取账号，申请入驻权</h3>
             <p>如需开通平台账号或申请机构入驻，请联系管理员获取授权。</p>
             <div class="footer-actions">
-                <a href="contact.html" class="footer-btn primary">
-                    <span>📧</span> 联系我们
-                </a>
+                <button class="footer-btn primary" id="apply-trigger">
+                    <span>📝</span> 申请入驻授权
+                </button>
             </div>
             <div class="footer-tip">登录后可查看完整工具链接与实验详情</div>
         </div>
