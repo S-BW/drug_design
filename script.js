@@ -333,95 +333,10 @@ document.querySelectorAll('.phase').forEach(phase => {
 
 // ================= 生存分析功能 =================
 (function() {
-    // 确定性随机数生成器（相同输入产生相同输出）
-    function seededRandom(seed) {
-        let s = seed;
-        return function() {
-            s = (s * 16807 + 0) % 2147483647;
-            return (s - 1) / 2147483646;
-        };
-    }
-
-    // 字符串转种子数字
-    function strToSeed(str) {
-        let h = 0;
-        for (let i = 0; i < str.length; i++) {
-            h = ((h << 5) - h + str.charCodeAt(i)) | 0;
-        }
-        return Math.abs(h) + 1;
-    }
-
-    // 生成模拟KM数据
-    function generateSurvivalData(gene, cancerType) {
-        const seed = strToSeed(gene.toUpperCase() + '_' + cancerType);
-        const rng = seededRandom(seed);
-
-        // 决定该基因在癌种中的预后效应（高表达是好是坏）
-        const isRiskGene = rng() > 0.4; // 60%概率是高表达预后差
-        const effectSize = 0.5 + rng() * 2.0; // HR: 0.5 ~ 2.5
-        const hr = isRiskGene ? effectSize : 1 / effectSize;
-
-        // 样本量
-        const totalN = 200 + Math.floor(rng() * 600); // 200-800
-        const highN = Math.floor(totalN * (0.4 + rng() * 0.2)); // 40%-60%
-        const lowN = totalN - highN;
-
-        // 生成时间点和生存概率
-        const maxTime = 120 + Math.floor(rng() * 60); // 120-180个月
-        const timePoints = [];
-        const numPoints = 50;
-
-        // 高表达组（可能是高风险组）
-        const highMedianOS = isRiskGene
-            ? 20 + rng() * 40  // 短生存
-            : 40 + rng() * 50; // 长生存
-        const lowMedianOS = isRiskGene
-            ? 50 + rng() * 50  // 长生存
-            : 20 + rng() * 40; // 短生存
-
-        for (let i = 0; i <= numPoints; i++) {
-            const t = (i / numPoints) * maxTime;
-            const highSurv = Math.exp(-t * Math.LN2 / highMedianOS);
-            const lowSurv = Math.exp(-t * Math.LN2 / lowMedianOS);
-
-            // 添加一些噪声和阶梯效应
-            const highNoise = 1 - (rng() * 0.02);
-            const lowNoise = 1 - (rng() * 0.02);
-
-            timePoints.push({
-                time: Math.round(t),
-                high: Math.max(0, Math.min(1, highSurv * highNoise)),
-                low: Math.max(0, Math.min(1, lowSurv * lowNoise))
-            });
-        }
-
-        // 计算事件数
-        const highEvents = Math.floor(highN * (0.3 + rng() * 0.5));
-        const lowEvents = Math.floor(lowN * (0.2 + rng() * 0.4));
-
-        // p-value (基于HR和样本量)
-        const logHR = Math.log(hr);
-        const se = Math.sqrt(1/highEvents + 1/lowEvents);
-        const z = Math.abs(logHR) / se;
-        const pValue = 2 * (1 - normalCDF(z));
-
-        return {
-            gene: gene.toUpperCase(),
-            cancerType: cancerType,
-            hr: hr,
-            hrCI: [hr * Math.exp(-1.96 * se), hr * Math.exp(1.96 * se)],
-            pValue: Math.max(0.0001, Math.min(0.999, pValue)),
-            highN: highN,
-            lowN: lowN,
-            highEvents: highEvents,
-            lowEvents: lowEvents,
-            highMedianOS: Math.round(highMedianOS),
-            lowMedianOS: Math.round(lowMedianOS),
-            timePoints: timePoints,
-            isRiskGene: isRiskGene,
-            maxTime: maxTime
-        };
-    }
+    // 后端API基础URL (可根据部署环境修改)
+    const API_BASE = window.location.hostname === 'localhost' 
+        ? 'http://localhost:5000' 
+        : (window.API_BASE_URL || '');
 
     // 标准正态分布CDF
     function normalCDF(x) {
@@ -436,6 +351,122 @@ document.querySelectorAll('.phase').forEach(phase => {
         const t = 1 / (1 + p * x);
         const y = 1 - (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x));
         return 0.5 * (1 + sign * y);
+    }
+
+    // 确定性随机数生成器（模拟数据后备）
+    function seededRandom(seed) {
+        let s = seed;
+        return function() {
+            s = (s * 16807 + 0) % 2147483647;
+            return (s - 1) / 2147483646;
+        };
+    }
+    function strToSeed(str) {
+        let h = 0;
+        for (let i = 0; i < str.length; i++) {
+            h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+        }
+        return Math.abs(h) + 1;
+    }
+
+    // 模拟数据生成（API不可用时后备）
+    function generateMockSurvivalData(gene, cancerType) {
+        const seed = strToSeed(gene.toUpperCase() + '_' + cancerType);
+        const rng = seededRandom(seed);
+        const isRiskGene = rng() > 0.4;
+        const effectSize = 0.5 + rng() * 2.0;
+        const hr = isRiskGene ? effectSize : 1 / effectSize;
+        const totalN = 200 + Math.floor(rng() * 600);
+        const highN = Math.floor(totalN * (0.4 + rng() * 0.2));
+        const lowN = totalN - highN;
+        const maxTime = 120 + Math.floor(rng() * 60);
+        const timePoints = [];
+        const numPoints = 50;
+        const highMedianOS = isRiskGene ? 20 + rng() * 40 : 40 + rng() * 50;
+        const lowMedianOS = isRiskGene ? 50 + rng() * 50 : 20 + rng() * 40;
+        for (let i = 0; i <= numPoints; i++) {
+            const t = (i / numPoints) * maxTime;
+            const highSurv = Math.exp(-t * Math.LN2 / highMedianOS);
+            const lowSurv = Math.exp(-t * Math.LN2 / lowMedianOS);
+            timePoints.push({
+                time: Math.round(t),
+                high: Math.max(0, Math.min(1, highSurv * (1 - rng() * 0.02))),
+                low: Math.max(0, Math.min(1, lowSurv * (1 - rng() * 0.02)))
+            });
+        }
+        const highEvents = Math.floor(highN * (0.3 + rng() * 0.5));
+        const lowEvents = Math.floor(lowN * (0.2 + rng() * 0.4));
+        const logHR = Math.log(hr);
+        const se = Math.sqrt(1/highEvents + 1/lowEvents);
+        const z = Math.abs(logHR) / se;
+        const pValue = 2 * (1 - normalCDF(z));
+        return {
+            gene: gene.toUpperCase(), cancerType: cancerType,
+            hr: hr, hrCI: [hr * Math.exp(-1.96 * se), hr * Math.exp(1.96 * se)],
+            pValue: Math.max(0.0001, Math.min(0.999, pValue)),
+            highN: highN, lowN: lowN, highEvents: highEvents, lowEvents: lowEvents,
+            highMedianOS: Math.round(highMedianOS), lowMedianOS: Math.round(lowMedianOS),
+            timePoints: timePoints, isRiskGene: isRiskGene, maxTime: maxTime,
+            data_source: 'Demo (API unavailable)'
+        };
+    }
+
+    // 从后端API获取真实生存分析数据
+    async function fetchSurvivalData(gene, cancerType) {
+        try {
+            const resp = await fetch(API_BASE + '/api/survival/forward', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ gene: gene, cancer_type: cancerType, survival_type: 'OS', cutoff: 50 })
+            });
+            if (!resp.ok) {
+                const err = await resp.json();
+                throw new Error(err.error || 'API error: ' + resp.status);
+            }
+            const data = await resp.json();
+            // 转换API格式为内部格式
+            return {
+                gene: data.gene,
+                cancerType: data.gene + ' in ' + cancerType,
+                hr: data.hr,
+                hrCI: [data.hr_ci_low, data.hr_ci_high],
+                pValue: data.p_value,
+                highN: data.high_n,
+                lowN: data.low_n,
+                highEvents: data.high_events,
+                lowEvents: data.low_events,
+                highMedianOS: data.high_median ? Math.round(data.high_median) : '--',
+                lowMedianOS: data.low_median ? Math.round(data.low_median) : '--',
+                timePoints: convertKMData(data.km_data),
+                isRiskGene: data.hr > 1,
+                maxTime: data.km_data && data.km_data.high && data.km_data.high.time.length > 0
+                    ? Math.max(...data.km_data.high.time)
+                    : 180,
+                data_source: data.data_source || 'cBioPortal/TCGA'
+            };
+        } catch (e) {
+            console.warn('API failed, using mock data:', e.message);
+            return generateMockSurvivalData(gene, cancerType);
+        }
+    }
+
+    // 转换后端KM数据格式
+    function convertKMData(km) {
+        if (!km || !km.high || !km.low) return [];
+        const highTime = km.high.time;
+        const highSurv = km.high.survival;
+        const lowTime = km.low.time;
+        const lowSurv = km.low.survival;
+        const maxLen = Math.max(highTime.length, lowTime.length);
+        const points = [];
+        for (let i = 0; i < maxLen; i++) {
+            points.push({
+                time: i < highTime.length ? Math.round(highTime[i]) : Math.round(highTime[highTime.length - 1]),
+                high: i < highSurv.length ? highSurv[i] : highSurv[highSurv.length - 1],
+                low: i < lowSurv.length ? lowSurv[i] : lowSurv[lowSurv.length - 1]
+            });
+        }
+        return points;
     }
 
     // 绘制KM曲线
@@ -592,8 +623,9 @@ document.querySelectorAll('.phase').forEach(phase => {
 
     // 显示结果
     function displayResults(data) {
+        var sourceTag = data.data_source ? ' | ' + data.data_source : '';
         document.getElementById('result-title').textContent =
-            data.gene + ' / ' + data.cancerType + ' - OS生存分析';
+            data.gene + ' / ' + data.cancerType + ' - OS生存分析' + sourceTag;
 
         // 统计指标
         document.getElementById('stat-hr').textContent =
@@ -674,7 +706,7 @@ document.querySelectorAll('.phase').forEach(phase => {
     let currentResult = null;
 
     // 核心分析函数 - 同时暴露为全局函数供内联onclick调用
-    window.runSurvivalAnalysis = function() {
+    window.runSurvivalAnalysis = async function() {
         const cancerSelect = document.getElementById('cancer-type-select');
         const geneInput = document.getElementById('gene-input');
         const cancer = cancerSelect ? cancerSelect.value : '';
@@ -701,11 +733,9 @@ document.querySelectorAll('.phase').forEach(phase => {
         if (loadingDiv) loadingDiv.style.display = 'block';
         if (resultContent) resultContent.style.display = 'none';
 
-        // 模拟网络延迟后执行分析
-        setTimeout(function() {
-            currentResult = generateSurvivalData(gene, cancer);
-            displayResults(currentResult);
-        }, 1200);
+        // 调用后端API获取真实数据
+        currentResult = await fetchSurvivalData(gene, cancer);
+        displayResults(currentResult);
     };
 
     // 使用事件委托绑定点击事件（兼容 lockStepBottoms / unlockStepBottoms 的DOM替换）
@@ -830,8 +860,27 @@ document.querySelectorAll('.phase').forEach(phase => {
         document.getElementById('rev-result-content').style.display = 'block';
     }
 
+    // 从后端API获取反向分析数据
+    async function fetchReverseData(cancer, survivalType, cutoff) {
+        try {
+            var resp = await fetch(API_BASE + '/api/survival/reverse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cancer_type: cancer, survival_type: survivalType, cutoff: cutoff, max_genes: 68 })
+            });
+            if (!resp.ok) {
+                var err = await resp.json();
+                throw new Error(err.error || 'API error: ' + resp.status);
+            }
+            return await resp.json();
+        } catch (e) {
+            console.warn('Reverse API failed, using mock:', e.message);
+            return null;
+        }
+    }
+
     // 反向分析 - 暴露为全局函数
-    window.runReverseAnalysis = function() {
+    window.runReverseAnalysis = async function() {
         var cancerSelect = document.getElementById('rev-cancer-select');
         var survivalSelect = document.getElementById('rev-survival-type');
         var cutoffInput = document.getElementById('rev-cutoff');
@@ -851,11 +900,75 @@ document.querySelectorAll('.phase').forEach(phase => {
         if (loadingDiv) loadingDiv.style.display = 'block';
         if (resultContent) resultContent.style.display = 'none';
 
-        setTimeout(function() {
+        // 尝试调用后端API
+        var apiData = await fetchReverseData(cancer, survivalType, cutoff);
+        if (apiData && apiData.genes) {
+            displayReverseAPIData(apiData);
+        } else {
+            // 后备：使用模拟数据
             var data = generateReverseData(cancer, survivalType, cutoff);
             displayReverseResults(data, cancer, survivalType, cutoff);
-        }, 1200);
+        }
     };
+
+    // 显示后端API返回的反向分析结果
+    function displayReverseAPIData(data) {
+        var cancer = data.cancer_type;
+        var survivalType = data.survival_type;
+        var cutoff = data.cutoff;
+        var genes = data.genes || [];
+        var source = data.data_source || 'cBioPortal/TCGA';
+
+        document.getElementById('rev-result-title').textContent =
+            cancer + ' - ' + survivalType + ' 相关基因列表 | ' + source;
+        document.getElementById('rev-filter-desc').textContent =
+            cancer + ' | ' + survivalType + ' | cutoff=' + cutoff + '%';
+        document.getElementById('rev-gene-count').textContent = genes.length;
+
+        // 填充表格
+        var tbody = document.getElementById('rev-gene-table-body');
+        if (!tbody) return;
+        var html = '';
+        if (genes.length === 0) {
+            html = '<tr><td colspan="7" style="padding: 20px; text-align: center; color: #a0c4e8;">未找到显著相关的基因（p<0.05），建议调整cutoff值或更换癌种</td></tr>';
+        } else {
+            genes.forEach(function(gene) {
+                var pStr = gene.p_value < 0.001 ? '<0.001' : gene.p_value.toFixed(3);
+                var pColor = gene.p_value < 0.01 ? '#00ff88' : (gene.p_value < 0.05 ? '#ffc107' : '#e0e8ff');
+                var trendIcon = gene.hr > 1 ? '🔴 高风险' : '🟢 保护性';
+                var trendColor = gene.hr > 1 ? '#ff6b6b' : '#4ecdc4';
+                var ciStr = gene.hr_ci_low.toFixed(2) + '-' + gene.hr_ci_high.toFixed(2);
+                var medOS = gene.high_median ? Math.round(gene.high_median) : '--';
+                html += '<tr style="background: ' + (gene.rank % 2 === 0 ? 'rgba(0,212,255,0.03)' : 'transparent') + ';">' +
+                    '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: #a0c4e8;">' + gene.rank + '</td>' +
+                    '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: left; font-weight: 600; color: #00d4ff;">' + gene.gene + '</td>' +
+                    '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: ' + (gene.hr > 1 ? '#ff6b6b' : '#4ecdc4') + ';">' + gene.hr.toFixed(2) + '</td>' +
+                    '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: #a0c4e8;">' + ciStr + '</td>' +
+                    '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: ' + pColor + '; font-weight: 600;">' + pStr + '</td>' +
+                    '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: #e0e8ff;">' + medOS + '</td>' +
+                    '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: ' + trendColor + ';">' + trendIcon + '</td>' +
+                '</tr>';
+            });
+        }
+        tbody.innerHTML = html;
+
+        // 结果解读
+        var riskGenes = genes.filter(function(g) { return g.hr > 1; }).length;
+        var protGenes = genes.filter(function(g) { return g.hr <= 1; }).length;
+        var interp;
+        if (genes.length > 0) {
+            var topGene = genes[0];
+            var pStr = topGene.p_value < 0.001 ? '<0.001' : topGene.p_value.toFixed(3);
+            interp = '在 ' + cancer + ' 中，基于 ' + survivalType + ' 指标共筛选出 ' + genes.length + ' 个与预后显著相关的基因（p<0.05）。其中 ' + riskGenes + ' 个为高风险基因（高表达预后差），' + protGenes + ' 个为保护性基因（高表达预后好）。最显著的基因是 ' + topGene.gene + ' (HR=' + topGene.hr.toFixed(2) + ', p=' + pStr + ')。数据来源：' + source + '。';
+        } else {
+            interp = '在 ' + cancer + ' 中，基于 ' + survivalType + ' 指标未找到与预后显著相关的基因（p<0.05）。建议：1) 调整cutoff值（尝试25%或75%）；2) 更换生存指标（尝试DFS或PFS）；3) 扩大基因筛选范围。数据来源：' + source + '。';
+        }
+        document.getElementById('rev-interpretation-text').textContent = interp;
+
+        // 切换显示
+        document.getElementById('rev-loading').style.display = 'none';
+        document.getElementById('rev-result-content').style.display = 'block';
+    }
 
     // 按Enter键触发分析
     document.addEventListener('keypress', function(e) {
