@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="images/icon.png">
-    <title>研发平台 - 智药寻踪 PharmaTrace</title>
+    <title>研发平台 - 智药寻踪</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="inner-page">
+<body class="platforms-page inner-page">
     <!-- 登录遮罩 -->
     <div class="login-overlay hidden" id="login-overlay">
         <div class="login-box">
@@ -44,11 +44,23 @@
                 <a href="about.html">关于我们</a>
                 <a href="contact.html">联系我们</a>
             </nav>
+            <div class="header-actions">
+                <div class="user-bar" id="user-bar" style="display: none;">
+                    <span class="user-name" id="user-name"></span>
+                    <button class="logout-btn" id="logout-btn">退出</button>
+                </div>
+                <button class="login-trigger" id="login-trigger">🔐 登录</button>
+            </div>
         </header>
-        
+
         <!-- 全局提示框 -->
         <div class="tooltip" id="global-tooltip"></div>
-        
+
+        <div class="page-title">
+            <h1>🧬 智药寻踪——肿瘤靶向原创新药研发平台</h1>
+            <p class="subtitle">PharmaTrace - Tumor-Targeted Innovative Drug Design Platform</p>
+        </div>
+
         <!-- 干湿实验图例 -->
         <div class="experiment-legend">
             <div class="exp-type">
@@ -260,7 +272,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="website-links">
                                 <a href="http://gepia2.cancer-pku.cn/" class="website-link" target="_blank" data-tooltip="GEPIA2: 输入基因+癌种，分析OS、DFS，可设置表达cutoff，输出最显著生存相关基因。支持多基因联合分析，基于TCGA数据">
                                     <span class="link-icon">🔗</span> GEPIA2
@@ -813,7 +824,7 @@
         </div><!-- .workflow -->
 
             <!-- 药物管线进度条 -->
-            <div class="drug-track">
+            <div class="drug-track" data-link="pipeline.html">
                 <div class="drug-track-title">Therapeutic Pipeline</div>
                 <div class="drug-track-lines">
                     <a href="sin001.html" class="drug-line completed" data-drug="SIN001" title="SIN001">
@@ -853,52 +864,6 @@
         </div>
     </div>
 
-    <!-- 申请入驻授权弹窗 -->
-    <div class="apply-overlay hidden" id="apply-overlay">
-        <div class="apply-box">
-            <button type="button" class="apply-close" id="apply-close" aria-label="关闭">×</button>
-            <div class="apply-header">
-                <h2>申请入驻授权</h2>
-                <p>填写以下信息，开始您的科研算力之旅</p>
-            </div>
-            <form id="apply-form" autocomplete="off">
-                <div class="apply-tabs">
-                    <button type="button" class="apply-tab active" data-tab="org">机构注册</button>
-                    <button type="button" class="apply-tab" data-tab="person">个人申请</button>
-                </div>
-                <input type="hidden" id="apply-type" value="org">
-
-                <div class="form-group">
-                    <label for="apply-name"><span id="name-label">机构全称</span><span class="required">*</span></label>
-                    <input type="text" id="apply-name" placeholder="请输入机构全称" required>
-                </div>
-                <div class="form-group">
-                    <label for="apply-email">单位邮箱<span class="required">*</span></label>
-                    <input type="email" id="apply-email" placeholder="name@institution.edu" required>
-                </div>
-                <div class="form-group">
-                    <label for="apply-field">研究领域<span class="required">*</span></label>
-                    <select id="apply-field" required>
-                        <option value="" disabled selected>请选择研究领域</option>
-                        <option value="靶点发现与验证">靶点发现与验证</option>
-                        <option value="苗头化合物发现">苗头化合物发现</option>
-                        <option value="先导化合物优化">先导化合物优化</option>
-                        <option value="分子动力学模拟">分子动力学模拟</option>
-                        <option value="ADMET 预测">ADMET 预测</option>
-                        <option value="药物重定位">药物重定位</option>
-                        <option value="其他">其他</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="apply-desc">需求说明<span class="required">*</span></label>
-                    <textarea id="apply-desc" rows="4" placeholder="请简要描述您的研究需求、预期算力规模及使用周期..." required></textarea>
-                </div>
-                <button type="submit" class="apply-submit">提交申请</button>
-                <p class="apply-note">提交即表示您同意我们的服务条款与隐私政策。您的信息将受到端到端加密保护。</p>
-            </form>
-        </div>
-    </div>
-
     <!-- 底部入驻引导 -->
     <footer class="site-footer" id="site-footer">
         <div class="footer-inner">
@@ -906,9 +871,9 @@
             <h3>联系我们获取账号，申请入驻权</h3>
             <p>如需开通平台账号或申请机构入驻，请联系管理员获取授权。</p>
             <div class="footer-actions">
-                <button class="footer-btn primary" id="apply-trigger">
-                    <span>📝</span> 申请入驻授权
-                </button>
+                <a href="contact.html" class="footer-btn primary">
+                    <span>📧</span> 联系我们
+                </a>
             </div>
             <div class="footer-tip">登录后可查看完整工具链接与实验详情</div>
         </div>
