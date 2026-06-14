@@ -40,7 +40,7 @@
                 <a href="platforms.html" class="active">研发平台</a>
                 <a href="pipeline.html">在研管线</a>
                 <a href="vision.html">企业愿景</a>
-                <a href="services.html">技术服务</a>
+                <a href="platforms.html">技术服务</a>
                 <a href="about.html">关于我们</a>
                 <a href="contact.html">联系我们</a>
             </nav>
@@ -131,7 +131,7 @@
                             <div class="step-desc">输入: 基因+癌种<br>输出: 该基因的生存分析结果(OS/DFS)</div>
                             <span class="tools-badge">生存分析</span>
                         </div>
-                        <div class="step-bottom">
+                        <div class="step-bottom step-bottom-public">
                             <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
                                 <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">📝 分析参数设置 <span style="font-size: 0.8em; font-weight: 400; color: #a0c4e8;">(数据来源: cBioPortal/TCGA)</span></div>
                                 <div class="form-group" style="margin-bottom: 8px;">
@@ -295,7 +295,7 @@
                             <div class="step-desc">输入: 癌种、OS/PFS、cutoff<br>输出: 与该生存特征相关的基因/靶点列表</div>
                             <span class="tools-badge">关联分析</span>
                         </div>
-                        <div class="step-bottom">
+                        <div class="step-bottom step-bottom-public">
                             <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
                                 <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">📝 反向筛选参数 <span style="font-size: 0.8em; font-weight: 400; color: #a0c4e8;">(数据来源: cBioPortal/TCGA)</span></div>
                                 <div class="form-group" style="margin-bottom: 8px;">
@@ -429,7 +429,83 @@
                             <div class="step-desc">In Silico Validation<br>基于计算方法的靶点功能验证</div>
                             <span class="tools-badge">计算预测</span>
                         </div>
-                        <div class="step-bottom">
+                        <div class="step-bottom step-bottom-public">
+                            <!-- 虚拟敲除输入表单 -->
+                            <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
+                                <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">🧬 虚拟基因敲除分析</div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="knockout-gene-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">基因 ID 或基因名</label>
+                                    <input type="text" id="knockout-gene-input" placeholder="例如: TP53, EGFR, BRCA1..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="knockout-geo-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">GEO 数据库号</label>
+                                    <input type="text" id="knockout-geo-input" placeholder="例如: GSE42568, GSE30219..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <button type="button" id="knockout-confirm-btn" onclick="runVirtualKnockout()" style="width: 100%; margin-top: 4px; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #33ddff 0%, #00aadd 100%)';this.style.boxShadow='0 4px 12px rgba(0,212,255,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)';this.style.boxShadow='0 2px 8px rgba(0,212,255,0.3)';">🧪 确认并生成虚拟敲除结果</button>
+                            </div>
+
+                            <!-- 虚拟敲除结果面板 -->
+                            <div id="knockout-result-panel" style="display: none; margin-bottom: 12px; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border: 1px solid rgba(0,212,255,0.2);">
+                                <div id="knockout-loading" style="display: none; text-align: center; padding: 20px;">
+                                    <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(0,212,255,0.2); border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p style="color: #a0c4e8; font-size: 0.75em; margin-top: 10px;">正在分析基因敲除效应...</p>
+                                </div>
+                                <div id="knockout-result-content" style="display: none;">
+                                    <div style="font-size: 0.8em; color: #00d4ff; font-weight: 600; text-align: left; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,0.2);">
+                                        📊 <span id="knockout-result-title">虚拟敲除分析结果</span>
+                                    </div>
+                                    <!-- 敲除效应概要 -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">基因依赖性评分</div>
+                                            <div id="ko-dep-score" style="font-size: 0.9em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">细胞存活率</div>
+                                            <div id="ko-viability" style="font-size: 0.9em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">p-value</div>
+                                            <div id="ko-pvalue" style="font-size: 0.9em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">效应分类</div>
+                                            <div id="ko-effect" style="font-size: 0.85em; font-weight: 600;">--</div>
+                                        </div>
+                                    </div>
+                                    <!-- 可视化图表 -->
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">📈 敲除前后基因表达变化 (Top 10 差异基因)</div>
+                                        <canvas id="ko-canvas" width="360" height="220" style="width: 100%; border-radius: 8px; background: rgba(15,23,42,0.8);"></canvas>
+                                    </div>
+                                    <!-- 通路富集 -->
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">🔄 受影响通路 (Top 5)</div>
+                                        <table style="width: 100%; border-collapse: collapse; font-size: 0.7em; color: #e0e8ff;">
+                                            <thead>
+                                                <tr style="background: rgba(0,212,255,0.1);">
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: left;">通路</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">富集度</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">p-value</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="ko-pathway-body">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- 结果解读 -->
+                                    <div id="ko-interpretation" style="background: rgba(255,193,7,0.08); border-left: 3px solid #ffc107; border-radius: 0 6px 6px 0; padding: 10px; margin-bottom: 12px; text-align: left;">
+                                        <div style="font-size: 0.7em; color: #ffc107; font-weight: 600; margin-bottom: 4px;">💡 结果解读</div>
+                                        <div id="ko-interpretation-text" style="font-size: 0.7em; color: #e0e8ff; line-height: 1.5;">--</div>
+                                    </div>
+                                    <!-- 操作按钮 -->
+                                    <div style="display: flex; gap: 8px;">
+                                        <button type="button" id="ko-download-png-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">📥 下载图片</button>
+                                        <button type="button" id="ko-close-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(255,107,107,0.4); background: rgba(255,107,107,0.1); color: #ff6b6b; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">✕ 关闭</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="website-links">
                                 <div style="font-size: 0.7em; color: #00d4ff; margin: 0 0 4px 0; text-align: left; padding-left: 5px;">虚拟敲除</div>
                                 <a href="https://github.com/cailab-tamu/scTenifoldKnk" class="website-link" target="_blank" data-tooltip="scTenifoldKnk: 基于单细胞RNA-seq的虚拟敲除工具，通过张量分解预测基因敲除效应">
@@ -495,6 +571,79 @@
                             <span class="tools-badge">结构生物学</span>
                         </div>
                         <div class="step-bottom step-bottom-public">
+                            <!-- 蛋白结构查询表单 -->
+                            <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
+                                <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">🧬 蛋白结构查询 (PDB / AlphaFold)</div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="protein-id-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">蛋白 ID 或蛋白名 / UniProt ID</label>
+                                    <input type="text" id="protein-id-input" placeholder="例如: EGFR, P00533, 1M17..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <button type="button" id="protein-search-btn" onclick="runProteinStructureSearch()" style="width: 100%; margin-top: 4px; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #33ddff 0%, #00aadd 100%)';this.style.boxShadow='0 4px 12px rgba(0,212,255,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)';this.style.boxShadow='0 2px 8px rgba(0,212,255,0.3)';">🔍 查询蛋白结构</button>
+                            </div>
+
+                            <!-- 蛋白结构结果面板 -->
+                            <div id="protein-result-panel" style="display: none; margin-bottom: 12px; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border: 1px solid rgba(0,212,255,0.2);">
+                                <div id="protein-loading" style="display: none; text-align: center; padding: 20px;">
+                                    <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(0,212,255,0.2); border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p style="color: #a0c4e8; font-size: 0.75em; margin-top: 10px;">正在查询蛋白结构数据库...</p>
+                                </div>
+                                <div id="protein-result-content" style="display: none;">
+                                    <div style="font-size: 0.8em; color: #00d4ff; font-weight: 600; text-align: left; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,0.2);">
+                                        🧬 <span id="protein-result-title">蛋白结构信息</span>
+                                    </div>
+                                    <!-- 结构来源标签 -->
+                                    <div id="protein-source-badge" style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.7em; font-weight: 600; margin-bottom: 10px;"></div>
+                                    <!-- 蛋白信息 -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">蛋白名称</div>
+                                            <div id="prot-name" style="font-size: 0.8em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">UniProt ID</div>
+                                            <div id="prot-uniprot" style="font-size: 0.8em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">PDB ID</div>
+                                            <div id="prot-pdb" style="font-size: 0.85em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">分辨率</div>
+                                            <div id="prot-resolution" style="font-size: 0.85em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">氨基酸长度</div>
+                                            <div id="prot-length" style="font-size: 0.85em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">可药性</div>
+                                            <div id="prot-druggability" style="font-size: 0.8em; font-weight: 600;">--</div>
+                                        </div>
+                                    </div>
+                                    <!-- 结构示意图 -->
+                                    <div style="margin-bottom: 12px; text-align: center;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">🧬 蛋白结构拓扑示意图</div>
+                                        <canvas id="protein-canvas" width="360" height="200" style="width: 100%; border-radius: 8px; background: rgba(15,23,42,0.8);"></canvas>
+                                    </div>
+                                    <!-- 外部链接 -->
+                                    <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+                                        <a id="prot-pdb-link" href="#" target="_blank" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.68em; text-align: center; text-decoration: none; display: inline-block;">🔗 PDB</a>
+                                        <a id="prot-af-link" href="#" target="_blank" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.68em; text-align: center; text-decoration: none; display: inline-block;">🔗 AlphaFold</a>
+                                        <a id="prot-uniprot-link" href="#" target="_blank" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.68em; text-align: center; text-decoration: none; display: inline-block;">🔗 UniProt</a>
+                                    </div>
+                                    <!-- 结果解读 -->
+                                    <div id="prot-interpretation" style="background: rgba(255,193,7,0.08); border-left: 3px solid #ffc107; border-radius: 0 6px 6px 0; padding: 10px; margin-bottom: 10px; text-align: left;">
+                                        <div style="font-size: 0.7em; color: #ffc107; font-weight: 600; margin-bottom: 4px;">💡 结构分析</div>
+                                        <div id="prot-interpretation-text" style="font-size: 0.7em; color: #e0e8ff; line-height: 1.5;">--</div>
+                                    </div>
+                                    <!-- 操作按钮 -->
+                                    <div style="display: flex; gap: 8px;">
+                                        <button type="button" id="prot-download-png-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">📥 下载图片</button>
+                                        <button type="button" id="prot-close-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(255,107,107,0.4); background: rgba(255,107,107,0.1); color: #ff6b6b; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">✕ 关闭</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="website-links">
                                 <a href="https://www.rcsb.org/" class="website-link" target="_blank" data-tooltip="PDB: 蛋白质结构数据库，获取实验解析的靶点结构">
                                     <span class="link-icon">🔗</span> PDB
@@ -536,7 +685,83 @@
                             <div class="step-desc">Binding Site Detection<br>活性位点分析与定义</div>
                             <span class="tools-badge">结构分析</span>
                         </div>
-                        <div class="step-bottom">
+                        <div class="step-bottom step-bottom-public">
+                            <!-- 结合口袋预测表单 -->
+                            <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
+                                <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">🎯 结合口袋 / 活性位点预测</div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="pocket-protein-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">蛋白 ID 或蛋白名</label>
+                                    <input type="text" id="pocket-protein-input" placeholder="例如: EGFR, TP53, KRAS..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <button type="button" id="pocket-search-btn" onclick="runPocketDetection()" style="width: 100%; margin-top: 4px; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #33ddff 0%, #00aadd 100%)';this.style.boxShadow='0 4px 12px rgba(0,212,255,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)';this.style.boxShadow='0 2px 8px rgba(0,212,255,0.3)';">🎯 预测结合口袋</button>
+                            </div>
+
+                            <!-- 口袋预测结果面板 -->
+                            <div id="pocket-result-panel" style="display: none; margin-bottom: 12px; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border: 1px solid rgba(0,212,255,0.2);">
+                                <div id="pocket-loading" style="display: none; text-align: center; padding: 20px;">
+                                    <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(0,212,255,0.2); border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p style="color: #a0c4e8; font-size: 0.75em; margin-top: 10px;">正在分析蛋白表面并预测结合口袋...</p>
+                                </div>
+                                <div id="pocket-result-content" style="display: none;">
+                                    <div style="font-size: 0.8em; color: #00d4ff; font-weight: 600; text-align: left; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,0.2);">
+                                        🎯 <span id="pocket-result-title">结合口袋预测结果</span>
+                                    </div>
+                                    <!-- 口袋概要 -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">发现口袋数</div>
+                                            <div id="pocket-count" style="font-size: 0.9em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">最佳口袋评分</div>
+                                            <div id="pocket-best-score" style="font-size: 0.9em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">可药性</div>
+                                            <div id="pocket-druggability" style="font-size: 0.85em; font-weight: 600;">--</div>
+                                        </div>
+                                    </div>
+                                    <!-- 3D口袋可视化 -->
+                                    <div style="margin-bottom: 12px; text-align: center;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">🧬 蛋白表面结合口袋分布图 (Top 5 口袋)</div>
+                                        <canvas id="pocket-canvas" width="360" height="260" style="width: 100%; border-radius: 8px; background: rgba(15,23,42,0.8);"></canvas>
+                                    </div>
+                                    <!-- 口袋详情表格 -->
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">📋 口袋详情 (按可药性排序)</div>
+                                        <table style="width: 100%; border-collapse: collapse; font-size: 0.68em; color: #e0e8ff;">
+                                            <thead>
+                                                <tr style="background: rgba(0,212,255,0.1);">
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">#</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: left;">位置</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">体积(Å³)</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">深度</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">可药性</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">类型</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="pocket-table-body">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- 氨基酸残基 -->
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">🔑 最佳口袋关键残基</div>
+                                        <div id="pocket-residues" style="font-size: 0.7em; color: #e0e8ff; line-height: 1.6; background: rgba(0,212,255,0.05); border-radius: 6px; padding: 8px; word-break: break-all;"></div>
+                                    </div>
+                                    <!-- 结果解读 -->
+                                    <div id="pocket-interpretation" style="background: rgba(255,193,7,0.08); border-left: 3px solid #ffc107; border-radius: 0 6px 6px 0; padding: 10px; margin-bottom: 12px; text-align: left;">
+                                        <div style="font-size: 0.7em; color: #ffc107; font-weight: 600; margin-bottom: 4px;">💡 口袋分析</div>
+                                        <div id="pocket-interpretation-text" style="font-size: 0.7em; color: #e0e8ff; line-height: 1.5;">--</div>
+                                    </div>
+                                    <!-- 操作按钮 -->
+                                    <div style="display: flex; gap: 8px;">
+                                        <button type="button" id="pocket-download-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">📥 下载图片</button>
+                                        <button type="button" id="pocket-close-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(255,107,107,0.4); background: rgba(255,107,107,0.1); color: #ff6b6b; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">✕ 关闭</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="website-links">
                                 <a href="https://github.com/Discngine/fpocket" class="website-link" target="_blank" data-tooltip="FPocket: 基于几何学的蛋白质口袋检测工具，开源免费">
                                     <span class="link-icon">🔗</span> FPocket
@@ -560,7 +785,7 @@
                             <div class="step-desc">HTVS / Docking<br>大规模分子对接</div>
                             <span class="tools-badge">虚拟筛选</span>
                         </div>
-                        <div class="step-bottom">
+                        <div class="step-bottom step-bottom-public">
                             <div class="website-links">
                                 <div style="font-size: 0.7em; color: #00d4ff; margin: 0 0 4px 0; text-align: left; padding-left: 5px;">国内AI平台</div>
                                 <a href="https://www.drugclip.com" class="website-link" target="_blank" data-tooltip="DrugCLIP: 清华出品，向量化检索（最快），免费学术，全基因组覆盖">
@@ -608,7 +833,7 @@
                             <div class="step-desc">Scoring & Ranking<br>结合亲和力评估</div>
                             <span class="tools-badge">评分函数</span>
                         </div>
-                        <div class="step-bottom">
+                        <div class="step-bottom step-bottom-public">
                             <div class="website-links">
                                 <a href="https://github.com/oddt/oddt" class="website-link" target="_blank" data-tooltip="ODDT: 分子对接打分函数集成与评估">
                                     <span class="link-icon">🔗</span> ODDT
@@ -632,7 +857,95 @@
                             <div class="step-desc">Molecular Docking<br>蛋白-配体相互作用预测</div>
                             <span class="tools-badge">对接计算</span>
                         </div>
-                        <div class="step-bottom">
+                        <div class="step-bottom step-bottom-public">
+                            <!-- 分子对接输入表单 -->
+                            <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
+                                <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">🔗 蛋白-配体分子对接</div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="dock-protein-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">蛋白 ID 或蛋白名</label>
+                                    <input type="text" id="dock-protein-input" placeholder="例如: EGFR, TP53, KRAS..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    <label for="dock-ligand-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">分子 CAS号 或 SMILES</label>
+                                    <input type="text" id="dock-ligand-input" placeholder="例如: 71-43-2 或 c1ccccc1..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button type="button" id="dock-vina-btn" onclick="runDocking('vina')" style="flex: 1; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.75em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #33ddff 0%, #00aadd 100%)';this.style.boxShadow='0 4px 12px rgba(0,212,255,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)';this.style.boxShadow='0 2px 8px rgba(0,212,255,0.3)';">⚡ AutoDock Vina 对接</button>
+                                    <button type="button" id="dock-af3-btn" onclick="runDocking('alphafold3')" style="flex: 1; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); color: #fff; font-size: 0.75em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(162,155,254,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #b8b0ff 0%, #7c6bf0 100%)';this.style.boxShadow='0 4px 12px rgba(162,155,254,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%)';this.style.boxShadow='0 2px 8px rgba(162,155,254,0.3)';">🤖 AlphaFold3 预测</button>
+                                </div>
+                            </div>
+
+                            <!-- 分子对接结果面板 -->
+                            <div id="dock-result-panel" style="display: none; margin-bottom: 12px; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border: 1px solid rgba(0,212,255,0.2);">
+                                <div id="dock-loading" style="display: none; text-align: center; padding: 20px;">
+                                    <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(0,212,255,0.2); border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p id="dock-loading-text" style="color: #a0c4e8; font-size: 0.75em; margin-top: 10px;">正在进行分子对接计算...</p>
+                                </div>
+                                <div id="dock-result-content" style="display: none;">
+                                    <div style="font-size: 0.8em; color: #00d4ff; font-weight: 600; text-align: left; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,0.2);">
+                                        🔗 <span id="dock-result-title">分子对接结果</span>
+                                        <span id="dock-method-badge" style="float: right; padding: 2px 8px; border-radius: 10px; font-size: 0.75em;"></span>
+                                    </div>
+                                    <!-- 对接分数概要 -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">结合能 (kcal/mol)</div>
+                                            <div id="dock-binding-energy" style="font-size: 0.9em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">Ki (估算)</div>
+                                            <div id="dock-ki" style="font-size: 0.85em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">对接质量</div>
+                                            <div id="dock-quality" style="font-size: 0.85em; font-weight: 600;">--</div>
+                                        </div>
+                                    </div>
+                                    <!-- 相互作用可视化 -->
+                                    <div style="margin-bottom: 12px; text-align: center;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">🧬 蛋白-配体相互作用图</div>
+                                        <canvas id="dock-canvas" width="360" height="240" style="width: 100%; border-radius: 8px; background: rgba(15,23,42,0.8);"></canvas>
+                                    </div>
+                                    <!-- 相互作用详情表 -->
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">🔑 关键相互作用 (Top 8)</div>
+                                        <table style="width: 100%; border-collapse: collapse; font-size: 0.68em; color: #e0e8ff;">
+                                            <thead>
+                                                <tr style="background: rgba(0,212,255,0.1);">
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">类型</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: left;">配体原子</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: left;">蛋白残基</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">距离(Å)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="dock-interactions-body">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Pose信息 -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+                                        <div style="background: rgba(0,212,255,0.05); border-radius: 6px; padding: 8px;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8; margin-bottom: 4px;">📐 RMSD (参考)</div>
+                                            <div id="dock-rmsd" style="font-size: 0.8em; color: #e0e8ff;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.05); border-radius: 6px; padding: 8px;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8; margin-bottom: 4px;">📊 构象数量</div>
+                                            <div id="dock-poses" style="font-size: 0.8em; color: #e0e8ff;">--</div>
+                                        </div>
+                                    </div>
+                                    <!-- 结果解读 -->
+                                    <div id="dock-interpretation" style="background: rgba(255,193,7,0.08); border-left: 3px solid #ffc107; border-radius: 0 6px 6px 0; padding: 10px; margin-bottom: 12px; text-align: left;">
+                                        <div style="font-size: 0.7em; color: #ffc107; font-weight: 600; margin-bottom: 4px;">💡 对接分析</div>
+                                        <div id="dock-interpretation-text" style="font-size: 0.7em; color: #e0e8ff; line-height: 1.5;">--</div>
+                                    </div>
+                                    <!-- 操作按钮 -->
+                                    <div style="display: flex; gap: 8px;">
+                                        <button type="button" id="dock-download-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">📥 下载图片</button>
+                                        <button type="button" id="dock-close-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(255,107,107,0.4); background: rgba(255,107,107,0.1); color: #ff6b6b; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">✕ 关闭</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="website-links">
                                 <a href="https://vina.scripps.edu/" class="website-link" target="_blank" data-tooltip="AutoDock Vina: 快速准确的分子对接程序，开源免费，广泛使用">
                                     <span class="link-icon">🔗</span> AutoDock Vina
@@ -650,7 +963,7 @@
                             <div class="step-desc">HTS<br>大规模化合物活性测试</div>
                             <span class="tools-badge">实验筛选</span>
                         </div>
-                        <div class="step-bottom">
+                        <div class="step-bottom step-bottom-public">
                             <div class="experiment-list">
                                 <ul>
                                     <li>• 化合物库准备</li>
@@ -668,7 +981,7 @@
                             <div class="step-desc">Lead Optimization<br>分子优化 + ADMET预测</div>
                             <span class="tools-badge">分子优化</span>
                         </div>
-                        <div class="step-bottom">
+                        <div class="step-bottom step-bottom-public">
                             <div class="website-links">
                                 <div style="font-size: 0.7em; color: #00d4ff; margin: 0 0 4px 0; text-align: left; padding-left: 5px;">🎯 定点修饰优化</div>
                                 <a href="http://software.tdd-lab.com/molmod" class="website-link" target="_blank" data-tooltip="MolMod: 定点修饰优化平台，标记修改部位，AI生成优化片段，溶解度优化成功率>93%">
