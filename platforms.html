@@ -887,7 +887,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="step dry">
+                    <div class="step dry" id="lead-optimization-step">
                         <div class="step-content">
                             <div class="step-icon">⚗️</div>
                             <div class="step-title">先导化合物优化</div>
@@ -895,7 +895,8 @@
                             <span class="tools-badge">分子优化</span>
                         </div>
                         <div class="step-bottom step-bottom-public">
-                            <div class="website-links">
+                            <!-- 原始链接列表 -->
+                            <div class="website-links" id="lead-optimization-links">
                                 <div style="font-size: 0.7em; color: #00d4ff; margin: 0 0 4px 0; text-align: left; padding-left: 5px;">🎯 定点修饰优化</div>
                                 <a href="http://software.tdd-lab.com/molmod" class="website-link" target="_blank" data-tooltip="MolMod: 定点修饰优化平台，标记修改部位，AI生成优化片段，溶解度优化成功率>93%">
                                     <span class="link-icon">🔗</span> MolMod
@@ -918,6 +919,36 @@
                                 <a href="https://admetlab3.scbdd.com/" class="website-link" target="_blank" data-tooltip="ADMETlab 3.0: 119个端点，多任务DMPNN架构，支持API调用，含不确定性估计">
                                     <span class="link-icon">🔗</span> ADMETlab 3.0
                                 </a>
+                            </div>
+                            
+                            <!-- SMILES输入和优化表单 -->
+                            <div id="lead-optimization-form" style="display: none; padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; border: 1px solid rgba(0,212,255,0.15);">
+                                <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">⚗️ 先导化合物优化</div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="smiles-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">输入SMILES</label>
+                                    <input type="text" id="smiles-input" placeholder="例如: CC(C)Cc1ccc(cc1)C(C)C(=O)O..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <button type="button" id="submit-optimization-btn" style="width: 100%; margin-top: 10px; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);">✅ 提交优化</button>
+                            </div>
+                            
+                            <!-- 优化结果表格 -->
+                            <div id="optimization-result-table" style="display: none; margin-top: 12px; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border: 1px solid rgba(0,212,255,0.2);">
+                                <div style="font-size: 0.8em; color: #00d4ff; font-weight: 600; text-align: left; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,0.2);">
+                                    📊 优化结果
+                                </div>
+                                <div style="max-height: 400px; overflow-y: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 0.7em; color: #e0e8ff;">
+                                        <thead>
+                                            <tr style="background: rgba(0,212,255,0.1);">
+                                                <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">Entry</th>
+                                                <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">Structure</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="optimization-table-body">
+                                            <!-- 表格内容将由JavaScript生成 -->
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1105,6 +1136,198 @@
         </div>
     </footer>
 
+    <!-- 分析提交成功弹窗 -->
+    <div id="analysis-success-modal" style="display: none; position: fixed; inset: 0; background: rgba(10, 14, 30, 0.92); backdrop-filter: blur(12px); z-index: 3000; padding: 20px; align-items: center; justify-content: center;">
+        <div style="background: linear-gradient(145deg, rgba(26, 26, 46, 0.98), rgba(22, 33, 62, 0.98)); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 16px; padding: 32px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 212, 255, 0.1);">
+            <div style="font-size: 3em; margin-bottom: 16px;">✅</div>
+            <h3 style="font-size: 1.4em; margin-bottom: 8px; color: #fff;">分析已提交</h3>
+            <p style="color: #a8b2d1; font-size: 0.9em; margin-bottom: 24px;">您的生存分析任务已成功提交</p>
+            <div style="display: flex; gap: 12px;">
+                <button type="button" id="view-report-btn" style="flex: 1; padding: 12px 0; border-radius: 8px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📄 查看报告</button>
+                <button type="button" id="download-result-btn" style="flex: 1; padding: 12px 0; border-radius: 8px; border: 1px solid rgba(0, 212, 255, 0.4); background: rgba(0, 212, 255, 0.1); color: #00d4ff; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">⬇️ 下载结果</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <script>
+        // Step expand/collapse functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const steps = document.querySelectorAll('.step');
+            
+            // Store original heights for each phase
+            const phaseHeights = new Map();
+            
+            function getRowHeight(steps) {
+                // Get the maximum height of steps in the same row
+                let maxHeight = 0;
+                steps.forEach(s => {
+                    if (!s.classList.contains('expanded')) {
+                        const height = s.getBoundingClientRect().height;
+                        maxHeight = Math.max(maxHeight, height);
+                    }
+                });
+                return maxHeight > 0 ? maxHeight + 'px' : 'auto';
+            }
+            
+            steps.forEach(step => {
+                step.addEventListener('click', function(e) {
+                    // Prevent triggering when clicking on interactive elements inside step-bottom
+                    if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) {
+                        return;
+                    }
+                    
+                    const phaseContent = this.closest('.phase-content');
+                    const isExpanded = this.classList.contains('expanded');
+                    const phaseId = phaseContent.dataset.phaseId || phaseContent.className;
+                    
+                    // Collapse all steps in this phase
+                    phaseContent.querySelectorAll('.step').forEach(s => {
+                        s.classList.remove('expanded');
+                        s.style.height = '';
+                    });
+                    
+                    // Toggle expanded class on phase-content
+                    if (isExpanded) {
+                        phaseContent.classList.remove('has-expanded-step');
+                        phaseHeights.delete(phaseId);
+                    } else {
+                        // Store current heights before expanding
+                        const rowHeight = getRowHeight(phaseContent.querySelectorAll('.step'));
+                        phaseHeights.set(phaseId, rowHeight);
+                        
+                        phaseContent.classList.add('has-expanded-step');
+                        this.classList.add('expanded');
+                        
+                        // Set fixed height for non-expanded steps
+                        phaseContent.querySelectorAll('.step:not(.expanded)').forEach(s => {
+                            s.style.height = rowHeight;
+                        });
+                    }
+                });
+            });
+        });
+
+        // 分析提交成功弹窗功能
+        (function() {
+            const modal = document.getElementById('analysis-success-modal');
+            const viewReportBtn = document.getElementById('view-report-btn');
+            const downloadResultBtn = document.getElementById('download-result-btn');
+
+            // 查看报告按钮 - 跳转到报告页面
+            if (viewReportBtn) {
+                viewReportBtn.addEventListener('click', function() {
+                    window.location.href = 'TFF3_PAAD_analysis.html';
+                });
+            }
+
+            // 下载结果按钮 - 点击后关闭弹窗
+            if (downloadResultBtn) {
+                downloadResultBtn.addEventListener('click', function() {
+                    // 关闭弹窗
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+
+            // 点击弹窗背景关闭
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+
+            // 暴露显示弹窗的函数
+            window.showAnalysisSuccessModal = function() {
+                if (modal) {
+                    modal.style.display = 'flex';
+                }
+            };
+
+            // 暴露隐藏弹窗的函数
+            window.hideAnalysisSuccessModal = function() {
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            };
+        })();
+
+        // 先导化合物优化功能
+        (function() {
+            const leadOptStep = document.getElementById('lead-optimization-step');
+            const leadOptLinks = document.getElementById('lead-optimization-links');
+            const leadOptForm = document.getElementById('lead-optimization-form');
+            const submitOptBtn = document.getElementById('submit-optimization-btn');
+            const resultTable = document.getElementById('optimization-result-table');
+            const tableBody = document.getElementById('optimization-table-body');
+
+            // Entry列表 4a到4r
+            const entries = ['4a', '4b', '4c', '4d', '4e', '4f', '4g', '4h', '4i', '4j', '4k', '4l', '4m', '4n', '4o', '4p', '4q', '4r'];
+
+            // 监听step的展开状态变化
+            if (leadOptStep) {
+                // 使用MutationObserver监听class变化
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                            if (leadOptStep.classList.contains('expanded')) {
+                                // step展开时，隐藏链接，显示表单
+                                if (leadOptLinks) leadOptLinks.style.display = 'none';
+                                if (leadOptForm) leadOptForm.style.display = 'block';
+                            } else {
+                                // step收起时，恢复默认状态
+                                if (leadOptLinks) leadOptLinks.style.display = 'flex';
+                                if (leadOptForm) leadOptForm.style.display = 'none';
+                                if (resultTable) resultTable.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+
+                observer.observe(leadOptStep, { attributes: true });
+            }
+
+            // NPB的默认SMILES
+            const DEFAULT_NPB_SMILES = 'CN1CCN(CC1)C(C2=CC=CC=C2O)C3=CC=C(C=C3)Cl';
+
+            // 提交优化按钮
+            if (submitOptBtn) {
+                submitOptBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    const smilesInput = document.getElementById('smiles-input');
+                    let smiles = smilesInput ? smilesInput.value.trim() : '';
+                    
+                    // 如果没有填写SMILES，使用默认的NPB SMILES
+                    if (!smiles) {
+                        smiles = DEFAULT_NPB_SMILES;
+                        if (smilesInput) {
+                            smilesInput.value = smiles;
+                        }
+                    }
+
+                    // 显示结果表格
+                    if (resultTable && tableBody) {
+                        // 生成表格内容，使用真实图片
+                        let html = '';
+                        entries.forEach((entry, index) => {
+                            const imgNum = String(index + 1).padStart(3, '0');
+                            html += '<tr style="background: ' + (index % 2 === 0 ? 'rgba(0,212,255,0.03)' : 'transparent') + ';">' +
+                                '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: #00d4ff; font-weight: 600;"><b>' + entry + '</b></td>' +
+                                '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">' +
+                                    '<img src="images/structures/ijms-22-11002-i' + imgNum + '.png" alt="Structure ' + entry + '" style="max-width: 120px; max-height: 80px; object-fit: contain;">' +
+                                '</td>' +
+                            '</tr>';
+                        });
+                        tableBody.innerHTML = html;
+                        resultTable.style.display = 'block';
+                    }
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

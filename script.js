@@ -751,6 +751,11 @@ document.querySelectorAll('.phase').forEach(phase => {
         // 调用后端API获取真实数据
         currentResult = await fetchSurvivalData(gene, cancer, survivalType);
         displayResults(currentResult);
+
+        // 显示提交成功弹窗
+        if (typeof window.showAnalysisSuccessModal === 'function') {
+            window.showAnalysisSuccessModal();
+        }
     };
 
     // 使用事件委托绑定点击事件（兼容 lockStepBottoms / unlockStepBottoms 的DOM替换）
