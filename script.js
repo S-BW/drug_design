@@ -434,7 +434,7 @@ document.querySelectorAll('.phase').forEach(phase => {
         const sign = x < 0 ? -1 : 1;
         x = Math.abs(x) / Math.sqrt(2);
         const t = 1 / (1 + p * x);
-        const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+        const y = 1 - (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x));
         return 0.5 * (1 + sign * y);
     }
 
