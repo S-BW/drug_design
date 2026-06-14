@@ -62,6 +62,10 @@ function setLoginState(username) {
         userBar.style.display = 'flex';
         if (userNameEl) userNameEl.textContent = '👤 ' + username;
     }
+    if (typeof refreshDrugTrack === 'function') {
+        requestAnimationFrame(refreshDrugTrack);
+        setTimeout(refreshDrugTrack, 100);
+    }
 }
 
 function setLogoutState() {
@@ -74,6 +78,10 @@ function setLogoutState() {
     if (usernameInput) usernameInput.value = '';
     if (passwordInput) passwordInput.value = '';
     if (loginError) loginError.textContent = '';
+    if (typeof refreshDrugTrack === 'function') {
+        requestAnimationFrame(refreshDrugTrack);
+        setTimeout(refreshDrugTrack, 100);
+    }
 }
 
 if (loginTrigger) {
@@ -319,7 +327,7 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.phase').forEach(phase => {
     phase.style.opacity = '0';
     phase.style.transform = 'translateY(30px)';
-    phase.style.transition = 'all 0.6s ease';
+    phase.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     observer.observe(phase);
 });
 
