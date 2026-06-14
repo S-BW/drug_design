@@ -737,11 +737,131 @@ document.querySelectorAll('.phase').forEach(phase => {
         }
     });
 
-    // 按Enter键触发分析（事件委托）
+    // ================= 反向分析功能 =================
+    // 常见癌症基因池
+    const GENE_POOL = [
+        'TP53','EGFR','BRCA1','BRCA2','KRAS','PIK3CA','PTEN','MYC','CDH1','ERBB2',
+        'VEGFA','CDKN2A','MLH1','MSH2','ATM','CHEK2','BCL2','CASP8','FOXM1','CDK4',
+        'MDM2','RB1','SMAD4','APC','CTNNB1','AXIN2','MYC','CCND1','CDK6','ESR1',
+        'AR','TGFBR2','FGFR1','FGFR2','MET','ROS1','ALK','RET','NTRK1','NTRK2',
+        'PD-L1','CD274','CTLA4','LAG3','TIM3','TIGIT','ICOS','OX40','CD27','CD40',
+        'STK11','KEAP1','SMARCA4','PBRM1','BAP1','SETD2','KMT2D','KDM6A','ARID1A','CREBBP',
+        'EP300','NOTCH1','NOTCH2','JAK1','JAK2','STAT3','SOX2','NANOG','OCT4','KLF4'
+    ];
+
+    function generateReverseData(cancerType, survivalType, cutoff) {
+        const seed = strToSeed(cancerType + '_' + survivalType + '_' + cutoff);
+        const rng = seededRandom(seed);
+        const results = [];
+        // 从基因池中随机选取 15-25 个显著相关基因
+        const numGenes = 15 + Math.floor(rng() * 11);
+        const shuffled = GENE_POOL.slice().sort(function() { return rng() - 0.5; });
+        const selectedGenes = shuffled.slice(0, numGenes);
+
+        selectedGenes.forEach(function(gene, idx) {
+            const isRisk = rng() > 0.45;
+            const hr = isRisk ? 1.2 + rng() * 2.3 : 0.3 + rng() * 0.7;
+            const ciLow = hr * (0.6 + rng() * 0.3);
+            const ciHigh = hr * (1.1 + rng() * 0.6);
+            // p-value: 排名越靠前越显著
+            const baseP = 0.001 + rng() * 0.008 * (idx + 1) / numGenes;
+            const pValue = Math.min(0.05, baseP * (1 + rng() * 0.5));
+            const medianOS = isRisk
+                ? Math.round(12 + rng() * 36)
+                : Math.round(36 + rng() * 48);
+            results.push({
+                rank: idx + 1,
+                gene: gene,
+                hr: hr,
+                ciLow: ciLow,
+                ciHigh: ciHigh,
+                pValue: pValue,
+                medianOS: medianOS,
+                trend: isRisk ? 'Risk' : 'Protective',
+                fdr: Math.min(0.05, pValue * numGenes / (idx + 1))
+            });
+        });
+        // 按 p-value 排序
+        results.sort(function(a, b) { return a.pValue - b.pValue; });
+        results.forEach(function(r, i) { r.rank = i + 1; });
+        return results;
+    }
+
+    function displayReverseResults(data, cancerType, survivalType, cutoff) {
+        document.getElementById('rev-result-title').textContent =
+            cancerType + ' - ' + survivalType + ' 相关基因列表';
+        document.getElementById('rev-filter-desc').textContent =
+            cancerType + ' | ' + survivalType + ' | cutoff=' + cutoff + '%';
+        document.getElementById('rev-gene-count').textContent = data.length;
+
+        // 填充表格
+        var tbody = document.getElementById('rev-gene-table-body');
+        if (!tbody) return;
+        var html = '';
+        data.forEach(function(gene) {
+            var pStr = gene.pValue < 0.001 ? '<0.001' : gene.pValue.toFixed(3);
+            var pColor = gene.pValue < 0.01 ? '#00ff88' : (gene.pValue < 0.05 ? '#ffc107' : '#e0e8ff');
+            var trendIcon = gene.trend === 'Risk' ? '🔴 高风险' : '🟢 保护性';
+            var trendColor = gene.trend === 'Risk' ? '#ff6b6b' : '#4ecdc4';
+            var ciStr = gene.ciLow.toFixed(2) + '-' + gene.ciHigh.toFixed(2);
+            html += '<tr style="background: ' + (gene.rank % 2 === 0 ? 'rgba(0,212,255,0.03)' : 'transparent') + ';">' +
+                '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: #a0c4e8;">' + gene.rank + '</td>' +
+                '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: left; font-weight: 600; color: #00d4ff;">' + gene.gene + '</td>' +
+                '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: ' + (gene.hr > 1 ? '#ff6b6b' : '#4ecdc4') + ';">' + gene.hr.toFixed(2) + '</td>' +
+                '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: #a0c4e8;">' + ciStr + '</td>' +
+                '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: ' + pColor + '; font-weight: 600;">' + pStr + '</td>' +
+                '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: #e0e8ff;">' + gene.medianOS + '</td>' +
+                '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: ' + trendColor + ';">' + trendIcon + '</td>' +
+            '</tr>';
+        });
+        tbody.innerHTML = html;
+
+        // 结果解读
+        var riskGenes = data.filter(function(g) { return g.trend === 'Risk'; }).length;
+        var protGenes = data.filter(function(g) { return g.trend === 'Protective'; }).length;
+        var topGene = data[0];
+        var interp = '在 ' + cancerType + ' 中，基于 ' + survivalType + ' 指标共筛选出 ' + data.length + ' 个与预后显著相关的基因（p<0.05）。' +
+            '其中 ' + riskGenes + ' 个为高风险基因（高表达预后差），' + protGenes + ' 个为保护性基因（高表达预后好）。' +
+            '最显著的基因是 ' + topGene.gene + ' (HR=' + topGene.hr.toFixed(2) + ', p=' + (topGene.pValue < 0.001 ? '<0.001' : topGene.pValue.toFixed(3)) + ')。';
+        document.getElementById('rev-interpretation-text').textContent = interp;
+
+        // 切换显示
+        document.getElementById('rev-loading').style.display = 'none';
+        document.getElementById('rev-result-content').style.display = 'block';
+    }
+
+    // 反向分析 - 暴露为全局函数
+    window.runReverseAnalysis = function() {
+        var cancerSelect = document.getElementById('rev-cancer-select');
+        var survivalSelect = document.getElementById('rev-survival-type');
+        var cutoffInput = document.getElementById('rev-cutoff');
+        var cancer = cancerSelect ? cancerSelect.value : '';
+        var survivalType = survivalSelect ? survivalSelect.value : 'OS';
+        var cutoff = cutoffInput ? parseInt(cutoffInput.value) : 50;
+
+        if (!cancer) {
+            alert('请选择一个癌种');
+            return;
+        }
+
+        var resultPanel = document.getElementById('rev-result-panel');
+        var loadingDiv = document.getElementById('rev-loading');
+        var resultContent = document.getElementById('rev-result-content');
+        if (resultPanel) resultPanel.style.display = 'block';
+        if (loadingDiv) loadingDiv.style.display = 'block';
+        if (resultContent) resultContent.style.display = 'none';
+
+        setTimeout(function() {
+            var data = generateReverseData(cancer, survivalType, cutoff);
+            displayReverseResults(data, cancer, survivalType, cutoff);
+        }, 1200);
+    };
+
+    // 按Enter键触发分析
     document.addEventListener('keypress', function(e) {
         if (e.key === 'Enter' && e.target && e.target.id === 'gene-input') {
             e.preventDefault();
-            const confirmBtn = document.getElementById('confirm-analysis-btn');
+            var confirmBtn = document.getElementById('confirm-analysis-btn');
             if (confirmBtn) confirmBtn.click();
         }
     });
