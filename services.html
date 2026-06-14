@@ -193,6 +193,91 @@
                                 </div>
                                 <button type="button" id="confirm-analysis-btn" style="width: 100%; margin-top: 10px; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #33ddff 0%, #00aadd 100%)';this.style.boxShadow='0 4px 12px rgba(0,212,255,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)';this.style.boxShadow='0 2px 8px rgba(0,212,255,0.3)';">✅ 确认分析</button>
                             </div>
+
+                            <!-- 生存分析结果展示区域 -->
+                            <div id="survival-result-panel" style="display: none; margin-top: 12px; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border: 1px solid rgba(0,212,255,0.2);">
+                                <!-- 加载动画 -->
+                                <div id="survival-loading" style="display: none; text-align: center; padding: 20px;">
+                                    <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(0,212,255,0.2); border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p style="color: #a0c4e8; font-size: 0.75em; margin-top: 10px;">正在分析生存数据...</p>
+                                </div>
+
+                                <!-- 结果内容 -->
+                                <div id="survival-result-content" style="display: none;">
+                                    <!-- 分析标题 -->
+                                    <div style="font-size: 0.8em; color: #00d4ff; font-weight: 600; text-align: left; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,0.2);">
+                                        📊 <span id="result-title">生存分析结果</span>
+                                    </div>
+
+                                    <!-- KM曲线图 -->
+                                    <div style="position: relative; margin-bottom: 12px;">
+                                        <canvas id="km-canvas" width="360" height="240" style="width: 100%; border-radius: 8px; background: rgba(15,23,42,0.8);"></canvas>
+                                    </div>
+
+                                    <!-- 统计指标面板 -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">HR (95% CI)</div>
+                                            <div id="stat-hr" style="font-size: 0.85em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">Log-rank p-value</div>
+                                            <div id="stat-pvalue" style="font-size: 0.85em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">高表达中位OS</div>
+                                            <div id="stat-high-median" style="font-size: 0.85em; color: #ff6b6b; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">低表达中位OS</div>
+                                            <div id="stat-low-median" style="font-size: 0.85em; color: #4ecdc4; font-weight: 600;">--</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 样本信息表格 -->
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">📋 样本信息</div>
+                                        <table style="width: 100%; border-collapse: collapse; font-size: 0.7em; color: #e0e8ff;">
+                                            <thead>
+                                                <tr style="background: rgba(0,212,255,0.1);">
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: left;">分组</th>
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">样本数</th>
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">事件数</th>
+                                                    <th style="padding: 6px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">中位OS(月)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15);"><span style="color: #ff6b6b;">●</span> 高表达</td>
+                                                    <td id="table-high-n" style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">--</td>
+                                                    <td id="table-high-events" style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">--</td>
+                                                    <td id="table-high-os" style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">--</td>
+                                                </tr>
+                                                <tr style="background: rgba(0,212,255,0.03);">
+                                                    <td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15);"><span style="color: #4ecdc4;">●</span> 低表达</td>
+                                                    <td id="table-low-n" style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">--</td>
+                                                    <td id="table-low-events" style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">--</td>
+                                                    <td id="table-low-os" style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">--</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- 结果解读 -->
+                                    <div id="result-interpretation" style="background: rgba(255,193,7,0.08); border-left: 3px solid #ffc107; border-radius: 0 6px 6px 0; padding: 10px; margin-bottom: 12px; text-align: left;">
+                                        <div style="font-size: 0.7em; color: #ffc107; font-weight: 600; margin-bottom: 4px;">💡 结果解读</div>
+                                        <div id="interpretation-text" style="font-size: 0.7em; color: #e0e8ff; line-height: 1.5;">--</div>
+                                    </div>
+
+                                    <!-- 操作按钮 -->
+                                    <div style="display: flex; gap: 8px;">
+                                        <button type="button" id="download-png-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">📥 下载图片</button>
+                                        <button type="button" id="download-csv-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">📄 导出CSV</button>
+                                        <button type="button" id="close-result-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(255,107,107,0.4); background: rgba(255,107,107,0.1); color: #ff6b6b; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">✕ 关闭</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="website-links">
                                 <a href="http://gepia2.cancer-pku.cn/" class="website-link" target="_blank" data-tooltip="GEPIA2: 输入基因+癌种，分析OS、DFS，可设置表达cutoff，输出最显著生存相关基因。支持多基因联合分析，基于TCGA数据">
                                     <span class="link-icon">🔗</span> GEPIA2

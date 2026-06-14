@@ -3150,5 +3150,33 @@ h1 {
     }
 }
 
+/* ===== 生存分析结果面板动画 ===== */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#survival-result-panel {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+#survival-result-panel button:hover {
+    filter: brightness(1.2);
+}
+
+#km-canvas {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+
 
 
