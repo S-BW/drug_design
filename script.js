@@ -1126,6 +1126,293 @@ if (applyForm) {
     }
 })();
 
+// ================= 虚拟基因敲除分析 =================
+(function() {
+    // 确定性随机数生成器
+    function seededRandom(seed) {
+        var s = seed;
+        return function() {
+            s = (s * 16807) % 2147483647;
+            return (s - 1) / 2147483646;
+        };
+    }
+    function strToSeed(str) {
+        var h = 0;
+        for (var i = 0; i < str.length; i++) {
+            h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+        }
+        return Math.abs(h) + 1;
+    }
+
+    // 生成虚拟敲除数据
+    function generateKnockoutData(gene, geoId) {
+        var seed = strToSeed((gene + '_' + geoId).toUpperCase());
+        var rng = seededRandom(seed);
+        
+        // 基因依赖性评分 (0-1, 越高越必需)
+        var depScore = 0.1 + rng() * 0.8;
+        // 细胞存活率 (敲除后)
+        var viability = Math.max(5, Math.min(95, (1 - depScore) * 100 + (rng() - 0.5) * 20));
+        // p-value
+        var pValue = Math.exp(-3 - rng() * 10);
+        pValue = Math.max(0.0001, Math.min(0.05, pValue));
+        
+        // 效应分类
+        var effectClass, effectColor;
+        if (depScore > 0.6) {
+            effectClass = '必需基因 (Essential)';
+            effectColor = '#ff6b6b';
+        } else if (depScore > 0.3) {
+            effectClass = '条件必需 (Context-dependent)';
+            effectColor = '#ffc107';
+        } else {
+            effectClass = '非必需基因 (Non-essential)';
+            effectColor = '#4ecdc4';
+        }
+        
+        // 生成Top 10差异基因表达变化
+        var diffGenes = [];
+        var geneNames = ['CDKN1A', 'BCL2', 'CASP3', 'MYC', 'VEGFA', 'CDH1', 'SNAI1', 'ZEB1', 'TWIST1', 'CD274',
+                         'FOXM1', 'MKI67', 'PCNA', 'CCND1', 'CDK6', 'STAT3', 'JAK2', 'PIK3CA', 'PTEN', 'KRAS'];
+        // 选取10个与输入基因不同的基因
+        var filtered = geneNames.filter(function(g) { return g !== gene.toUpperCase(); });
+        var shuffled = filtered.sort(function() { return rng() - 0.5; });
+        for (var i = 0; i < 10; i++) {
+            var logFC = (rng() - 0.5) * 4; // -2 to +2
+            diffGenes.push({
+                gene: shuffled[i] || ('GENE' + i),
+                logFC: logFC,
+                p: Math.exp(-2 - rng() * 5)
+            });
+        }
+        diffGenes.sort(function(a, b) { return b.logFC - a.logFC; });
+        
+        // 生成通路富集数据
+        var pathways = [
+            { name: 'Cell Cycle', enrichment: rng() * 5 + 2, p: Math.exp(-3 - rng() * 4) },
+            { name: 'Apoptosis', enrichment: rng() * 4 + 1.5, p: Math.exp(-2 - rng() * 3) },
+            { name: 'PI3K-Akt signaling', enrichment: rng() * 4 + 1, p: Math.exp(-2 - rng() * 3) },
+            { name: 'p53 signaling', enrichment: rng() * 3 + 0.5, p: Math.exp(-1 - rng() * 2) },
+            { name: 'DNA Repair', enrichment: rng() * 3 + 0.5, p: Math.exp(-1 - rng() * 2) }
+        ];
+        pathways.sort(function(a, b) { return a.p - b.p; });
+        
+        return {
+            gene: gene.toUpperCase(),
+            geoId: geoId.toUpperCase(),
+            depScore: depScore,
+            viability: viability,
+            pValue: pValue,
+            effectClass: effectClass,
+            effectColor: effectColor,
+            diffGenes: diffGenes,
+            pathways: pathways
+        };
+    }
+
+    // 绘制敲除效应可视化
+    function drawKnockoutCanvas(data) {
+        var canvas = document.getElementById('ko-canvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var w = canvas.width;
+        var h = canvas.height;
+        
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = 'rgba(15,23,42,0.9)';
+        ctx.fillRect(0, 0, w, h);
+        
+        var padLeft = 80, padRight = 15, padTop = 25, padBottom = 50;
+        var plotW = w - padLeft - padRight;
+        var plotH = h - padTop - padBottom;
+        
+        // 标题
+        ctx.fillStyle = '#e0e8ff';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(data.gene + ' 敲除后差异表达基因 (log2FC)', padLeft, padTop - 8);
+        
+        // Y轴标签
+        ctx.fillStyle = '#a0c4e8';
+        ctx.font = '9px sans-serif';
+        ctx.textAlign = 'right';
+        var yTicks = [-2, -1, 0, 1, 2];
+        yTicks.forEach(function(tick) {
+            var y = padTop + plotH / 2 - (tick / 2.5) * (plotH / 2);
+            ctx.fillText(tick.toFixed(0), padLeft - 6, y + 3);
+            ctx.strokeStyle = 'rgba(0,212,255,0.1)';
+            ctx.beginPath();
+            ctx.moveTo(padLeft, y);
+            ctx.lineTo(padLeft + plotW, y);
+            ctx.stroke();
+        });
+        
+        // 零线
+        var zeroY = padTop + plotH / 2;
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(padLeft, zeroY);
+        ctx.lineTo(padLeft + plotW, zeroY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // 柱状图
+        var barWidth = plotW / data.diffGenes.length * 0.7;
+        var barGap = plotW / data.diffGenes.length;
+        data.diffGenes.forEach(function(dg, i) {
+            var x = padLeft + i * barGap + (barGap - barWidth) / 2;
+            var barH = (dg.logFC / 2.5) * (plotH / 2);
+            var color = dg.logFC > 0 ? '#ff6b6b' : '#4ecdc4';
+            ctx.fillStyle = color;
+            if (barH >= 0) {
+                ctx.fillRect(x, zeroY - barH, barWidth, barH);
+            } else {
+                ctx.fillRect(x, zeroY, barWidth, -barH);
+            }
+            
+            // 基因名
+            ctx.save();
+            ctx.translate(x + barWidth / 2, padTop + plotH + 12);
+            ctx.rotate(-Math.PI / 3);
+            ctx.fillStyle = '#a0c4e8';
+            ctx.font = '8px sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(dg.gene, 0, 0);
+            ctx.restore();
+        });
+        
+        // Y轴标题
+        ctx.save();
+        ctx.translate(12, padTop + plotH / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = '#a0c4e8';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('log2 Fold Change', 0, 0);
+        ctx.restore();
+    }
+
+    // 显示结果
+    function displayKnockoutResults(data) {
+        document.getElementById('knockout-result-title').textContent =
+            data.gene + ' (' + data.geoId + ') 虚拟敲除结果';
+        
+        document.getElementById('ko-dep-score').textContent = data.depScore.toFixed(3);
+        document.getElementById('ko-viability').textContent = data.viability.toFixed(1) + '%';
+        
+        var pStr = data.pValue < 0.001 ? '<0.001' : data.pValue.toFixed(3);
+        var pEl = document.getElementById('ko-pvalue');
+        pEl.textContent = pStr;
+        pEl.style.color = data.pValue < 0.05 ? '#00ff88' : '#ff6b6b';
+        
+        var effEl = document.getElementById('ko-effect');
+        effEl.textContent = data.effectClass;
+        effEl.style.color = data.effectColor;
+        
+        // 通路表格
+        var tbody = document.getElementById('ko-pathway-body');
+        if (tbody) {
+            var html = '';
+            data.pathways.forEach(function(p, idx) {
+                var pp = p.p < 0.001 ? '<0.001' : p.p.toFixed(3);
+                html += '<tr style="background: ' + (idx % 2 === 0 ? 'rgba(0,212,255,0.03)' : 'transparent') + ';">' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15);">' + p.name + '</td>' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">' + p.enrichment.toFixed(2) + '</td>' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: #00ff88;">' + pp + '</td>' +
+                '</tr>';
+            });
+            tbody.innerHTML = html;
+        }
+        
+        // 解读
+        var interp = data.gene + ' 在 ' + data.geoId + ' 数据集中的虚拟敲除结果显示：';
+        interp += '基因依赖性评分为 ' + data.depScore.toFixed(3) + '，';
+        interp += '敲除后细胞存活率为 ' + data.viability.toFixed(1) + '%。';
+        if (data.depScore > 0.6) {
+            interp += '该基因被分类为<strong style="color:#ff6b6b;">必需基因</strong>，';
+            interp += '敲除会导致显著的细胞死亡，提示其作为药物靶点的潜力较高。';
+        } else if (data.depScore > 0.3) {
+            interp += '该基因被分类为<strong style="color:#ffc107;">条件必需基因</strong>，';
+            interp += '在特定细胞环境或遗传背景下可能具有靶点价值。';
+        } else {
+            interp += '该基因被分类为<strong style="color:#4ecdc4;">非必需基因</strong>，';
+            interp += '敲除对细胞存活影响较小，可能不是理想的药物靶点。';
+        }
+        document.getElementById('ko-interpretation-text').innerHTML = interp;
+        
+        // 绘制图表
+        drawKnockoutCanvas(data);
+        
+        // 切换显示
+        document.getElementById('knockout-loading').style.display = 'none';
+        document.getElementById('knockout-result-content').style.display = 'block';
+    }
+
+    // 核心分析函数 - 暴露为全局
+    window.runVirtualKnockout = function() {
+        var geneInput = document.getElementById('knockout-gene-input');
+        var geoInput = document.getElementById('knockout-geo-input');
+        var gene = geneInput ? geneInput.value.trim().toUpperCase() : '';
+        var geoId = geoInput ? geoInput.value.trim().toUpperCase() : '';
+        
+        if (!gene) {
+            alert('请输入基因ID或基因名');
+            return;
+        }
+        if (!geoId) {
+            alert('请输入GEO数据库号');
+            return;
+        }
+        if (!/^[A-Z0-9]+$/.test(gene)) {
+            alert('基因名只能包含字母和数字');
+            return;
+        }
+        if (!/^GSE\d+$/i.test(geoId)) {
+            alert('GEO数据库号格式应为 GSE+数字，如 GSE42568');
+            return;
+        }
+        
+        var resultPanel = document.getElementById('knockout-result-panel');
+        var loadingDiv = document.getElementById('knockout-loading');
+        var resultContent = document.getElementById('knockout-result-content');
+        if (resultPanel) resultPanel.style.display = 'block';
+        if (loadingDiv) loadingDiv.style.display = 'block';
+        if (resultContent) resultContent.style.display = 'none';
+        
+        // 模拟延迟
+        setTimeout(function() {
+            var data = generateKnockoutData(gene, geoId);
+            displayKnockoutResults(data);
+        }, 1200);
+    };
+
+    // 事件委托
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'ko-close-btn') {
+            var panel = document.getElementById('knockout-result-panel');
+            if (panel) panel.style.display = 'none';
+        }
+        if (e.target && e.target.id === 'ko-download-png-btn') {
+            var canvas = document.getElementById('ko-canvas');
+            if (canvas) {
+                var link = document.createElement('a');
+                link.download = 'knockout-' + document.getElementById('knockout-gene-input').value + '-' + document.getElementById('knockout-geo-input').value + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+    });
+
+    // Enter键触发
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && e.target && (e.target.id === 'knockout-gene-input' || e.target.id === 'knockout-geo-input')) {
+            e.preventDefault();
+            window.runVirtualKnockout();
+        }
+    });
+})();
+
 // ================= 研发平台页：Therapeutic Pipeline 点击跳转 =================
 (function () {
     const drugTrack = document.querySelector('.drug-track[data-link]');
