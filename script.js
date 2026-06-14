@@ -673,16 +673,13 @@ document.querySelectorAll('.phase').forEach(phase => {
     // 当前结果
     let currentResult = null;
 
-    // 事件监听
-    const confirmBtn = document.getElementById('confirm-analysis-btn');
-    const cancerSelect = document.getElementById('cancer-type-select');
-    const geneInput = document.getElementById('gene-input');
-    const resultPanel = document.getElementById('survival-result-panel');
-    const loadingDiv = document.getElementById('survival-loading');
-    const resultContent = document.getElementById('survival-result-content');
-
-    if (confirmBtn) {
-        confirmBtn.addEventListener('click', function() {
+    // 使用事件委托绑定点击事件（兼容 lockStepBottoms / unlockStepBottoms 的DOM替换）
+    document.addEventListener('click', function(e) {
+        // 确认分析按钮
+        if (e.target && e.target.id === 'confirm-analysis-btn') {
+            e.preventDefault();
+            const cancerSelect = document.getElementById('cancer-type-select');
+            const geneInput = document.getElementById('gene-input');
             const cancer = cancerSelect ? cancerSelect.value : '';
             const gene = geneInput ? geneInput.value.trim() : '';
 
@@ -700,6 +697,9 @@ document.querySelectorAll('.phase').forEach(phase => {
             }
 
             // 显示面板和加载动画
+            const resultPanel = document.getElementById('survival-result-panel');
+            const loadingDiv = document.getElementById('survival-loading');
+            const resultContent = document.getElementById('survival-result-content');
             if (resultPanel) resultPanel.style.display = 'block';
             if (loadingDiv) loadingDiv.style.display = 'block';
             if (resultContent) resultContent.style.display = 'none';
@@ -709,34 +709,37 @@ document.querySelectorAll('.phase').forEach(phase => {
                 currentResult = generateSurvivalData(gene, cancer);
                 displayResults(currentResult);
             }, 1200);
-        });
-    }
+            return;
+        }
 
-    const closeResultBtn = document.getElementById('close-result-btn');
-    if (closeResultBtn && resultPanel) {
-        closeResultBtn.addEventListener('click', function() {
-            resultPanel.style.display = 'none';
-        });
-    }
+        // 关闭结果按钮
+        if (e.target && e.target.id === 'close-result-btn') {
+            const resultPanel = document.getElementById('survival-result-panel');
+            if (resultPanel) resultPanel.style.display = 'none';
+            return;
+        }
 
-    const downloadPngBtn = document.getElementById('download-png-btn');
-    if (downloadPngBtn) {
-        downloadPngBtn.addEventListener('click', downloadPNG);
-    }
+        // 下载PNG按钮
+        if (e.target && e.target.id === 'download-png-btn') {
+            downloadPNG();
+            return;
+        }
 
-    const downloadCsvBtn = document.getElementById('download-csv-btn');
-    if (downloadCsvBtn) {
-        downloadCsvBtn.addEventListener('click', downloadCSV);
-    }
+        // 导出CSV按钮
+        if (e.target && e.target.id === 'download-csv-btn') {
+            downloadCSV();
+            return;
+        }
+    });
 
-    // 按Enter键触发分析
-    if (geneInput) {
-        geneInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && confirmBtn) {
-                confirmBtn.click();
-            }
-        });
-    }
+    // 按Enter键触发分析（事件委托）
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && e.target && e.target.id === 'gene-input') {
+            e.preventDefault();
+            const confirmBtn = document.getElementById('confirm-analysis-btn');
+            if (confirmBtn) confirmBtn.click();
+        }
+    });
 })();
 
 // ================= 申请入驻授权弹窗 =================
