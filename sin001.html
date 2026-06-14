@@ -31,17 +31,129 @@
         <div class="tooltip" id="global-tooltip"></div>
 
         <main class="home-content">
-            <section class="home-section">
-                <h3 class="section-title">🧬 SIN001</h3>
-                <p class="lead">药物详情介绍页</p>
+            <!-- 标题区 -->
+            <section class="home-section drug-hero">
+                <div class="drug-header grid-2">
+                    <div class="drug-header-text">
+                        <h1 class="sin-title">SIN001</h1>
+                        <hr class="sin-divider">
+                        <h2 class="drug-name">NCK</h2>
+                        <p class="drug-code">BAD 磷酸化抑制剂</p>
+                    </div>
+                    <div class="drug-header-image">
+                        <img src="images/sin/NPB.png" alt="NPB">
+                    </div>
+                </div>
             </section>
 
-            <div class="site-footer" style="margin-top: 40px;">
-                <div class="footer-inner">
-                    <h3>SIN001 介绍</h3>
-                    <p>此处待补充 SIN001 的详细介绍内容。</p>
+            <!-- Assays Completed -->
+            <section class="home-section">
+                <h3 class="section-title">已完成实验 · Assays Completed</h3>
+                <p class="section-subtitle">自主研发并开放合作授权 · Wholly-owned and Available for Licensing</p>
+                <div class="grid-4 assay-grid">
+                    <div class="card assay-card">
+                        <img class="assay-icon" src="images/sin/in_vivo_efficacy_combo.png" alt="单药体内药效研究">
+                        <h4>单药体内药效研究</h4>
+                        <p>In vivo efficacy studies with single agent</p>
+                    </div>
+                    <div class="card assay-card">
+                        <img class="assay-icon" src="images/sin/in_vivo_pkpd.png" alt="体内 PK-PD 研究">
+                        <h4>体内 PK-PD 研究</h4>
+                        <p>In vivo PK-PD</p>
+                    </div>
+                    <div class="card assay-card">
+                        <img class="assay-icon" src="images/sin/in_vivo_pk.png" alt="体内药代动力学研究">
+                        <h4>体内药代动力学研究</h4>
+                        <p>In vivo PK studies</p>
+                    </div>
+                    <div class="card assay-card">
+                        <img class="assay-icon" src="images/sin/preclinical.svg" alt="体内药效研究">
+                        <h4>体内药效研究</h4>
+                        <p>In vivo efficacy studies</p>
+                    </div>
+                    <div class="card assay-card">
+                        <img class="assay-icon" src="images/sin/in_vitro_admet.png" alt="体外 ADMET 研究">
+                        <h4>体外 ADMET 研究</h4>
+                        <p>In vitro ADMET studies</p>
+                    </div>
+                    <div class="card assay-card">
+                        <img class="assay-icon" src="images/sin/developability_cmc.png" alt="可开发性 / CMC">
+                        <h4>可开发性 / CMC</h4>
+                        <p>Developability/CMC</p>
+                    </div>
+                    <div class="card assay-card">
+                        <img class="assay-icon" src="images/sin/in_vitro_cell_based.png" alt="体外细胞实验">
+                        <h4>体外细胞实验</h4>
+                        <p>In vitro cell-based</p>
+                    </div>
+                    <div class="card assay-card">
+                        <img class="assay-icon" src="images/sin/toxicology.png" alt="毒理学研究">
+                        <h4>毒理学研究</h4>
+                        <p>Toxicology studies</p>
+                    </div>
+                    <div class="card assay-card">
+                        <img class="assay-icon" src="images/sin/enzymatic.svg" alt="酶学实验">
+                        <h4>激酶实验</h4>
+                        <p>Enzymatic</p>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- Target Rationale & Project Status -->
+            <section class="home-section">
+                <div class="grid-2 info-split">
+                    <div class="info-block">
+                        <h3 class="section-title">靶点科学依据 · Target Rationale</h3>
+                        <div class="info-content">
+                            <p class="info-text">BAD（Bcl-2-associated death promoter）是Bcl-2蛋白家族中关键的促凋亡BH3-only蛋白，通过与抗凋亡蛋白Bcl-2/Bcl-xL结合、释放并激活Bax/Bak，调控线粒体外膜通透化及细胞凋亡。在正常生理条件下，BAD的活性受其磷酸化状态严格调控：Akt/PKB、p90RSK、PKA及CaMKI等生存相关激酶可磷酸化BAD的Ser112、Ser136和Ser155位点，促使BAD与14-3-3蛋白结合并滞留于胞质，从而抑制其促凋亡功能。在多种肿瘤中，异常激活的生长因子受体、PI3K-AKT及RAS-MAPK等信号通路导致BAD持续高磷酸化，使肿瘤细胞逃避凋亡并获得对化疗及靶向治疗的耐药性。因此，选择性抑制BAD磷酸化可恢复其促凋亡活性，为肿瘤治疗提供精准的干预策略。</p>
+                        </div>
+                    </div>
+                    <div class="info-block">
+                        <h3 class="section-title">项目状态 · Project Status</h3>
+                        <div class="info-content">
+                            <p class="info-text">我们借助剑桥大学化学信息学平台，从约170万种化合物中虚拟筛选出靶向BAD磷酸化位点的先导化合物NPB，NPB单药可削弱卵巢癌同源重组修复，联合PARP抑制剂协同增效；在PTEN缺失子宫内膜癌和宫颈癌中，NPB分别联合Rucaparib和丝裂霉素C显著抑制肿瘤。对NPB进行结构优化后得到第二代候选分子NCK，其口服利用度和半衰期大幅提升，单药对三阴型乳腺癌及KRAS突变胰腺癌效果优于NPB，联合MEK抑制剂等方案进一步显著抑制移植瘤生长且耐受良好。</p>
+                            <div class="status-footer">目前项目已进行到PPC (IND-enabling study)阶段</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Indication -->
+            <section class="home-section">
+                <h3 class="section-title">适应症 · Indication</h3>
+                <div class="indication-tags">
+                    <span class="tag">胰腺癌</span>
+                    <span class="tag">乳腺癌</span>
+                    <span class="tag">肺腺癌</span>
+                    <span class="tag">卵巢癌</span>
+                    <span class="tag">子宫内膜癌</span>
+                    <span class="tag">宫颈癌</span>
+                    <span class="tag">结直肠癌</span>
+                </div>
+            </section>
+
+            <!-- Core Peer-Reviewed Publications -->
+            <section class="home-section">
+                <h3 class="section-title">核心同行评审出版物 · Core Peer-Reviewed Publications</h3>
+                <div class="publication-placeholder" style="text-align: center; padding: 40px; color: #8892b0; font-size: 1.1em;">
+                    成果暂未发表，敬请期待。
+                </div>
+            </section>
+
+            <!-- 底部入驻引导 -->
+            <footer class="site-footer" id="site-footer">
+                <div class="footer-inner">
+                    <div class="footer-icon">🔐</div>
+                    <h3>联系我们获取账号，申请入驻权</h3>
+                    <p>如需开通平台账号或申请机构入驻，请联系管理员获取授权。</p>
+                    <div class="footer-actions">
+                        <a href="contact.html" class="footer-btn primary">
+                            <span>📧</span> 联系我们
+                        </a>
+                    </div>
+                    <div class="footer-tip">登录后可查看完整工具链接与实验详情</div>
+                </div>
+            </footer>
         </main>
     </div>
 
