@@ -864,12 +864,13 @@ document.querySelectorAll('.phase').forEach(phase => {
     }
 
     // 从后端API获取反向分析数据
-    async function fetchReverseData(cancer, survivalType, cutoff) {
+    async function fetchReverseData(cancer, survivalType, cutoff, msigdbCategory) {
+        msigdbCategory = msigdbCategory || 'C6';
         try {
             var resp = await fetch(API_BASE + '/api/survival/reverse', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cancer_type: cancer, survival_type: survivalType, cutoff: cutoff, max_genes: 500 })
+                body: JSON.stringify({ cancer_type: cancer, survival_type: survivalType, cutoff: cutoff, max_genes: 200, msigdb_category: msigdbCategory })
             });
             if (!resp.ok) {
                 var err = await resp.json();
@@ -887,9 +888,11 @@ document.querySelectorAll('.phase').forEach(phase => {
         var cancerSelect = document.getElementById('rev-cancer-select');
         var survivalSelect = document.getElementById('rev-survival-type');
         var cutoffInput = document.getElementById('rev-cutoff');
+        var msigdbSelect = document.getElementById('rev-msigdb-category');
         var cancer = cancerSelect ? cancerSelect.value : '';
         var survivalType = survivalSelect ? survivalSelect.value : 'OS';
         var cutoff = cutoffInput ? parseInt(cutoffInput.value) : 50;
+        var msigdbCategory = msigdbSelect ? msigdbSelect.value : 'C6';
 
         if (!cancer) {
             alert('请选择一个癌种');
@@ -904,7 +907,7 @@ document.querySelectorAll('.phase').forEach(phase => {
         if (resultContent) resultContent.style.display = 'none';
 
         // 尝试调用后端API
-        var apiData = await fetchReverseData(cancer, survivalType, cutoff);
+        var apiData = await fetchReverseData(cancer, survivalType, cutoff, msigdbCategory);
         if (apiData && apiData.genes) {
             displayReverseAPIData(apiData);
         } else {
