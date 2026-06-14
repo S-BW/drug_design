@@ -3123,10 +3123,32 @@ h1 {
     line-height: 1.5;
 }
 
+.home-map-card {
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.home-map-figure {
+    margin: 0;
+}
+
+.home-map-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    background: transparent;
+}
+
 @media (max-width: 768px) {
     .contact-email {
         font-size: 1.2em;
     }
+
+    .home-map-card {
+        padding: 12px;
+    }
 }
+
 
 
