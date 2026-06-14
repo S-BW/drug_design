@@ -7,7 +7,7 @@
     <title>关于我们 - 智药寻踪</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="inner-page">
     <!-- 登录遮罩 -->
     <div class="login-overlay hidden" id="login-overlay">
         <div class="login-box">
@@ -31,27 +31,19 @@
     </div>
 
     <div class="container">
-        <header class="page-header">
+        <header class="page-header home-header">
+            <a href="index.html" class="header-logo">
+                <img src="images/sinotar.png" alt="Sinotar Biopharm">
+            </a>
             <nav class="main-nav">
                 <a href="index.html">首页</a>
-                <a href="index.html#rd-platforms">研发平台</a>
-                <a href="index.html#pipeline">在研管线</a>
-                <a href="index.html#vision">企业愿景</a>
+                <a href="platforms.html">研发平台</a>
+                <a href="pipeline.html">在研管线</a>
+                <a href="vision.html">企业愿景</a>
                 <a href="services.html">技术服务</a>
                 <a href="about.html" class="active">关于我们</a>
-                <a href="index.html#contact">联系我们</a>
+                <a href="contact.html">联系我们</a>
             </nav>
-            <div class="header-titles">
-                <h1>🧬 智药寻踪——肿瘤靶向原创新药研发平台</h1>
-                <p class="subtitle">PharmaTrace - Tumor-Targeted Innovative Drug Design Platform</p>
-            </div>
-            <div class="header-actions">
-                <div class="user-bar" id="user-bar" style="display: none;">
-                    <span class="user-name" id="user-name"></span>
-                    <button class="logout-btn" id="logout-btn">退出</button>
-                </div>
-                <button class="login-trigger" id="login-trigger">🔐 登录</button>
-            </div>
         </header>
 
         <!-- 全局提示框 -->
@@ -59,13 +51,28 @@
 
         <main class="about-content">
             <div class="about-hero">
-                <h2>关于我们</h2>
                 <p>思诺达药业致力于打造国际领先的 AI 驱动抗肿瘤药物研发平台，汇聚全球顶尖科学家与产业专家，构建从靶点发现到临床前验证的端到端智能化闭环。</p>
             </div>
 
-            <!-- 01 核心团队 -->
+            <!-- 企业简介 -->
+            <section class="about-section" id="about">
+                <h3 class="section-title"><span class="section-number">01</span> 企业简介 · Company Profile</h3>
+                <p class="lead">
+                    思诺达生物医药（Sinotar Biopharm Limited）实行香港、深圳双总部架构，入驻港深科创园（HSITP）。企业深度联动高水平科研院校，聚焦肿瘤精准治疗赛道，持续推进创新药物研发与转化。
+                </p>
+                <div class="card">
+                    <p>
+                        公司独创 <strong>AI 赋能小分子药物研发 + 患者源肿瘤类器官双核心研发体系</strong>，聚焦耐药恶性肿瘤临床未满足用药缺口。依托 AI 高通量靶点挖掘技术与个体化肿瘤类器官药效评价技术，打通「靶点发现 — 先导化合物优化 — 体外药效验证 — 伴随诊断开发」全链条，自主布局多款具备完整知识产权的临床前候选新药，同步搭建智能化伴随诊断平台，实现靶向新药 + 配套诊断试剂协同研发。
+                    </p>
+                    <p class="home-en" style="margin-top: 12px;">
+                        Sinotar is a Hong Kong-based innovative biotech company settled in HSITP, concentrating on cutting-edge precision oncology research against drug-resistant cancers. We establish an exclusive dual-core R&D system combining AI-powered small-molecule drug design and patient-derived tumor organoid assessment to resolve critical clinical bottlenecks of refractory malignant tumors. Supported by high-throughput AI target identification and personalized organoid-based efficacy screening, we have built a full industrial pipeline covering novel target discovery, lead compound optimization, preclinical validation and companion diagnostic development. Multiple preclinical novel drug candidates with independent IP rights are under in-house development. Our self-developed AI companion diagnostic platform enables synergistic R&D of targeted therapeutics and matched diagnostic kits.
+                    </p>
+                </div>
+            </section>
+
+            <!-- 02 核心团队 -->
             <section class="about-section">
-                <h3 class="section-title"><span class="section-number">01</span> 核心团队 · 国际顶尖，多点协同</h3>
+                <h3 class="section-title"><span class="section-number">02</span> 核心团队 · 国际顶尖，多点协同</h3>
 
                 <p class="lead">汇聚全球行业精英，构建跨学科协作网络。团队拥有国际顶尖学术背景、20+ 年创新药研发经验，以及从基础研究到产业化的完整闭环能力。</p>
 
@@ -88,7 +95,7 @@
 
             <!-- 02 市场分析 -->
             <section class="about-section">
-                <h3 class="section-title"><span class="section-number">02</span> 市场分析 · 痛点明确，规模千亿</h3>
+                <h3 class="section-title"><span class="section-number">03</span> 市场分析 · 痛点明确，规模千亿</h3>
                 <div class="card" style="margin: 24px 0;">
                     <h4>🌏 中国癌症现状与慢病化管理</h4>
                     <p>近年来，中国新发病例和死亡人数均为全球第一，已成为名副其实的“癌症大国”。世界卫生组织（WHO）、中国国家卫生健康委员会等权威机构均已将癌症纳入慢性疾病管理体系，期望癌症患者可通过长期口服药物、阶段性维持治疗，将肿瘤控制在“休眠”状态，实现数年甚至十几年的无进展生存。</p>
@@ -155,7 +162,7 @@
 
             <!-- 03 技术平台 -->
             <section class="about-section">
-                <h3 class="section-title"><span class="section-number">03</span> 技术平台 · AI 驱动，高效创新</h3>
+                <h3 class="section-title"><span class="section-number">04</span> 技术平台 · AI 驱动，高效创新</h3>
 
                 <div class="card" style="margin-bottom: 24px;">
                     <h4>🧠 “智药寻踪”平台：AI 重塑研发新范式</h4>
@@ -288,7 +295,7 @@
 
             <!-- 04 三位一体创新范式 -->
             <section class="about-section">
-                <h3 class="section-title"><span class="section-number">04</span> 三位一体创新范式</h3>
+                <h3 class="section-title"><span class="section-number">05</span> 三位一体创新范式</h3>
 
                 <div class="grid-3" style="margin-bottom: 24px;">
                     <div class="card metric">
@@ -311,6 +318,7 @@
                     <p style="margin-top:10px;">构建国际领先的 AI 驱动抗肿瘤药物研发平台，实现从靶点发现到临床前验证的端到端智能化闭环。</p>
                 </div>
             </section>
+
         </main>
 
         <!-- 底部入驻引导 -->
@@ -320,9 +328,9 @@
                 <h3>联系我们获取账号，申请入驻权</h3>
                 <p>如需开通平台账号或申请机构入驻，请联系管理员获取授权。</p>
                 <div class="footer-actions">
-                    <button class="footer-btn primary" id="apply-trigger">
-                        <span>📝</span> 申请入驻授权
-                    </button>
+                    <a href="contact.html" class="footer-btn primary">
+                        <span>📧</span> 联系我们
+                    </a>
                 </div>
                 <div class="footer-tip">登录后可查看完整工具链接与实验详情</div>
             </div>

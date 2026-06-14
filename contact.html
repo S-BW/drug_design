@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/icon.png">
+    <title>联系我们 - 智药寻踪</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="contact-page">
+    <!-- 登录遮罩 -->
+    <div class="login-overlay hidden" id="login-overlay">
+        <div class="login-box">
+            <button type="button" class="login-close" id="login-close" aria-label="关闭">×</button>
+            <div class="login-logo">🧬</div>
+            <h2>智药寻踪</h2>
+            <p class="login-subtitle">肿瘤靶向原创新药研发平台</p>
+            <form id="login-form" autocomplete="off">
+                <div class="form-group">
+                    <label for="username">账号</label>
+                    <input type="text" id="username" placeholder="请输入账号" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="login-btn">登录</button>
+                <div class="login-error" id="login-error"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="page-header home-header">
+            <a href="index.html" class="header-logo">
+                <img src="images/sinotar.png" alt="Sinotar Biopharm">
+            </a>
+            <nav class="main-nav">
+                <a href="index.html">首页</a>
+                <a href="platforms.html">研发平台</a>
+                <a href="pipeline.html">在研管线</a>
+                <a href="vision.html">企业愿景</a>
+                <a href="services.html">技术服务</a>
+                <a href="about.html">关于我们</a>
+                <a href="contact.html" class="active">联系我们</a>
+            </nav>
+        </header>
+
+        <!-- 全局提示框 -->
+        <div class="tooltip" id="global-tooltip"></div>
+
+        <main class="home-content">
+            <section class="home-section contact-main" id="contact">
+                <div class="footer-inner">
+                    <h3>联系我们获取账号，申请入驻权</h3>
+                    <p>如需开通平台账号或申请机构入驻，请联系管理员获取授权。</p>
+
+                    <div class="contact-body-layout">
+                        <div class="contact-body-left">
+                            <div class="card contact-inquiry">
+                                <h4>合作咨询</h4>
+                                <p class="contact-email">sinotarzhangx@126.com</p>
+                                <button type="button" class="footer-btn primary" id="copy-email">复制邮箱</button>
+                            </div>
+
+                            <div class="contact-address-compact">
+                                <div class="contact-address-cards">
+                                    <div class="about-map-address">
+                                        <div class="about-map-address-head">
+                                            <h4>公司地址</h4>
+                                        </div>
+                                        <div class="about-map-address-row">
+                                            <span class="about-map-pin">📍</span>
+                                            <div>
+                                                <strong>香港 · Hong Kong</strong>
+                                                <p>8th Floor of Building 8, Hong Kong-Shenzhen Innovation and Technology Park</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="contact-apply-action">
+                                <button class="footer-btn primary" id="apply-trigger">
+                                    <span>📝</span> 申请入驻授权
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="contact-body-right">
+                            <figure class="about-map-figure">
+                                <object data="images/world-map-sinotar.svg" type="image/svg+xml" class="about-map-img"></object>
+                            </figure>
+                        </div>
+                    </div>
+                    <p class="contact-map-caption">香港 · 深圳双总部，服务亚太地区生物医药创新</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 申请入驻授权弹窗 -->
+    <div class="apply-overlay hidden" id="apply-overlay">
+        <div class="apply-box">
+            <button type="button" class="apply-close" id="apply-close" aria-label="关闭">×</button>
+            <div class="apply-header">
+                <h2>申请入驻授权</h2>
+                <p>填写以下信息，开始您的科研算力之旅</p>
+            </div>
+            <form id="apply-form" autocomplete="off">
+                <div class="apply-tabs">
+                    <button type="button" class="apply-tab active" data-tab="org">机构注册</button>
+                    <button type="button" class="apply-tab" data-tab="person">个人申请</button>
+                </div>
+                <input type="hidden" id="apply-type" value="org">
+
+                <div class="form-group">
+                    <label for="apply-name"><span id="name-label">机构全称</span><span class="required">*</span></label>
+                    <input type="text" id="apply-name" placeholder="请输入机构全称" required>
+                </div>
+                <div class="form-group">
+                    <label for="apply-email">单位邮箱<span class="required">*</span></label>
+                    <input type="email" id="apply-email" placeholder="name@institution.edu" required>
+                </div>
+                <div class="form-group">
+                    <label for="apply-field">研究领域<span class="required">*</span></label>
+                    <select id="apply-field" required>
+                        <option value="" disabled selected>请选择研究领域</option>
+                        <option value="靶点发现与验证">靶点发现与验证</option>
+                        <option value="苗头化合物发现">苗头化合物发现</option>
+                        <option value="先导化合物优化">先导化合物优化</option>
+                        <option value="分子动力学模拟">分子动力学模拟</option>
+                        <option value="ADMET 预测">ADMET 预测</option>
+                        <option value="药物重定位">药物重定位</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="apply-desc">需求说明<span class="required">*</span></label>
+                    <textarea id="apply-desc" rows="4" placeholder="请简要描述您的研究需求、预期算力规模及使用周期..." required></textarea>
+                </div>
+                <button type="submit" class="apply-submit">提交申请</button>
+                <p class="apply-note">提交即表示您同意我们的服务条款与隐私政策。您的信息将受到端到端加密保护。</p>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+    (function () {
+        var copyBtn = document.getElementById('copy-email');
+
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function () {
+                var email = 'sinotarzhangx@126.com';
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(email).then(function () {
+                        copyBtn.textContent = '已复制';
+                        setTimeout(function () { copyBtn.textContent = '复制邮箱'; }, 1500);
+                    }, function () {
+                        copyBtn.textContent = '复制失败';
+                    });
+                } else {
+                    var input = document.createElement('input');
+                    input.value = email;
+                    document.body.appendChild(input);
+                    input.select();
+                    try {
+                        document.execCommand('copy');
+                        copyBtn.textContent = '已复制';
+                        setTimeout(function () { copyBtn.textContent = '复制邮箱'; }, 1500);
+                    } catch (err) {
+                        copyBtn.textContent = '复制失败';
+                    }
+                    document.body.removeChild(input);
+                }
+            });
+        }
+    })();
+    </script>
+</body>
+</html>

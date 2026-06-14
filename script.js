@@ -375,6 +375,10 @@ function switchApplyTab(tab) {
     if (applyNameInput) {
         applyNameInput.placeholder = tab === 'org' ? '请输入机构全称' : '请输入申请人姓名';
     }
+    const emailLabel = document.querySelector('label[for="apply-email"]');
+    if (emailLabel && emailLabel.firstChild) {
+        emailLabel.firstChild.textContent = tab === 'org' ? '单位邮箱' : '个人邮箱';
+    }
 }
 
 if (applyTrigger) {
@@ -442,3 +446,35 @@ if (applyForm) {
         }
     });
 }
+
+// ================= 内页导航栏滚动毛玻璃效果 =================
+(function () {
+    const header = document.querySelector('.home-header');
+    if (header) {
+        function updateHeaderScroll() {
+            header.classList.toggle('scrolled', window.scrollY > 20);
+        }
+        window.addEventListener('scroll', updateHeaderScroll);
+        updateHeaderScroll();
+    }
+})();
+
+// ================= 研发平台页：Therapeutic Pipeline 点击跳转 =================
+(function () {
+    const drugTrack = document.querySelector('.drug-track[data-link]');
+    if (drugTrack) {
+        drugTrack.addEventListener('click', function (e) {
+            if (e.target.closest('.drug-line')) return;
+            window.location.href = drugTrack.dataset.link;
+        });
+    }
+})();
+
+// ================= 在研管线页：表格行点击跳转 =================
+(function () {
+    document.querySelectorAll('.data-table tbody tr[data-link]').forEach(function (row) {
+        row.addEventListener('click', function () {
+            window.location.href = row.dataset.link;
+        });
+    });
+})();

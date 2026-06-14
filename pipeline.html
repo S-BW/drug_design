@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/icon.png">
+    <title>在研管线 - 智药寻踪</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="inner-page">
+    <!-- 登录遮罩 -->
+    <div class="login-overlay hidden" id="login-overlay">
+        <div class="login-box">
+            <button type="button" class="login-close" id="login-close" aria-label="关闭">×</button>
+            <div class="login-logo">🧬</div>
+            <h2>智药寻踪</h2>
+            <p class="login-subtitle">肿瘤靶向原创新药研发平台</p>
+            <form id="login-form" autocomplete="off">
+                <div class="form-group">
+                    <label for="username">账号</label>
+                    <input type="text" id="username" placeholder="请输入账号" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="login-btn">登录</button>
+                <div class="login-error" id="login-error"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="page-header home-header">
+            <a href="index.html" class="header-logo">
+                <img src="images/sinotar.png" alt="Sinotar Biopharm">
+            </a>
+            <nav class="main-nav">
+                <a href="index.html">首页</a>
+                <a href="platforms.html">研发平台</a>
+                <a href="pipeline.html" class="active">在研管线</a>
+                <a href="vision.html">企业愿景</a>
+                <a href="services.html">技术服务</a>
+                <a href="about.html">关于我们</a>
+                <a href="contact.html">联系我们</a>
+            </nav>
+        </header>
+
+        <!-- 全局提示框 -->
+        <div class="tooltip" id="global-tooltip"></div>
+
+
+        <main class="home-content">
+            <!-- 在研产品目录 -->
+            <section class="home-section" id="pipeline">
+                <h3 class="section-title">在研产品目录 · Product Catalogue</h3>
+                <div class="data-table-wrapper home-pipeline-table">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Project Code</th>
+                                <th>Indication 适应症</th>
+                                <th>R&amp;D Stage 研发阶段</th>
+                                <th>Core Advantage 产品亮点</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-link="sin001.html">
+                                <td>1</td>
+                                <td>SIN-001</td>
+                                <td>胰腺癌、乳腺癌、肺腺癌、卵巢癌、子宫内膜癌、宫颈癌、结直肠癌</td>
+                                <td>PPC<br>(IND-enabling study)</td>
+                                <td>Inhibit multi-oncogenic signaling downstream node；Higher specificity and lower off-target toxicity；Broad indications</td>
+                            </tr>
+                            <tr data-link="sin002.html">
+                                <td>2</td>
+                                <td>SIN-002</td>
+                                <td>胃腺癌、乳腺癌、肺腺癌、结直肠癌、肝细胞癌、胰腺癌</td>
+                                <td>PPC</td>
+                                <td>Inhibit multi-oncogenic signaling downstream node；Higher specificity and lower off-target toxicity；Broad indications</td>
+                            </tr>
+                            <tr data-link="sin003.html">
+                                <td>3</td>
+                                <td>SIN-003</td>
+                                <td>肺腺癌、乳腺癌、肝细胞癌</td>
+                                <td>Preclinical validation</td>
+                                <td>Inhibit multi-oncogenic signaling downstream node；Higher specificity and lower off-target toxicity；Broad indications</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部入驻引导 -->
+        <footer class="site-footer" id="site-footer">
+            <div class="footer-inner">
+                <div class="footer-icon">🔐</div>
+                <h3>联系我们获取账号，申请入驻权</h3>
+                <p>如需开通平台账号或申请机构入驻，请联系管理员获取授权。</p>
+                <div class="footer-actions">
+                    <a href="contact.html" class="footer-btn primary">
+                        <span>📧</span> 联系我们
+                    </a>
+                </div>
+                <div class="footer-tip">登录后可查看完整工具链接与实验详情</div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

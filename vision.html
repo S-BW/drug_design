@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/icon.png">
+    <title>企业愿景 - 智药寻踪</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="inner-page">
+    <!-- 登录遮罩 -->
+    <div class="login-overlay hidden" id="login-overlay">
+        <div class="login-box">
+            <button type="button" class="login-close" id="login-close" aria-label="关闭">×</button>
+            <div class="login-logo">🧬</div>
+            <h2>智药寻踪</h2>
+            <p class="login-subtitle">肿瘤靶向原创新药研发平台</p>
+            <form id="login-form" autocomplete="off">
+                <div class="form-group">
+                    <label for="username">账号</label>
+                    <input type="text" id="username" placeholder="请输入账号" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="login-btn">登录</button>
+                <div class="login-error" id="login-error"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="page-header home-header">
+            <a href="index.html" class="header-logo">
+                <img src="images/sinotar.png" alt="Sinotar Biopharm">
+            </a>
+            <nav class="main-nav">
+                <a href="index.html">首页</a>
+                <a href="platforms.html">研发平台</a>
+                <a href="pipeline.html">在研管线</a>
+                <a href="vision.html" class="active">企业愿景</a>
+                <a href="services.html">技术服务</a>
+                <a href="about.html">关于我们</a>
+                <a href="contact.html">联系我们</a>
+            </nav>
+        </header>
+
+        <!-- 全局提示框 -->
+        <div class="tooltip" id="global-tooltip"></div>
+
+            <main class="home-content">
+            <!-- 技术平台与企业愿景 -->
+            <section class="home-section" id="vision">
+                <h3 class="section-title">技术平台与企业愿景 · Platform &amp; Vision</h3>
+                <div class="grid-2 home-vision-grid">
+                    <div class="card">
+                        <h4>PharmaTrace 智药寻踪一体化研发平台</h4>
+                        <p>
+                            平台划分为靶点研究、苗头化合物研发、临床前评价三大标准化模块，整合生信大数据、AI 计算化学、原代类器官培养、体内药理全套尖端技术，既是公司自研新药的核心载体，也是对外 CRO 技术服务的硬件支撑。
+                        </p>
+                        <p class="home-en">
+                            Divided into Target Research, Hit Discovery and Preclinical Assessment, the integrated platform combines bioinformatics, AI computational chemistry, patient-derived organoid culture and in-vivo pharmacology to support both internal drug R&amp;D and external CRO business.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h4>企业愿景 · Corporate Vision</h4>
+                        <p>
+                            立足港深生物医药产业高地，以 AI + 类器官前沿技术打破抗肿瘤新药研发瓶颈，一边自研老百姓用得起的原研靶向新药，一边以开放的技术服务助力全球生物医药产业提速，成长为亚太地区特色鲜明的肿瘤精准药物研发龙头企业。
+                        </p>
+                        <p class="home-en">
+                            Rooted in the Hong Kong-Shenzhen biotech cluster, Sinotar aims to overcome core barriers in anti-tumor drug discovery via AI and organoid technology. We strive to develop affordable innovative targeted drugs while accelerating global biotech progress through professional technical services, evolving into a leading precision oncology R&amp;D enterprise across Asia-Pacific.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部入驻引导 -->
+        <footer class="site-footer" id="site-footer">
+            <div class="footer-inner">
+                <div class="footer-icon">🔐</div>
+                <h3>联系我们获取账号，申请入驻权</h3>
+                <p>如需开通平台账号或申请机构入驻，请联系管理员获取授权。</p>
+                <div class="footer-actions">
+                    <a href="contact.html" class="footer-btn primary">
+                        <span>📧</span> 联系我们
+                    </a>
+                </div>
+                <div class="footer-tip">登录后可查看完整工具链接与实验详情</div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
