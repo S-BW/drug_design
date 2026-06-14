@@ -333,10 +333,11 @@ document.querySelectorAll('.phase').forEach(phase => {
 
 // ================= 生存分析功能 =================
 (function() {
-    // 后端API基础URL (可根据部署环境修改)
-    const API_BASE = window.location.hostname === 'localhost' 
-        ? 'http://localhost:5000' 
-        : (window.API_BASE_URL || '');
+    // 后端API基础URL
+    // 配置方式：在HTML中 <script>window.API_BASE_URL = 'https://your-backend.com';</script>
+    const API_BASE = window.API_BASE_URL || (
+        window.location.hostname === 'localhost' ? 'http://localhost:5000' : ''
+    );
 
     // 标准正态分布CDF
     function normalCDF(x) {
@@ -415,6 +416,9 @@ document.querySelectorAll('.phase').forEach(phase => {
     async function fetchSurvivalData(gene, cancerType, survivalType) {
         survivalType = survivalType || 'OS';
         try {
+            if (!API_BASE) {
+                throw new Error('Backend API not configured. Set window.API_BASE_URL');
+            }
             const resp = await fetch(API_BASE + '/api/survival/forward', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -443,11 +447,15 @@ document.querySelectorAll('.phase').forEach(phase => {
                 maxTime: data.km_data && data.km_data.high && data.km_data.high.time.length > 0
                     ? Math.max(...data.km_data.high.time)
                     : 180,
-                data_source: data.data_source || 'cBioPortal/TCGA'
+                data_source: data.data_source || 'cBioPortal/TCGA',
+                isRealData: true
             };
         } catch (e) {
-            console.warn('API failed, using mock data:', e.message);
-            return generateMockSurvivalData(gene, cancerType);
+            console.warn('API failed:', e.message);
+            alert('\u26a0\ufe0f \u65e0\u6cd5\u8fde\u63a5\u5230\u540e\u7aefAPI\uff0c\u4f7f\u7528\u6f14\u793a\u6570\u636e\u3002\n\n\u8981\u83b7\u53d6\u771f\u5b9e\u6570\u636e\uff0c\u8bf7\uff1a\n1. \u542f\u52a8\u540e\u7aef: cd backend && python app.py\n2. \u6216\u90e8\u7f72\u5230 Render\n\nAPI_BASE \u5f53\u524d\u503c: ' + (API_BASE || '(\u672a\u914d\u7f6e)'));
+            var mock = generateMockSurvivalData(gene, cancerType);
+            mock.isRealData = false;
+            return mock;
         }
     }
 
@@ -624,9 +632,13 @@ document.querySelectorAll('.phase').forEach(phase => {
 
     // 显示结果
     function displayResults(data) {
+        var isReal = data.isRealData;
         var sourceTag = data.data_source ? ' | ' + data.data_source : '';
-        document.getElementById('result-title').textContent =
-            data.gene + ' / ' + data.cancerType + ' - OS生存分析' + sourceTag;
+        var statusBadge = isReal 
+            ? ' | \ud83d\udd12 \u771f\u5b9e\u6570\u636e' 
+            : ' | \u26a0\ufe0f \u6f14\u793a\u6570\u636e';
+        document.getElementById('result-title').innerHTML =
+            data.gene + ' / ' + data.cancerType + ' - OS\u751f\u5b58\u5206\u6790' + sourceTag + '<span style="color:' + (isReal ? '#00ff88' : '#ffc107') + ';">' + statusBadge + '</span>';
 
         // 统计指标
         document.getElementById('stat-hr').textContent =
