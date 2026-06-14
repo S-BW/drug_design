@@ -1269,7 +1269,92 @@ h1 {
     min-width: 180px;
 }
 
-/* ================= 关于我们页面 ================= */
+html {
+    scroll-behavior: smooth;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 160px;
+}
+
+.header-logo img {
+    max-height: 48px;
+    width: auto;
+    max-width: 220px;
+    display: block;
+}
+
+.home-header {
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.home-header .main-nav {
+    flex: 2 1 auto;
+    justify-content: center;
+    min-width: 0;
+}
+
+.home-header .main-nav a {
+    padding: 8px 13px;
+    font-size: 0.84em;
+}
+
+@media (max-width: 900px) {
+    .home-header {
+        gap: 10px;
+    }
+
+    .home-header .main-nav {
+        order: 2;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .home-header .main-nav a {
+        padding: 7px 11px;
+        font-size: 0.8em;
+    }
+
+    .header-logo {
+        order: 1;
+        width: 100%;
+        flex: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-nav {
+        order: 2;
+        width: 100%;
+        justify-content: center;
+        margin-top: 6px;
+    }
+
+    .header-actions {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .header-titles {
+        order: 1;
+        width: 100%;
+    }
+
+    .page-header {
+        align-items: center;
+    }
+
+    .header-logo img {
+        max-height: 40px;
+    }
+}
 .about-content {
     margin-top: 30px;
     animation: fadeInUp 0.7s ease;
