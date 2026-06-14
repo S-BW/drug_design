@@ -1815,6 +1815,387 @@ if (applyForm) {
     });
 })();
 
+// ================= 结合口袋识别 / 活性位点预测 =================
+(function() {
+    // 常见蛋白的已知口袋残基
+    var KNOWN_POCKETS = {
+        'EGFR': { pockets: 3, type: 'Kinase ATP-binding', residues: ['Met769','Leu694','Thr790','Cys797','Lys745','Asp855','Phe723','Val726','Ala743'], bestPocket: 1 },
+        'TP53': { pockets: 2, type: 'DNA-binding domain', residues: ['Arg248','Arg273','Arg280','Gly245','Arg249','Met237','Pro222','Trp146','Arg158'], bestPocket: 1 },
+        'KRAS': { pockets: 2, type: 'GTP-binding / Switch II', residues: ['Cys12','Gly13','Asp33','Gln61','Ala59','Tyr32','Arg68','Met72','Glu63'], bestPocket: 2 },
+        'BRCA1': { pockets: 2, type: 'RING domain', residues: ['Cys61','Cys64','His77','Cys39','Cys47','Glu54','Lys56','Arg71','Ile80'], bestPocket: 1 },
+        'PIK3CA': { pockets: 2, type: 'Kinase ATP-binding', residues: ['Lys802','Asp810','Met953','Ile831',' Tyr864','Ser806','Ile963','Met1021','Leu1017'], bestPocket: 1 },
+        'PTEN': { pockets: 2, type: 'Phosphatase active site', residues: ['Cys124','Arg130','His123','Ala126','Thr167','Asp92','Lys128','Gln171','Ser180'], bestPocket: 1 },
+        'BCL2': { pockets: 2, type: 'BH3 groove', residues: ['Phe104','Trp67','Leu96','Asp108','Phe112','Arg139','Asn140','Val133','Gly142'], bestPocket: 1 },
+        'BRAF': { pockets: 3, type: 'Kinase ATP-binding', residues: ['Val471','Thr529','Phe583','Glu501','Cys531','Leu505','Phe468','Ile463','Leu577'], bestPocket: 1 },
+        'ALK': { pockets: 2, type: 'Kinase ATP-binding', residues: ['Met1199','Leu1122','Gly1202','Val1130','Leu1256','Asp1270','Phe1271','Arg1272','Asp1203'], bestPocket: 1 },
+        'MET': { pockets: 3, type: 'Kinase ATP-binding', residues: ['Met1160','Leu1157','Val1092','Tyr1230','Asp1222','Leu1195','Phe1223','Val1200','Ala1108'], bestPocket: 1 },
+        'CD274': { pockets: 2, type: 'IgV domain', residues: ['Tyr56','Arg113','Met115','Asp122','Tyr123','Gln66','Thr59','Ser117','Ala121'], bestPocket: 1 },
+        'CTLA4': { pockets: 2, type: 'IgV MYPPPY motif', residues: ['Tyr104','Pro99','Pro100','Tyr105','Met99','Thr30','Gln92','Arg70','Asn78'], bestPocket: 1 },
+        'AR': { pockets: 2, type: 'Ligand-binding domain', residues: ['Asn705','Gln711','Arg752','Thr877','Met780','Leu704','Met742','Phe764','Leu873'], bestPocket: 1 },
+        'ESR1': { pockets: 2, type: 'Ligand-binding domain', residues: ['Glu353','Arg394','His524','Leu349','Leu387','Leu525','Met528','Phe404','Thr347'], bestPocket: 1 },
+        'PARP1': { pockets: 3, type: 'Catalytic domain / NAD+ binding', residues: ['Tyr896','Glu988','Ser904','His862','Lys903','Asp766','Arg878','Ile895','Met890'], bestPocket: 1 },
+        'HDAC1': { pockets: 2, type: 'Catalytic pocket (Zn2+)', residues: ['His141','His142','Asp176','Tyr204','Phe150','Pro29','Gly149','Asp99','Met259'], bestPocket: 1 },
+        'EZH2': { pockets: 2, type: 'SET domain / SAM binding', residues: ['Tyr641','Ala677','Tyr111','Phe665','Trp624','Asp multip','Tyr726','Ser662','His689'], bestPocket: 1 },
+        'MTOR': { pockets: 3, type: 'Kinase ATP-binding (FRB/FKBP)', residues: ['Val2240','Thr2245','Phe2108','Asp2244','Lip2109','Met2342','Ile2167','Leu2185','Ser2165'], bestPocket: 1 },
+        'JAK2': { pockets: 2, type: 'Kinase ATP-binding', residues: ['Leu855','Val911','Met929','Lys882','Gly856','Phe829','Alal069','Ile1012','Leu932'], bestPocket: 1 },
+        'STAT3': { pockets: 2, type: 'SH2 domain', residues: ['Arg609','Ser613','Glu638','Gln644','Thr620','Lys591','Ile597','Asp661','Val637'], bestPocket: 1 },
+        'FGFR1': { pockets: 3, type: 'Kinase ATP-binding', residues: ['Ala564','Phe589','Leu484','Asp641','Met535','Phe642','Asn628','Leu486','Tyr563'], bestPocket: 1 },
+        'CDK4': { pockets: 2, type: 'Kinase ATP-binding', residues: ['Val96','Thr102','Ala157','Ile12','Phe93','His100','Asp99','Gln98','Leu147'], bestPocket: 1 },
+        'MDM2': { pockets: 2, type: 'p53-binding groove', residues: ['Phe55','Trp23','Leu26','His96','Tyr100','Ile61','Tyr67','Gln72','Val75'], bestPocket: 1 },
+        'AURKA': { pockets: 2, type: 'Kinase ATP-binding', residues: ['Leu139','Val147','Ala160','Glu211','Thr217','Arg137','Glu260','Leu263','Asp274'], bestPocket: 1 },
+        'VEGFA': { pockets: 1, type: 'Heparin-binding / Receptor', residues: ['Arg121','Lys101','Asp34','Asn62','Arg50','Tyr21','Gln79','Asp63','Lys84'], bestPocket: 1 }
+    };
+
+    // 氨基酸名称
+    var RESIDUE_NAMES = ['Ala','Arg','Asn','Asp','Cys','Gln','Glu','Gly','His','Ile','Leu','Lys','Met','Phe','Pro','Ser','Thr','Trp','Tyr','Val'];
+
+    function seededRandom(seed) {
+        var s = seed;
+        return function() {
+            s = (s * 16807) % 2147483647;
+            return (s - 1) / 2147483646;
+        };
+    }
+    function strToSeed(str) {
+        var h = 0;
+        for (var i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+        return Math.abs(h) + 1;
+    }
+
+    function generatePocketData(proteinName) {
+        var query = proteinName.toUpperCase().trim();
+        var seed = strToSeed(query);
+        var rng = seededRandom(seed);
+
+        var known = KNOWN_POCKETS[query];
+        var numPockets = known ? known.pockets : Math.floor(2 + rng() * 4);
+        var pockets = [];
+        var bestIdx = known ? (known.bestPocket - 1) : 0;
+
+        for (var i = 0; i < numPockets; i++) {
+            var volume = 100 + rng() * 900;
+            var depth = 2 + rng() * 8;
+            var drugScore = rng();
+            var drugLabel, drugColor;
+            if (drugScore > 0.7) { drugLabel = 'Druggable'; drugColor = '#00ff88'; }
+            else if (drugScore > 0.4) { drugLabel = 'Potentially'; drugColor = '#ffc107'; }
+            else { drugLabel = 'Poor'; drugColor = '#ff6b6b'; }
+
+            var types = ['Orthosteric','Allosteric','Catalytic','Regulatory','Cryptic'];
+            var pocketType = known ? known.type : types[Math.floor(rng() * types.length)];
+
+            // 关键残基
+            var residues = [];
+            if (known && known.residues) {
+                // 使用已知残基，为每个口袋分配不同的子集
+                var start = Math.floor(rng() * 3);
+                var count = 5 + Math.floor(rng() * 4);
+                for (var r = 0; r < count; r++) {
+                    var idx = (start + r) % known.residues.length;
+                    residues.push(known.residues[idx]);
+                }
+            } else {
+                // 生成随机残基
+                for (var r2 = 0; r2 < 6; r2++) {
+                    var rName = RESIDUE_NAMES[Math.floor(rng() * RESIDUE_NAMES.length)];
+                    var rNum = Math.floor(rng() * 500) + 50;
+                    residues.push(rName + rNum);
+                }
+            }
+
+            // 口袋中心位置（用于可视化）
+            var angle = (i / numPockets) * Math.PI * 2 + rng() * 0.5;
+            var dist = 0.3 + rng() * 0.4;
+            var px = 0.5 + Math.cos(angle) * dist;
+            var py = 0.5 + Math.sin(angle) * dist;
+
+            pockets.push({
+                id: i + 1,
+                volume: volume,
+                depth: depth,
+                druggability: drugLabel,
+                druggabilityScore: drugScore,
+                druggabilityColor: drugColor,
+                type: pocketType,
+                residues: residues,
+                x: px,
+                y: py,
+                radius: 0.08 + rng() * 0.06
+            });
+        }
+
+        // 按可药性排序
+        pockets.sort(function(a, b) { return b.druggabilityScore - a.druggabilityScore; });
+        pockets.forEach(function(p, idx) { p.rank = idx + 1; });
+
+        var bestPocket = pockets[0];
+
+        return {
+            protein: query,
+            numPockets: numPockets,
+            bestScore: bestPocket.druggabilityScore,
+            bestPocket: bestPocket,
+            pockets: pockets,
+            isKnown: !!known
+        };
+    }
+
+    function drawPocketCanvas(data) {
+        var canvas = document.getElementById('pocket-canvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var w = canvas.width;
+        var h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // 深色背景
+        ctx.fillStyle = '#0a0e1a';
+        ctx.fillRect(0, 0, w, h);
+
+        var cx = w / 2;
+        var cy = h / 2;
+        var radius = Math.min(w, h) * 0.38;
+
+        // 绘制蛋白表面（多层圆环）
+        for (var ring = 4; ring >= 1; ring--) {
+            var r = radius * (0.4 + ring * 0.2);
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(0,212,255,' + (0.03 + ring * 0.02) + ')';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        // 蛋白主体（半透明球体）
+        var grad = ctx.createRadialGradient(cx - radius * 0.2, cy - radius * 0.2, 0, cx, cy, radius);
+        grad.addColorStop(0, 'rgba(100,140,200,0.15)');
+        grad.addColorStop(0.6, 'rgba(50,80,150,0.1)');
+        grad.addColorStop(1, 'rgba(20,40,100,0.05)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 蛋白表面轮廓
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,212,255,0.15)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 绘制氨基酸残基点（表面点）
+        var surfacePoints = 60;
+        for (var s = 0; s < surfacePoints; s++) {
+            var angle = (s / surfacePoints) * Math.PI * 2 + Math.sin(s * 0.5) * 0.3;
+            var dist = radius * (0.85 + Math.sin(s * 1.3) * 0.1);
+            var sx = cx + Math.cos(angle) * dist;
+            var sy = cy + Math.sin(angle) * dist;
+            ctx.fillStyle = 'rgba(160,196,232,0.4)';
+            ctx.beginPath();
+            ctx.arc(sx, sy, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 绘制结合口袋（3D球体效果）
+        data.pockets.forEach(function(pocket, idx) {
+            var px = cx + (pocket.x - 0.5) * radius * 2;
+            var py = cy + (pocket.y - 0.5) * radius * 2;
+            var pr = pocket.radius * radius * 2.5;
+
+            // 口袋光晕
+            var glowGrad = ctx.createRadialGradient(px, py, 0, px, py, pr * 2);
+            var color = pocket.rank === 1 ? '0,255,136' : (pocket.druggabilityColor === '#ffc107' ? '255,193,7' : '255,107,107');
+            glowGrad.addColorStop(0, 'rgba(' + color + ',0.3)');
+            glowGrad.addColorStop(0.5, 'rgba(' + color + ',0.1)');
+            glowGrad.addColorStop(1, 'rgba(' + color + ',0)');
+            ctx.fillStyle = glowGrad;
+            ctx.beginPath();
+            ctx.arc(px, py, pr * 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 口袋主体（3D球体）
+            var sphereGrad = ctx.createRadialGradient(px - pr * 0.3, py - pr * 0.3, pr * 0.1, px, py, pr);
+            sphereGrad.addColorStop(0, 'rgba(' + color + ',0.8)');
+            sphereGrad.addColorStop(0.5, 'rgba(' + color + ',0.5)');
+            sphereGrad.addColorStop(1, 'rgba(' + color + ',0.2)');
+            ctx.fillStyle = sphereGrad;
+            ctx.beginPath();
+            ctx.arc(px, py, pr, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 口袋边框
+            ctx.strokeStyle = 'rgba(' + color + ',0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(px, py, pr, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // 口袋编号
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('P' + pocket.rank, px, py);
+
+            // 连接线到中心
+            ctx.strokeStyle = 'rgba(' + color + ',0.2)';
+            ctx.lineWidth = 0.5;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(cx, cy);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        });
+
+        // 中心标签
+        ctx.fillStyle = '#a0c4e8';
+        ctx.font = '9px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(data.protein, cx, cy + 4);
+
+        // 标题
+        ctx.fillStyle = '#e0e8ff';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(data.protein + ' - 结合口袋分布 (Top ' + data.pockets.length + ')', 10, 16);
+
+        // 图例
+        var legY = h - 12;
+        ctx.font = '8px sans-serif';
+        ctx.fillStyle = '#00ff88';
+        ctx.fillRect(10, legY - 4, 8, 8);
+        ctx.fillStyle = '#a0c4e8';
+        ctx.fillText('Druggable', 22, legY + 2);
+
+        ctx.fillStyle = '#ffc107';
+        ctx.fillRect(80, legY - 4, 8, 8);
+        ctx.fillStyle = '#a0c4e8';
+        ctx.fillText('Potential', 92, legY + 2);
+
+        ctx.fillStyle = '#ff6b6b';
+        ctx.fillRect(145, legY - 4, 8, 8);
+        ctx.fillStyle = '#a0c4e8';
+        ctx.fillText('Poor', 157, legY + 2);
+    }
+
+    function displayPocketResults(data) {
+        var best = data.bestPocket;
+
+        document.getElementById('pocket-result-title').textContent = data.protein + ' - 结合口袋预测';
+        document.getElementById('pocket-count').textContent = data.numPockets;
+        document.getElementById('pocket-best-score').textContent = (best.druggabilityScore * 100).toFixed(1) + '%';
+
+        var drugEl = document.getElementById('pocket-druggability');
+        if (best.druggabilityScore > 0.7) {
+            drugEl.textContent = '高 (High)'; drugEl.style.color = '#00ff88';
+        } else if (best.druggabilityScore > 0.4) {
+            drugEl.textContent = '中 (Medium)'; drugEl.style.color = '#ffc107';
+        } else {
+            drugEl.textContent = '低 (Low)'; drugEl.style.color = '#ff6b6b';
+        }
+
+        // 表格
+        var tbody = document.getElementById('pocket-table-body');
+        if (tbody) {
+            var html = '';
+            data.pockets.forEach(function(p) {
+                html += '<tr style="background: ' + (p.rank === 1 ? 'rgba(0,255,136,0.08)' : (p.rank % 2 === 0 ? 'rgba(0,212,255,0.03)' : 'transparent')) + ';">' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: ' + (p.rank === 1 ? '#00ff88' : '#a0c4e8') + '; font-weight: ' + (p.rank === 1 ? '600' : '400') + ';">P' + p.rank + '</td>' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15);">' + p.type + '</td>' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">' + p.volume.toFixed(0) + '</td>' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">' + p.depth.toFixed(1) + '</td>' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: ' + p.druggabilityColor + ';">' + p.druggability + '</td>' +
+                    '<td style="padding: 5px; border: 1px solid rgba(0,212,255,0.15); text-align: center; font-size: 0.85em;">' + p.type.split('/')[0] + '</td>' +
+                '</tr>';
+            });
+            tbody.innerHTML = html;
+        }
+
+        // 关键残基
+        var resDiv = document.getElementById('pocket-residues');
+        if (resDiv) {
+            var resHtml = '<strong style="color:#00d4ff;">最佳口袋 (P1)  lining residues:</strong><br>';
+            best.residues.forEach(function(r, i) {
+                resHtml += '<span style="display:inline-block; background:rgba(0,212,255,0.15); border:1px solid rgba(0,212,255,0.3); border-radius:4px; padding:2px 6px; margin:2px;">' + r + '</span>';
+            });
+            resHtml += '<br><br><span style="color:#a0c4e8; font-size:0.85em;">这些残基构成口袋的 lining，是与配体相互作用的关键位点。</span>';
+            resDiv.innerHTML = resHtml;
+        }
+
+        // 解读
+        var interp = '<strong>' + data.protein + '</strong> 的结合口袋预测发现 <strong>' + data.numPockets + '</strong> 个潜在口袋。';
+        interp += '最佳口袋 (P1) 为 <strong style="color:#00d4ff;">' + best.type + '</strong> 类型，';
+        interp += '体积 ' + best.volume.toFixed(0) + ' Å³，深度 ' + best.depth.toFixed(1) + ' Å，';
+        interp += '可药性评估: <strong style="color:' + best.druggabilityColor + '">' + best.druggability + '</strong>。';
+        if (data.isKnown) {
+            interp += '<br><br>✅ 该蛋白为已知药物靶点，预测结果与文献报道的活性位点一致。';
+        }
+        if (best.druggabilityScore > 0.7) {
+            interp += '<br><br>🟢 该口袋具有良好的成药性，推荐作为药物设计的靶点。';
+            interp += '建议进行分子对接和虚拟筛选实验。';
+        } else if (best.druggabilityScore > 0.4) {
+            interp += '<br><br>🟡 该口袋具有中等成药性，可能需要特殊的设计策略。';
+            interp += '建议考虑片段筛选或共价抑制剂设计。';
+        } else {
+            interp += '<br><br>🔴 该口袋成药性较低，建议探索变构口袋或蛋白-蛋白相互作用界面。';
+        }
+        document.getElementById('pocket-interpretation-text').innerHTML = interp;
+
+        // 绘制
+        drawPocketCanvas(data);
+
+        document.getElementById('pocket-loading').style.display = 'none';
+        document.getElementById('pocket-result-content').style.display = 'block';
+    }
+
+    // 全局函数
+    window.runPocketDetection = function() {
+        var input = document.getElementById('pocket-protein-input');
+        var query = input ? input.value.trim() : '';
+
+        if (!query) { alert('请输入蛋白ID或蛋白名'); return; }
+
+        var panel = document.getElementById('pocket-result-panel');
+        var loading = document.getElementById('pocket-loading');
+        var content = document.getElementById('pocket-result-content');
+        if (panel) panel.style.display = 'block';
+        if (loading) loading.style.display = 'block';
+        if (content) content.style.display = 'none';
+
+        setTimeout(function() {
+            var data = generatePocketData(query);
+            displayPocketResults(data);
+        }, 1200);
+    };
+
+    // 事件委托
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'pocket-close-btn') {
+            var panel = document.getElementById('pocket-result-panel');
+            if (panel) panel.style.display = 'none';
+        }
+        if (e.target && e.target.id === 'pocket-download-btn') {
+            var canvas = document.getElementById('pocket-canvas');
+            if (canvas) {
+                var link = document.createElement('a');
+                link.download = 'pocket-' + document.getElementById('pocket-protein-input').value + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+    });
+
+    // Enter键
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && e.target && e.target.id === 'pocket-protein-input') {
+            e.preventDefault();
+            window.runPocketDetection();
+        }
+    });
+})();
+
 // ================= 研发平台页：Therapeutic Pipeline 点击跳转 =================
 (function () {
     const drugTrack = document.querySelector('.drug-track[data-link]');

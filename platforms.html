@@ -686,6 +686,82 @@
                             <span class="tools-badge">结构分析</span>
                         </div>
                         <div class="step-bottom step-bottom-public">
+                            <!-- 结合口袋预测表单 -->
+                            <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
+                                <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">🎯 结合口袋 / 活性位点预测</div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="pocket-protein-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">蛋白 ID 或蛋白名</label>
+                                    <input type="text" id="pocket-protein-input" placeholder="例如: EGFR, TP53, KRAS..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <button type="button" id="pocket-search-btn" onclick="runPocketDetection()" style="width: 100%; margin-top: 4px; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #33ddff 0%, #00aadd 100%)';this.style.boxShadow='0 4px 12px rgba(0,212,255,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)';this.style.boxShadow='0 2px 8px rgba(0,212,255,0.3)';">🎯 预测结合口袋</button>
+                            </div>
+
+                            <!-- 口袋预测结果面板 -->
+                            <div id="pocket-result-panel" style="display: none; margin-bottom: 12px; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border: 1px solid rgba(0,212,255,0.2);">
+                                <div id="pocket-loading" style="display: none; text-align: center; padding: 20px;">
+                                    <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(0,212,255,0.2); border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p style="color: #a0c4e8; font-size: 0.75em; margin-top: 10px;">正在分析蛋白表面并预测结合口袋...</p>
+                                </div>
+                                <div id="pocket-result-content" style="display: none;">
+                                    <div style="font-size: 0.8em; color: #00d4ff; font-weight: 600; text-align: left; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,0.2);">
+                                        🎯 <span id="pocket-result-title">结合口袋预测结果</span>
+                                    </div>
+                                    <!-- 口袋概要 -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">发现口袋数</div>
+                                            <div id="pocket-count" style="font-size: 0.9em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">最佳口袋评分</div>
+                                            <div id="pocket-best-score" style="font-size: 0.9em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">可药性</div>
+                                            <div id="pocket-druggability" style="font-size: 0.85em; font-weight: 600;">--</div>
+                                        </div>
+                                    </div>
+                                    <!-- 3D口袋可视化 -->
+                                    <div style="margin-bottom: 12px; text-align: center;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">🧬 蛋白表面结合口袋分布图 (Top 5 口袋)</div>
+                                        <canvas id="pocket-canvas" width="360" height="260" style="width: 100%; border-radius: 8px; background: rgba(15,23,42,0.8);"></canvas>
+                                    </div>
+                                    <!-- 口袋详情表格 -->
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">📋 口袋详情 (按可药性排序)</div>
+                                        <table style="width: 100%; border-collapse: collapse; font-size: 0.68em; color: #e0e8ff;">
+                                            <thead>
+                                                <tr style="background: rgba(0,212,255,0.1);">
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">#</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: left;">位置</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">体积(Å³)</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">深度</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">可药性</th>
+                                                    <th style="padding: 5px; border: 1px solid rgba(0,212,255,0.2); text-align: center;">类型</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="pocket-table-body">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- 氨基酸残基 -->
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">🔑 最佳口袋关键残基</div>
+                                        <div id="pocket-residues" style="font-size: 0.7em; color: #e0e8ff; line-height: 1.6; background: rgba(0,212,255,0.05); border-radius: 6px; padding: 8px; word-break: break-all;"></div>
+                                    </div>
+                                    <!-- 结果解读 -->
+                                    <div id="pocket-interpretation" style="background: rgba(255,193,7,0.08); border-left: 3px solid #ffc107; border-radius: 0 6px 6px 0; padding: 10px; margin-bottom: 12px; text-align: left;">
+                                        <div style="font-size: 0.7em; color: #ffc107; font-weight: 600; margin-bottom: 4px;">💡 口袋分析</div>
+                                        <div id="pocket-interpretation-text" style="font-size: 0.7em; color: #e0e8ff; line-height: 1.5;">--</div>
+                                    </div>
+                                    <!-- 操作按钮 -->
+                                    <div style="display: flex; gap: 8px;">
+                                        <button type="button" id="pocket-download-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">📥 下载图片</button>
+                                        <button type="button" id="pocket-close-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(255,107,107,0.4); background: rgba(255,107,107,0.1); color: #ff6b6b; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">✕ 关闭</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="website-links">
                                 <a href="https://github.com/Discngine/fpocket" class="website-link" target="_blank" data-tooltip="FPocket: 基于几何学的蛋白质口袋检测工具，开源免费">
                                     <span class="link-icon">🔗</span> FPocket
