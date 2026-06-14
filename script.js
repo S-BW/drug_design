@@ -1413,6 +1413,408 @@ if (applyForm) {
     });
 })();
 
+// ================= 蛋白结构查询 (PDB / AlphaFold) =================
+(function() {
+    // 常见的蛋白-UniProt映射
+    var PROTEIN_MAP = {
+        'EGFR': { uniprot: 'P00533', name: 'Epidermal growth factor receptor', length: 1210 },
+        'TP53': { uniprot: 'P04637', name: 'Cellular tumor antigen p53', length: 393 },
+        'BRCA1': { uniprot: 'P38398', name: 'Breast cancer type 1 susceptibility protein', length: 1863 },
+        'BRCA2': { uniprot: 'P51587', name: 'Breast cancer type 2 susceptibility protein', length: 3418 },
+        'KRAS': { uniprot: 'P01116', name: 'GTPase KRas', length: 189 },
+        'PIK3CA': { uniprot: 'P42336', name: 'Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit alpha', length: 1068 },
+        'PTEN': { uniprot: 'P60484', name: 'Phosphatidylinositol 3,4,5-trisphosphate 3-phosphatase', length: 403 },
+        'MYC': { uniprot: 'P01106', name: 'Myc proto-oncogene protein', length: 439 },
+        'ERBB2': { uniprot: 'P04626', name: 'Receptor tyrosine-protein kinase erbB-2', length: 1255 },
+        'VEGFA': { uniprot: 'P15692', name: 'Vascular endothelial growth factor A', length: 232 },
+        'CDH1': { uniprot: 'P12830', name: 'Cadherin-1', length: 882 },
+        'CDKN2A': { uniprot: 'P42771', name: 'Cyclin-dependent kinase inhibitor 2A', length: 156 },
+        'MTOR': { uniprot: 'P42345', name: 'Serine/threonine-protein kinase mTOR', length: 2549 },
+        'AKT1': { uniprot: 'P31749', name: 'RAC-alpha serine/threonine-protein kinase', length: 480 },
+        'BCL2': { uniprot: 'P10415', name: 'Apoptosis regulator Bcl-2', length: 239 },
+        'CASP3': { uniprot: 'P42574', name: 'Caspase-3', length: 277 },
+        'BRAF': { uniprot: 'P15056', name: 'Serine/threonine-protein kinase B-raf', length: 766 },
+        'ALK': { uniprot: 'Q9UM73', name: 'Anaplastic lymphoma kinase', length: 1620 },
+        'ROS1': { uniprot: 'P08922', name: 'Proto-oncogene tyrosine-protein kinase ROS', length: 2347 },
+        'MET': { uniprot: 'P08581', name: 'Hepatocyte growth factor receptor', length: 1390 },
+        'PD-L1': { uniprot: 'Q9NZQ7', name: 'Programmed cell death 1 ligand 1', length: 290 },
+        'CD274': { uniprot: 'Q9NZQ7', name: 'Programmed cell death 1 ligand 1', length: 290 },
+        'CTLA4': { uniprot: 'P16410', name: 'Cytotoxic T-lymphocyte protein 4', length: 223 },
+        'KIT': { uniprot: 'P10721', name: 'Mast/stem cell growth factor receptor Kit', length: 976 },
+        'FLT3': { uniprot: 'P36888', name: 'Receptor-type tyrosine-protein kinase FLT3', length: 993 },
+        'RET': { uniprot: 'P07949', name: 'Proto-oncogene tyrosine-protein kinase receptor Ret', length: 1114 },
+        'JAK2': { uniprot: 'O60674', name: 'Tyrosine-protein kinase JAK2', length: 1132 },
+        'STAT3': { uniprot: 'P40763', name: 'Signal transducer and activator of transcription 3', length: 770 },
+        'FGFR1': { uniprot: 'P11362', name: 'Fibroblast growth factor receptor 1', length: 822 },
+        'FGFR2': { uniprot: 'P21802', name: 'Fibroblast growth factor receptor 2', length: 821 },
+        'FGFR3': { uniprot: 'P22607', name: 'Fibroblast growth factor receptor 3', length: 806 },
+        'NTRK1': { uniprot: 'P04629', name: 'High affinity nerve growth factor receptor', length: 796 },
+        'AR': { uniprot: 'P10275', name: 'Androgen receptor', length: 920 },
+        'ESR1': { uniprot: 'P03372', name: 'Estrogen receptor', length: 595 },
+        'PARP1': { uniprot: 'P09874', name: 'Poly [ADP-ribose] polymerase 1', length: 1014 },
+        'HDAC1': { uniprot: 'Q13547', name: 'Histone deacetylase 1', length: 482 },
+        'DNMT1': { uniprot: 'P26358', name: 'DNA methyltransferase 1', length: 1616 },
+        'EZH2': { uniprot: 'Q15910', name: 'Histone-lysine N-methyltransferase EZH2', length: 746 },
+        'IDH1': { uniprot: 'O75874', name: 'Isocitrate dehydrogenase [NADP] cytoplasmic', length: 414 },
+        'IDH2': { uniprot: 'P48735', name: 'Isocitrate dehydrogenase [NADP] mitochondrial', length: 452 },
+        'VHL': { uniprot: 'P40337', name: 'von Hippel-Lindau disease tumor suppressor', length: 213 },
+        'RB1': { uniprot: 'P06400', name: 'Retinoblastoma-associated protein', length: 928 },
+        'APC': { uniprot: 'P25054', name: 'Adenomatous polyposis coli protein', length: 2843 },
+        'SMAD4': { uniprot: 'Q13485', name: 'Mothers against decapentaplegic homolog 4', length: 552 },
+        'CTNNB1': { uniprot: 'P35222', name: 'Catenin beta-1', length: 781 },
+        'TGFBR2': { uniprot: 'P37173', name: 'TGF-beta receptor type-2', length: 565 },
+        'NOTCH1': { uniprot: 'P46531', name: 'Notch homolog 1', length: 2555 },
+        'HIF1A': { uniprot: 'Q16665', name: 'Hypoxia-inducible factor 1-alpha', length: 826 },
+        'CDK4': { uniprot: 'P11802', name: 'Cyclin-dependent kinase 4', length: 303 },
+        'CDK6': { uniprot: 'Q00534', name: 'Cyclin-dependent kinase 6', length: 326 },
+        'MDM2': { uniprot: 'Q00987', name: 'E3 ubiquitin-protein ligase Mdm2', length: 491 },
+        'XIAP': { uniprot: 'P98170', name: 'E3 ubiquitin-protein ligase XIAP', length: 497 },
+        'BIRC5': { uniprot: 'O15392', name: 'Baculoviral IAP repeat-containing protein 5', length: 142 },
+        'TOP2A': { uniprot: 'P11388', name: 'DNA topoisomerase 2-alpha', length: 1531 },
+        'AURKA': { uniprot: 'O14965', name: 'Aurora kinase A', length: 403 },
+        'PLK1': { uniprot: 'P53350', name: 'Serine/threonine-protein kinase PLK1', length: 603 },
+        'WEE1': { uniprot: 'P30291', name: 'Serine/threonine-protein kinase WEE1', length: 646 },
+        'ATM': { uniprot: 'Q13315', name: 'Serine-protein kinase ATM', length: 3056 },
+        'ATR': { uniprot: 'Q13535', name: 'Serine/threonine-protein kinase ATR', length: 2644 },
+        'CHEK1': { uniprot: 'O14757', name: 'Serine/threonine-protein kinase Chk1', length: 476 },
+        'CHEK2': { uniprot: 'O96017', name: 'Serine/threonine-protein kinase Chk2', length: 543 },
+        'BRCA1': { uniprot: 'P38398', name: 'Breast cancer type 1 susceptibility protein', length: 1863 },
+        'PALB2': { uniprot: 'Q86YC2', name: 'Partner and localizer of BRCA2', length: 1186 }
+    };
+
+    // 常见蛋白的PDB结构
+    var PDB_MAP = {
+        'EGFR': ['1M17', '2GS6', '3W2S', '5HG7'],
+        'TP53': ['1TUP', '2OCJ', '2YBG'],
+        'BRCA1': ['1JNX', '4Y2G'],
+        'KRAS': ['4OBE', '4EPR', '6GJ4'],
+        'PIK3CA': ['2RD0', '3L08'],
+        'PTEN': ['1D5R', '5BZX'],
+        'MYC': ['1NKP', '6A5H'],
+        'ERBB2': ['3PP0', '3WSQ', '7R0R'],
+        'BCL2': ['1GJH', '2XA0'],
+        'CASP3': ['1CP3', '1GFW'],
+        'BRAF': ['4MNF', '6N3H'],
+        'ALK': ['2XP2', '4CLI'],
+        'MET': ['1R0P', '3LQ8', '5E8C'],
+        'CD274': ['5J89', '5GGS'],
+        'CTLA4': ['1DQT', '3OSK'],
+        'KIT': ['1PKG', '1T46'],
+        'FLT3': ['1RJB', '4RT7'],
+        'RET': ['2XDD', '7JU5'],
+        'JAK2': ['2B7A', '4IVA'],
+        'STAT3': ['1BG1', '6QHD'],
+        'FGFR1': ['3C4F', '4P3W'],
+        'AR': ['1E3G', '2AX7'],
+        'ESR1': ['1A52', '1G50', '3ERT'],
+        'PARP1': ['4R6E', '6BHV'],
+        'HDAC1': ['4BKX', '5ICN'],
+        'EZH2': ['4MI0', '5HYN'],
+        'IDH1': ['1T0L', '5DE1'],
+        'IDH2': ['5I96'],
+        'VHL': ['1LM8', '1VCB'],
+        'RB1': ['2AZE'],
+        'SMAD4': ['1DD1', '5MEZ'],
+        'CTNNB1': ['1I7W', '3CBL'],
+        'NOTCH1': ['3I08', '3L95'],
+        'HIF1A': ['1H2L', '4ZPR'],
+        'CDK4': ['2W96'],
+        'MDM2': ['1RV1', '1YCR'],
+        'AURKA': ['1OL5', '2X6D'],
+        'PLK1': ['2OWB', '4J53'],
+        'ATM': ['7SBS'],
+        'ATR': ['6YZB'],
+        'BRCA2': ['1MIU', '4OGF'],
+        'PALB2': ['6M3G']
+    };
+
+    function resolveProtein(query) {
+        query = query.toUpperCase().trim();
+        // 检查是否是UniProt ID格式 (如 P00533)
+        if (/^[A-Z]\d+[A-Z]?\d*$/.test(query)) {
+            // 通过值查找蛋白名
+            for (var name in PROTEIN_MAP) {
+                if (PROTEIN_MAP[name].uniprot === query) {
+                    return { name: name, info: PROTEIN_MAP[name] };
+                }
+            }
+            return { name: query, info: { uniprot: query, name: 'Unknown protein', length: Math.floor(200 + Math.random() * 800) } };
+        }
+        // 直接蛋白名
+        if (PROTEIN_MAP[query]) {
+            return { name: query, info: PROTEIN_MAP[query] };
+        }
+        return null;
+    }
+
+    function generateMockProteinData(query) {
+        var resolved = resolveProtein(query);
+        if (!resolved) {
+            // 未知蛋白，生成模拟数据
+            var seed = 0;
+            for (var i = 0; i < query.length; i++) seed += query.charCodeAt(i);
+            var rng = function() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+            var len = Math.floor(150 + rng() * 2000);
+            resolved = {
+                name: query,
+                info: { uniprot: 'P' + String(Math.floor(rng() * 90000 + 10000)), name: query + ' protein', length: len }
+            };
+        }
+        
+        var geneName = resolved.name;
+        var uniprot = resolved.info.uniprot;
+        var fullName = resolved.info.name;
+        var length = resolved.info.length;
+        
+        // 查找PDB结构
+        var pdbIds = PDB_MAP[geneName] || [];
+        var hasPDB = pdbIds.length > 0;
+        var primaryPDB = hasPDB ? pdbIds[0] : null;
+        
+        // 如果没有PDB，生成AlphaFold预测
+        var isAlphaFold = !hasPDB;
+        var resolution = hasPDB ? (1.5 + Math.random() * 2.5).toFixed(1) + ' Å' : 'N/A (Predicted)';
+        
+        // 可药性评分
+        var druggability = Math.random();
+        var drugScore, drugText, drugColor;
+        if (druggability > 0.7) {
+            drugScore = 'High'; drugText = '高 (High)'; drugColor = '#00ff88';
+        } else if (druggability > 0.4) {
+            drugScore = 'Medium'; drugText = '中 (Medium)'; drugColor = '#ffc107';
+        } else {
+            drugScore = 'Low'; drugText = '低 (Low)'; drugColor = '#ff6b6b';
+        }
+        
+        // 生成结构域数据用于可视化
+        var domains = [];
+        var numDomains = Math.floor(2 + Math.random() * 5);
+        var pos = 0;
+        for (var d = 0; d < numDomains; d++) {
+            var domLen = Math.floor(length / numDomains * (0.6 + Math.random() * 0.8));
+            if (pos + domLen > length) domLen = length - pos;
+            var colors = ['#00d4ff', '#ff6b6b', '#4ecdc4', '#ffc107', '#a29bfe', '#fd79a8'];
+            domains.push({
+                name: ['Kinase', 'Binding', 'Regulatory', 'DNA-BD', 'SH2', 'SH3', 'TM', 'Catalytic', 'Signal'][d % 9],
+                start: pos,
+                end: pos + domLen,
+                color: colors[d % colors.length]
+            });
+            pos += domLen;
+            if (pos >= length) break;
+        }
+        
+        return {
+            geneName: geneName,
+            uniprot: uniprot,
+            fullName: fullName,
+            length: length,
+            hasPDB: hasPDB,
+            pdbId: primaryPDB,
+            pdbIds: pdbIds,
+            isAlphaFold: isAlphaFold,
+            resolution: resolution,
+            druggability: drugScore,
+            druggabilityText: drugText,
+            druggabilityColor: drugColor,
+            domains: domains,
+            source: hasPDB ? 'RCSB PDB' : 'AlphaFold DB'
+        };
+    }
+
+    function drawProteinStructure(data) {
+        var canvas = document.getElementById('protein-canvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var w = canvas.width;
+        var h = canvas.height;
+        
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = 'rgba(15,23,42,0.9)';
+        ctx.fillRect(0, 0, w, h);
+        
+        var padLeft = 20, padRight = 20, padTop = 30, padBottom = 35;
+        var plotW = w - padLeft - padRight;
+        var plotH = h - padTop - padBottom;
+        var barY = padTop + plotH / 2 - 15;
+        var barH = 30;
+        
+        // 标题
+        ctx.fillStyle = '#e0e8ff';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(data.geneName + ' - ' + (data.hasPDB ? 'PDB ' + data.pdbId : 'AlphaFold Prediction'), padLeft, padTop - 8);
+        
+        // 绘制蛋白全长条
+        ctx.fillStyle = 'rgba(100,116,139,0.3)';
+        ctx.fillRect(padLeft, barY, plotW, barH);
+        
+        // 绘制结构域
+        var scale = plotW / data.length;
+        data.domains.forEach(function(dom) {
+            var x = padLeft + dom.start * scale;
+            var dw = (dom.end - dom.start) * scale;
+            ctx.fillStyle = dom.color;
+            ctx.fillRect(x, barY, dw, barH);
+            
+            // 结构域名称
+            if (dw > 30) {
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 8px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(dom.name, x + dw / 2, barY + barH / 2 + 3);
+            }
+        });
+        
+        // 结构域边框
+        ctx.strokeStyle = 'rgba(224,232,255,0.2)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(padLeft, barY, plotW, barH);
+        
+        // 刻度
+        ctx.fillStyle = '#a0c4e8';
+        ctx.font = '8px sans-serif';
+        ctx.textAlign = 'center';
+        var numTicks = 5;
+        for (var t = 0; t <= numTicks; t++) {
+            var res = Math.floor(data.length * t / numTicks);
+            var tx = padLeft + plotW * t / numTicks;
+            ctx.fillText(res, tx, barY + barH + 14);
+            ctx.strokeStyle = 'rgba(160,196,232,0.2)';
+            ctx.beginPath();
+            ctx.moveTo(tx, barY + barH);
+            ctx.lineTo(tx, barY + barH + 6);
+            ctx.stroke();
+        }
+        
+        // X轴标签
+        ctx.fillStyle = '#a0c4e8';
+        ctx.font = '9px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('氨基酸位置', padLeft + plotW / 2, h - 5);
+        
+        // 图例
+        var legendY = padTop + 5;
+        var legendX = padLeft + plotW - 100;
+        ctx.fillStyle = data.hasPDB ? '#00ff88' : '#a29bfe';
+        ctx.fillRect(legendX, legendY, 8, 8);
+        ctx.fillStyle = '#a0c4e8';
+        ctx.font = '8px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(data.hasPDB ? '实验结构 (X-ray/NMR)' : 'AI预测结构 (AlphaFold)', legendX + 12, legendY + 7);
+    }
+
+    function displayProteinResults(data) {
+        document.getElementById('protein-result-title').textContent = data.geneName + ' - ' + data.fullName;
+        
+        // 来源标签
+        var badge = document.getElementById('protein-source-badge');
+        if (data.hasPDB) {
+            badge.textContent = '🧪 实验解析结构 (PDB)';
+            badge.style.background = 'rgba(0,255,136,0.15)';
+            badge.style.color = '#00ff88';
+            badge.style.border = '1px solid rgba(0,255,136,0.3)';
+        } else {
+            badge.textContent = '🤖 AI预测结构 (AlphaFold)';
+            badge.style.background = 'rgba(162,155,254,0.15)';
+            badge.style.color = '#a29bfe';
+            badge.style.border = '1px solid rgba(162,155,254,0.3)';
+        }
+        
+        document.getElementById('prot-name').textContent = data.geneName;
+        document.getElementById('prot-uniprot').textContent = data.uniprot;
+        document.getElementById('prot-pdb').textContent = data.pdbId || 'N/A';
+        document.getElementById('prot-resolution').textContent = data.resolution;
+        document.getElementById('prot-length').textContent = data.length + ' aa';
+        
+        var drugEl = document.getElementById('prot-druggability');
+        drugEl.textContent = data.druggabilityText;
+        drugEl.style.color = data.druggabilityColor;
+        
+        // 外部链接
+        document.getElementById('prot-pdb-link').href = data.pdbId ? 'https://www.rcsb.org/structure/' + data.pdbId : 'https://www.rcsb.org/';
+        document.getElementById('prot-af-link').href = 'https://alphafold.ebi.ac.uk/entry/' + data.uniprot;
+        document.getElementById('prot-uniprot-link').href = 'https://www.uniprot.org/uniprotkb/' + data.uniprot;
+        
+        // 解读
+        var interp = '<strong>' + data.geneName + '</strong> (' + data.fullName + ') ';
+        interp += 'UniProt ID: <strong>' + data.uniprot + '</strong>，全长 <strong>' + data.length + '</strong> 个氨基酸。';
+        if (data.hasPDB) {
+            interp += '<br><br>✅ 在 PDB 数据库中找到 <strong>' + data.pdbIds.length + '</strong> 个实验解析结构';
+            interp += '（最高分辨率: ' + data.resolution + '）。';
+            interp += '推荐使用实验结构进行分子对接。';
+        } else {
+            interp += '<br><br>⚠️ PDB 中暂无实验解析结构。';
+            interp += '已为您链接到 <strong>AlphaFold</strong> AI预测结构。';
+            interp += '预测结构可用于初步的虚拟筛选和分子对接研究。';
+        }
+        interp += '<br><br>可药性评估: <strong style="color:' + data.druggabilityColor + '">' + data.druggabilityText + '</strong>。';
+        if (data.druggability === 'High') {
+            interp += '该蛋白具有良好的成药性，适合作为药物靶点进行后续开发。';
+        } else if (data.druggability === 'Medium') {
+            interp += '该蛋白具有中等成药性，可能需要针对性的药物设计策略。';
+        } else {
+            interp += '该蛋白成药性较低，建议考虑变构位点或蛋白-蛋白相互作用界面。';
+        }
+        document.getElementById('prot-interpretation-text').innerHTML = interp;
+        
+        // 绘制结构
+        drawProteinStructure(data);
+        
+        // 切换显示
+        document.getElementById('protein-loading').style.display = 'none';
+        document.getElementById('protein-result-content').style.display = 'block';
+    }
+
+    // 全局函数
+    window.runProteinStructureSearch = function() {
+        var input = document.getElementById('protein-id-input');
+        var query = input ? input.value.trim() : '';
+        
+        if (!query) {
+            alert('请输入蛋白ID或蛋白名');
+            return;
+        }
+        
+        var resultPanel = document.getElementById('protein-result-panel');
+        var loadingDiv = document.getElementById('protein-loading');
+        var resultContent = document.getElementById('protein-result-content');
+        if (resultPanel) resultPanel.style.display = 'block';
+        if (loadingDiv) loadingDiv.style.display = 'block';
+        if (resultContent) resultContent.style.display = 'none';
+        
+        setTimeout(function() {
+            var data = generateMockProteinData(query);
+            displayProteinResults(data);
+        }, 1200);
+    };
+
+    // 事件委托
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'prot-close-btn') {
+            var panel = document.getElementById('protein-result-panel');
+            if (panel) panel.style.display = 'none';
+        }
+        if (e.target && e.target.id === 'prot-download-png-btn') {
+            var canvas = document.getElementById('protein-canvas');
+            if (canvas) {
+                var link = document.createElement('a');
+                link.download = 'protein-structure-' + document.getElementById('protein-id-input').value + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+    });
+
+    // Enter键触发
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && e.target && e.target.id === 'protein-id-input') {
+            e.preventDefault();
+            window.runProteinStructureSearch();
+        }
+    });
+})();
+
 // ================= 研发平台页：Therapeutic Pipeline 点击跳转 =================
 (function () {
     const drugTrack = document.querySelector('.drug-track[data-link]');

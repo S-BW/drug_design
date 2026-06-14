@@ -571,6 +571,79 @@
                             <span class="tools-badge">结构生物学</span>
                         </div>
                         <div class="step-bottom step-bottom-public">
+                            <!-- 蛋白结构查询表单 -->
+                            <div class="input-form-container" style="padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,212,255,0.15);">
+                                <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">🧬 蛋白结构查询 (PDB / AlphaFold)</div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label for="protein-id-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">蛋白 ID 或蛋白名 / UniProt ID</label>
+                                    <input type="text" id="protein-id-input" placeholder="例如: EGFR, P00533, 1M17..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                                </div>
+                                <button type="button" id="protein-search-btn" onclick="runProteinStructureSearch()" style="width: 100%; margin-top: 4px; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #33ddff 0%, #00aadd 100%)';this.style.boxShadow='0 4px 12px rgba(0,212,255,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)';this.style.boxShadow='0 2px 8px rgba(0,212,255,0.3)';">🔍 查询蛋白结构</button>
+                            </div>
+
+                            <!-- 蛋白结构结果面板 -->
+                            <div id="protein-result-panel" style="display: none; margin-bottom: 12px; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border: 1px solid rgba(0,212,255,0.2);">
+                                <div id="protein-loading" style="display: none; text-align: center; padding: 20px;">
+                                    <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(0,212,255,0.2); border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p style="color: #a0c4e8; font-size: 0.75em; margin-top: 10px;">正在查询蛋白结构数据库...</p>
+                                </div>
+                                <div id="protein-result-content" style="display: none;">
+                                    <div style="font-size: 0.8em; color: #00d4ff; font-weight: 600; text-align: left; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,0.2);">
+                                        🧬 <span id="protein-result-title">蛋白结构信息</span>
+                                    </div>
+                                    <!-- 结构来源标签 -->
+                                    <div id="protein-source-badge" style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.7em; font-weight: 600; margin-bottom: 10px;"></div>
+                                    <!-- 蛋白信息 -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">蛋白名称</div>
+                                            <div id="prot-name" style="font-size: 0.8em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">UniProt ID</div>
+                                            <div id="prot-uniprot" style="font-size: 0.8em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">PDB ID</div>
+                                            <div id="prot-pdb" style="font-size: 0.85em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">分辨率</div>
+                                            <div id="prot-resolution" style="font-size: 0.85em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">氨基酸长度</div>
+                                            <div id="prot-length" style="font-size: 0.85em; color: #00d4ff; font-weight: 600;">--</div>
+                                        </div>
+                                        <div style="background: rgba(0,212,255,0.08); border-radius: 6px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 0.65em; color: #a0c4e8;">可药性</div>
+                                            <div id="prot-druggability" style="font-size: 0.8em; font-weight: 600;">--</div>
+                                        </div>
+                                    </div>
+                                    <!-- 结构示意图 -->
+                                    <div style="margin-bottom: 12px; text-align: center;">
+                                        <div style="font-size: 0.7em; color: #a0c4e8; text-align: left; margin-bottom: 6px;">🧬 蛋白结构拓扑示意图</div>
+                                        <canvas id="protein-canvas" width="360" height="200" style="width: 100%; border-radius: 8px; background: rgba(15,23,42,0.8);"></canvas>
+                                    </div>
+                                    <!-- 外部链接 -->
+                                    <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+                                        <a id="prot-pdb-link" href="#" target="_blank" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.68em; text-align: center; text-decoration: none; display: inline-block;">🔗 PDB</a>
+                                        <a id="prot-af-link" href="#" target="_blank" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.68em; text-align: center; text-decoration: none; display: inline-block;">🔗 AlphaFold</a>
+                                        <a id="prot-uniprot-link" href="#" target="_blank" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.68em; text-align: center; text-decoration: none; display: inline-block;">🔗 UniProt</a>
+                                    </div>
+                                    <!-- 结果解读 -->
+                                    <div id="prot-interpretation" style="background: rgba(255,193,7,0.08); border-left: 3px solid #ffc107; border-radius: 0 6px 6px 0; padding: 10px; margin-bottom: 10px; text-align: left;">
+                                        <div style="font-size: 0.7em; color: #ffc107; font-weight: 600; margin-bottom: 4px;">💡 结构分析</div>
+                                        <div id="prot-interpretation-text" style="font-size: 0.7em; color: #e0e8ff; line-height: 1.5;">--</div>
+                                    </div>
+                                    <!-- 操作按钮 -->
+                                    <div style="display: flex; gap: 8px;">
+                                        <button type="button" id="prot-download-png-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(0,212,255,0.4); background: rgba(0,212,255,0.1); color: #00d4ff; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">📥 下载图片</button>
+                                        <button type="button" id="prot-close-btn" style="flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid rgba(255,107,107,0.4); background: rgba(255,107,107,0.1); color: #ff6b6b; font-size: 0.7em; cursor: pointer; transition: all 0.3s;">✕ 关闭</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="website-links">
                                 <a href="https://www.rcsb.org/" class="website-link" target="_blank" data-tooltip="PDB: 蛋白质结构数据库，获取实验解析的靶点结构">
                                     <span class="link-icon">🔗</span> PDB
