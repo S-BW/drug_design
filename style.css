@@ -3031,3 +3031,37 @@ h1 {
     }
 }
 
+/* 首页联系我们弹窗 */
+.contact-body {
+    text-align: center;
+    padding: 10px 0 20px;
+}
+
+.contact-email {
+    font-size: 1.45em;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 26px;
+    word-break: break-all;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.contact-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.contact-actions .footer-btn {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .contact-email {
+        font-size: 1.2em;
+    }
+}
+
+
