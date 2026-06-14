@@ -3058,6 +3058,64 @@ h1 {
     margin: 0;
 }
 
+.contact-divider {
+    margin: 22px 0 16px;
+    color: #8892b0;
+    font-size: 0.9em;
+    position: relative;
+}
+
+.contact-divider::before,
+.contact-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 70px);
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.contact-divider::before {
+    left: 0;
+}
+
+.contact-divider::after {
+    right: 0;
+}
+
+.contact-client-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.contact-client {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ccd6f6;
+    text-decoration: none;
+    font-size: 0.92em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.contact-client:hover {
+    background: rgba(0, 212, 255, 0.12);
+    border-color: rgba(0, 212, 255, 0.3);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.contact-client-icon {
+    font-size: 1.1em;
+}
+
 .contact-tip {
     margin-top: 18px;
     color: #a8b2d1;
