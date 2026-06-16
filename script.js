@@ -175,64 +175,69 @@ if (isLoggedIn()) {
 // ================= 药物管线进度条定位与分隔线 =================
 function updateDrugLinePositions() {
     const trackLines = document.querySelector('.drug-track-lines');
-    const phase3 = document.querySelector('.phase-3');
+    const phase3Content = document.querySelector('.phase-3 .phase-content');
     const sin4 = document.querySelector('.drug-line.in-progress');
 
-    if (trackLines && phase3 && sin4) {
+    if (trackLines && phase3Content && sin4) {
         const trackTop = trackLines.getBoundingClientRect().top;
-        const phase3Rect = phase3.getBoundingClientRect();
-        const phase3Mid = phase3Rect.top + (phase3Rect.bottom - phase3Rect.top) / 2;
-        sin4.style.height = Math.max(0, phase3Mid - trackTop) + 'px';
+        const contentRect = phase3Content.getBoundingClientRect();
+        const contentMid = contentRect.top + (contentRect.bottom - contentRect.top) / 2;
+        sin4.style.height = Math.max(0, contentMid - trackTop) + 'px';
     }
 }
 
-// 用 CSS mask 在 drug-bar 上“切开” phase 之间的间隙
-// 所有位置以 drug-track-lines 顶部为基准，确保切口与左侧 phase 间隙对齐
+// 用 CSS mask 在 drug-bar 上“切开” phase-content 之间的间隙
+// 所有位置以 drug-track-lines 顶部为基准，确保切口与左侧 phase-content 间隙对齐
 function applySegmentedMasks() {
     const trackLines = document.querySelector('.drug-track-lines');
-    const phase1 = document.querySelector('.phase-1');
-    const phase2 = document.querySelector('.phase-2');
-    const phase3 = document.querySelector('.phase-3');
+    const phaseContents = document.querySelectorAll('.phase-content');
     const completedLines = document.querySelectorAll('.drug-line.completed');
     const inProgressLine = document.querySelector('.drug-line.in-progress');
 
-    if (!trackLines || !phase1 || !phase2 || !phase3) return;
+    if (!trackLines || phaseContents.length === 0) return;
 
     const trackRect = trackLines.getBoundingClientRect();
     const trackTop = trackRect.top;
     const trackHeight = trackRect.height;
 
-    const p1Bottom = phase1.getBoundingClientRect().bottom - trackTop;
-    const p2Top = phase2.getBoundingClientRect().top - trackTop;
-    const p2Bottom = phase2.getBoundingClientRect().bottom - trackTop;
-    const p3Top = phase3.getBoundingClientRect().top - trackTop;
-    const p3Bottom = phase3.getBoundingClientRect().bottom - trackTop;
+    // 以每个 phase-content 的可见区域作为进度条上的显示段
+    const contentSegments = Array.from(phaseContents).map(content => {
+        const rect = content.getBoundingClientRect();
+        return {
+            start: rect.top - trackTop,
+            end: rect.bottom - trackTop
+        };
+    }).map(seg => ({
+        start: Math.max(0, seg.start),
+        end: Math.min(trackHeight, seg.end)
+    })).filter(seg => seg.end > seg.start);
 
-    // 完成线：三段可见，中间两段间隙透明
-    const completedMask = buildMaskGradient([
-        { start: 0, end: p1Bottom },
-        { start: p2Top, end: p2Bottom },
-        { start: p3Top, end: p3Bottom }
-    ], trackHeight);
-
-    completedLines.forEach(line => {
+    // 为每条 drug-line 生成 mask：以该线自身顶部为基准，把 phase-content 的绝对位置
+    // 转换为线内相对位置，确保无论线多长，切口在屏幕上的绝对位置都对齐。
+    function applyMaskToLine(line) {
         const bar = line.querySelector('.drug-bar');
-        if (bar) bar.style.setProperty('--mask-gradient', completedMask);
-    });
+        if (!bar) return;
 
-    // 进行中线：01/02、02/03 之间都切开，并延伸到 03 的一半
-    if (inProgressLine) {
-        const bar = inProgressLine.querySelector('.drug-bar');
-        if (bar) {
-            const halfP3 = p3Top + (p3Bottom - p3Top) / 2;
-            const inProgressMask = buildMaskGradient([
-                { start: 0, end: p1Bottom },
-                { start: p2Top, end: p2Bottom },
-                { start: p3Top, end: halfP3 }
-            ], halfP3);
-            bar.style.setProperty('--mask-gradient', inProgressMask);
-        }
+        const lineRect = line.getBoundingClientRect();
+        const lineTop = lineRect.top - trackTop;
+        const lineHeight = lineRect.height;
+
+        const segments = contentSegments
+            .map(seg => ({
+                start: seg.start - lineTop,
+                end: seg.end - lineTop
+            }))
+            .map(seg => ({
+                start: Math.max(0, seg.start),
+                end: Math.min(lineHeight, seg.end)
+            }))
+            .filter(seg => seg.end > seg.start);
+
+        bar.style.setProperty('--mask-gradient', buildMaskGradient(segments, lineHeight));
     }
+
+    completedLines.forEach(applyMaskToLine);
+    if (inProgressLine) applyMaskToLine(inProgressLine);
 }
 
 function buildMaskGradient(segments, totalHeight) {

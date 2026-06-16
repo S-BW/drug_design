@@ -1154,10 +1154,10 @@
         // Step expand/collapse functionality
         document.addEventListener('DOMContentLoaded', function() {
             const steps = document.querySelectorAll('.step');
-            
+
             // Store original heights for each phase
             const phaseHeights = new Map();
-            
+
             function getRowHeight(steps) {
                 // Get the maximum height of steps in the same row
                 let maxHeight = 0;
@@ -1169,24 +1169,24 @@
                 });
                 return maxHeight > 0 ? maxHeight + 'px' : 'auto';
             }
-            
+
             steps.forEach(step => {
                 step.addEventListener('click', function(e) {
                     // Prevent triggering when clicking on interactive elements inside step-bottom
                     if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) {
                         return;
                     }
-                    
+
                     const phaseContent = this.closest('.phase-content');
                     const isExpanded = this.classList.contains('expanded');
                     const phaseId = phaseContent.dataset.phaseId || phaseContent.className;
-                    
+
                     // Collapse all steps in this phase
                     phaseContent.querySelectorAll('.step').forEach(s => {
                         s.classList.remove('expanded');
                         s.style.height = '';
                     });
-                    
+
                     // Toggle expanded class on phase-content
                     if (isExpanded) {
                         phaseContent.classList.remove('has-expanded-step');
@@ -1195,17 +1195,28 @@
                         // Store current heights before expanding
                         const rowHeight = getRowHeight(phaseContent.querySelectorAll('.step'));
                         phaseHeights.set(phaseId, rowHeight);
-                        
+
                         phaseContent.classList.add('has-expanded-step');
                         this.classList.add('expanded');
-                        
+
                         // Set fixed height for non-expanded steps
                         phaseContent.querySelectorAll('.step:not(.expanded)').forEach(s => {
                             s.style.height = rowHeight;
                         });
                     }
+
+                    // 同步刷新右侧药物管线进度条，使切口跟随 phase-content 变化
+                    if (typeof refreshDrugTrack === 'function') {
+                        requestAnimationFrame(refreshDrugTrack);
+                    }
                 });
             });
+
+            // 监听 phase-content 尺寸变化，随时刷新右侧进度条切口位置
+            if (typeof ResizeObserver !== 'undefined' && typeof refreshDrugTrack === 'function') {
+                const resizeObserver = new ResizeObserver(refreshDrugTrack);
+                document.querySelectorAll('.phase-content').forEach(content => resizeObserver.observe(content));
+            }
         });
 
         // 分析提交成功弹窗功能
