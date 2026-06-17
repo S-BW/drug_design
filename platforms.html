@@ -1155,19 +1155,38 @@
         document.addEventListener('DOMContentLoaded', function() {
             const steps = document.querySelectorAll('.step');
 
-            // Store original heights for each phase
-            const phaseHeights = new Map();
+            function equalizeRowHeights(phaseContent) {
+                const steps = Array.from(phaseContent.querySelectorAll('.step'));
 
-            function getRowHeight(steps) {
-                // Get the maximum height of steps in the same row
-                let maxHeight = 0;
+                // 清除非展开 step 的固定高度，让浏览器按自然高度重新布局
                 steps.forEach(s => {
                     if (!s.classList.contains('expanded')) {
-                        const height = s.getBoundingClientRect().height;
-                        maxHeight = Math.max(maxHeight, height);
+                        s.style.height = '';
                     }
                 });
-                return maxHeight > 0 ? maxHeight + 'px' : 'auto';
+
+                // 按实际行分组（同一 offsetTop 的 step 在同一 flex 行）
+                const rows = new Map();
+                steps.forEach(s => {
+                    const top = Math.round(s.getBoundingClientRect().top);
+                    if (!rows.has(top)) rows.set(top, []);
+                    rows.get(top).push(s);
+                });
+
+                // 对每一行分别计算最大自然高度并统一应用
+                rows.forEach(rowSteps => {
+                    const nonExpanded = rowSteps.filter(s => !s.classList.contains('expanded'));
+                    if (nonExpanded.length === 0) return;
+
+                    let maxHeight = 0;
+                    nonExpanded.forEach(s => {
+                        maxHeight = Math.max(maxHeight, s.getBoundingClientRect().height);
+                    });
+
+                    nonExpanded.forEach(s => {
+                        s.style.height = maxHeight + 'px';
+                    });
+                });
             }
 
             steps.forEach(step => {
@@ -1179,7 +1198,7 @@
 
                     const phaseContent = this.closest('.phase-content');
                     const isExpanded = this.classList.contains('expanded');
-                    const phaseId = phaseContent.dataset.phaseId || phaseContent.className;
+                    const stepEl = this;
 
                     // Collapse all steps in this phase
                     phaseContent.querySelectorAll('.step').forEach(s => {
@@ -1187,28 +1206,75 @@
                         s.style.height = '';
                     });
 
-                    // Toggle expanded class on phase-content
                     if (isExpanded) {
                         phaseContent.classList.remove('has-expanded-step');
-                        phaseHeights.delete(phaseId);
-                    } else {
-                        // Store current heights before expanding
-                        const rowHeight = getRowHeight(phaseContent.querySelectorAll('.step'));
-                        phaseHeights.set(phaseId, rowHeight);
-
-                        phaseContent.classList.add('has-expanded-step');
-                        this.classList.add('expanded');
-
-                        // Set fixed height for non-expanded steps
-                        phaseContent.querySelectorAll('.step:not(.expanded)').forEach(s => {
-                            s.style.height = rowHeight;
-                        });
+                        if (typeof refreshDrugTrack === 'function') {
+                            requestAnimationFrame(refreshDrugTrack);
+                        }
+                        return;
                     }
 
-                    // 同步刷新右侧药物管线进度条，使切口跟随 phase-content 变化
-                    if (typeof refreshDrugTrack === 'function') {
-                        requestAnimationFrame(refreshDrugTrack);
-                    }
+                    // FLIP: First - 记录展开前的位置/大小
+                    const first = stepEl.getBoundingClientRect();
+                    const startScrollY = window.scrollY;
+
+                    // 应用最终展开状态
+                    phaseContent.classList.add('has-expanded-step');
+                    stepEl.classList.add('expanded');
+
+                    // 按新行均衡高度，让最终布局稳定
+                    equalizeRowHeights(phaseContent);
+
+                    // FLIP: Last - 记录展开后的位置/大小
+                    const last = stepEl.getBoundingClientRect();
+
+                    // 基于最终布局计算滚动目标位置，让展开后的 step 居中
+                    const targetY = startScrollY + last.top + last.height / 2 - window.innerHeight / 2;
+
+                    // FLIP: Invert - 用 transform 把展开后的元素"拉回"展开前的位置/大小
+                    const deltaX = first.left - last.left;
+                    const deltaY = first.top - last.top;
+                    const scaleX = first.width / last.width;
+                    const scaleY = first.height / last.height;
+
+                    stepEl.style.transition = 'none';
+                    stepEl.style.transformOrigin = 'top left';
+                    stepEl.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`;
+
+                    // 强制同步布局，确保 invert 状态被应用
+                    stepEl.getBoundingClientRect();
+
+                    // FLIP: Play - 下一帧移除 transform 触发过渡动画，并同时开始平滑滚动
+                    requestAnimationFrame(() => {
+                        stepEl.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                        stepEl.style.transform = '';
+
+                        // 与 FLIP 动画同步开始滚动
+                        window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+                    });
+
+                    // 动画结束后清理内联样式
+                    const clearFlipStyles = () => {
+                        stepEl.style.transition = '';
+                        stepEl.style.transform = '';
+                        stepEl.style.transformOrigin = '';
+                        stepEl.removeEventListener('transitionend', onTransitionEnd);
+                    };
+                    const onTransitionEnd = (event) => {
+                        if (event.propertyName !== 'transform') return;
+                        clearFlipStyles();
+                    };
+                    stepEl.addEventListener('transitionend', onTransitionEnd);
+
+                    // Fallback：如果 transitionend 因动画中断未触发，400ms 后仍清理样式
+                    setTimeout(clearFlipStyles, 400);
+
+                    // 刷新进度条
+                    requestAnimationFrame(() => {
+                        if (typeof refreshDrugTrack === 'function') {
+                            refreshDrugTrack();
+                        }
+                    });
                 });
             });
 
@@ -1217,6 +1283,15 @@
                 const resizeObserver = new ResizeObserver(refreshDrugTrack);
                 document.querySelectorAll('.phase-content').forEach(content => resizeObserver.observe(content));
             }
+
+            // 窗口大小变化时，重新计算已展开 phase 的每行高度
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    document.querySelectorAll('.phase-content.has-expanded-step').forEach(equalizeRowHeights);
+                }, 100);
+            });
         });
 
         // 分析提交成功弹窗功能
