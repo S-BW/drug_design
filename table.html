@@ -7777,7 +7777,7 @@
       } else if (name === 'Vina (kcal/mol)') {
         colConfig[i] = { higherBetter: false, numeric: true };
       } else if (name === 'Rank') {
-        colConfig[i] = { higherBetter: false, numeric: true };
+        colConfig[i] = { higherBetter: false, numeric: false };  // sort only, no heatmap
       }
     });
 
@@ -7810,8 +7810,24 @@
     }
 
     function compare(a, b, idx, cfg) {
+      const th = headers[idx];
+      const name = th.textContent.trim();
       const va = getValue(a, idx);
       const vb = getValue(b, idx);
+
+      // Categorical sorts with a fixed order
+      if (name === 'Patent risk') {
+        const order = ["Low", "Low-Medium", "Medium", "Marginal", "High"];
+        const ia = order.indexOf(String(va));
+        const ib = order.indexOf(String(vb));
+        return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+      }
+      if (name === 'Structural alerts') {
+        const na = String(va).startsWith('✓') || String(va).includes('None') ? 0 : 1;
+        const nb = String(vb).startsWith('✓') || String(vb).includes('None') ? 0 : 1;
+        return na - nb;
+      }
+
       const bothNum = typeof va === 'number' && typeof vb === 'number';
       if (bothNum) {
         if (isNaN(va) && isNaN(vb)) return 0;
@@ -7823,9 +7839,10 @@
     }
 
     function applyGlobalHeatmap() {
-      headers.forEach((_, cidx) => {
+      headers.forEach((th, cidx) => {
         const cfg = colConfig[cidx];
         if (!cfg || !cfg.numeric) return;
+        if (th.textContent.trim() === 'Rank') return;  // rank is not heat-mapped
         const dataRows = rows.filter(r => !r.classList.contains('ampc-row'));
         const vals = dataRows.map(r => getValue(r, cidx)).filter(v => typeof v === 'number' && !isNaN(v));
         if (vals.length === 0) return;
@@ -7902,7 +7919,7 @@
 
     markBetterThanAMPC();
     applyGlobalHeatmap();
-    sortBy(0);  // Default sort by Rank with AMPC on top
+    sortBy(0);  // Default sort by Rank 1..500 (AMPC stays at the bottom)
   })();
   </script>
 
