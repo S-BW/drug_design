@@ -566,7 +566,10 @@ h1 {
 /* 登录遮罩 */
 .login-overlay {
     position: fixed;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: rgba(10, 14, 30, 0.92);
     backdrop-filter: blur(12px);
     display: flex;
@@ -732,7 +735,10 @@ h1 {
 
 .step-bottom-overlay {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -992,7 +998,10 @@ h1 {
 /* 申请入驻授权弹窗 */
 .apply-overlay {
     position: fixed;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: rgba(10, 14, 30, 0.92);
     backdrop-filter: blur(12px);
     display: flex;
@@ -2616,7 +2625,10 @@ html {
 .home-hero::before {
     content: '';
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: radial-gradient(circle at 20% 30%, rgba(0, 212, 255, 0.2) 0%, transparent 45%),
                 radial-gradient(circle at 80% 70%, rgba(123, 44, 191, 0.2) 0%, transparent 45%);
     pointer-events: none;
@@ -3067,7 +3079,10 @@ html {
 
 .contact-body-right .about-map-img {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     border-radius: 12px;
