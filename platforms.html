@@ -1440,8 +1440,8 @@
                     // FLIP: Last - 记录展开后的位置/大小
                     const last = stepEl.getBoundingClientRect();
 
-                    // 基于最终布局计算滚动目标位置，让展开后的 step 居中
-                    const targetY = startScrollY + last.top + last.height / 2 - window.innerHeight / 2;
+                    // 基于最终布局计算滚动目标位置，让展开后的 step 顶端对齐视口顶部（留 120px 间距）
+                    const targetY = startScrollY + last.top - 120;
 
                     // FLIP: Invert - 用 transform 把展开后的元素"拉回"展开前的位置/大小
                     const deltaX = first.left - last.left;

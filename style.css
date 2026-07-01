@@ -80,7 +80,7 @@ h1 {
 .phase {
     display: flex;
     align-items: stretch;
-    margin-bottom: 30px;
+    margin-bottom: 0;
     position: relative;
 }
 
@@ -317,16 +317,24 @@ h1 {
 }
 
 .arrow-down {
+    position: relative;
+    z-index: 10;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    font-size: 2em;
+    font-size: 1.8em;
     color: #00d4ff;
-    margin: -10px 0;
+    margin: 0;
+    line-height: 1;
     animation: bounce 2s infinite;
+    pointer-events: none;
 }
 
 @keyframes bounce {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(10px); }
+    50% { transform: translateY(5px); }
 }
 
 /* Phase colors */
