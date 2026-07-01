@@ -311,7 +311,11 @@ function updateTooltipPosition(e) {
 
 // Add interactive hover effects
 document.querySelectorAll('.step').forEach(step => {
-    step.addEventListener('click', function() {
+    step.addEventListener('click', function(e) {
+        // 点击交互元素或先导化合物优化表单时不触发缩放，避免与表单操作冲突
+        if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('label') || e.target.closest('.lead-opt-form')) {
+            return;
+        }
         this.style.transform = 'scale(0.95)';
         setTimeout(() => {
             this.style.transform = '';

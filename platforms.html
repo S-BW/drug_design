@@ -6,6 +6,169 @@
     <link rel="icon" type="image/png" href="images/icon.png">
     <title>研发平台 - 智药寻踪</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* 先导化合物优化表单美化 */
+        .lead-opt-form {
+            padding: 14px;
+            background: rgba(0, 212, 255, 0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 255, 0.18);
+        }
+
+        .lead-opt-form .form-title {
+            font-size: 0.8em;
+            color: #00d4ff;
+            margin-bottom: 12px;
+            text-align: left;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lead-opt-form .form-group {
+            margin-bottom: 12px;
+        }
+
+        .lead-opt-form label.field-label {
+            display: block;
+            font-size: 0.72em;
+            color: #8fb8e8;
+            margin-bottom: 6px;
+            text-align: left;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .lead-opt-form input[type="text"],
+        .lead-opt-form input[type="number"] {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            background: rgba(12, 20, 38, 0.75);
+            color: #e6f0ff;
+            font-size: 0.76em;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lead-opt-form input[type="text"]:focus,
+        .lead-opt-form input[type="number"]:focus {
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12);
+        }
+
+        .lead-opt-form .option-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .lead-opt-form .option-group.vertical {
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .lead-opt-form .option-chip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.74em;
+            color: #cfe4ff;
+            cursor: pointer;
+            padding: 6px 10px 6px 28px;
+            background: rgba(0, 212, 255, 0.07);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 212, 255, 0.12);
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .lead-opt-form .option-chip:hover {
+            background: rgba(0, 212, 255, 0.14);
+            border-color: rgba(0, 212, 255, 0.28);
+        }
+
+        /* 隐藏原生 checkbox，使用自定义勾选样式，消除浏览器默认缩放动画 */
+        .lead-opt-form .option-chip input[type="checkbox"] {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            width: 14px;
+            height: 14px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .lead-opt-form .option-chip::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 3px;
+            background: rgba(12, 20, 38, 0.6);
+            transition: background 0.15s ease, border-color 0.15s ease;
+            pointer-events: none;
+        }
+
+        .lead-opt-form .option-chip::after {
+            content: '✓';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%) scale(0);
+            font-size: 10px;
+            color: #0f172a;
+            font-weight: bold;
+            transition: transform 0.12s ease;
+            pointer-events: none;
+        }
+
+        .lead-opt-form .option-chip:has(input[type="checkbox"]:checked) {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .lead-opt-form .option-chip:has(input[type="checkbox"]:checked)::before {
+            background: #00d4ff;
+            border-color: #00d4ff;
+        }
+
+        .lead-opt-form .option-chip:has(input[type="checkbox"]:checked)::after {
+            transform: translateY(-50%) scale(1);
+        }
+
+        .lead-opt-form .submit-btn {
+            width: 100%;
+            margin-top: 4px;
+            padding: 9px 0;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: #0f172a;
+            font-size: 0.82em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 3px 10px rgba(0, 212, 255, 0.25);
+        }
+
+        .lead-opt-form .submit-btn:hover {
+            background: linear-gradient(135deg, #33ddff 0%, #00aadd 100%);
+            box-shadow: 0 5px 16px rgba(0, 212, 255, 0.4);
+            transform: translateY(-1px);
+        }
+    </style>
 </head>
 <body class="platforms-page inner-page">
     <!-- 登录遮罩 -->
@@ -922,13 +1085,62 @@
                             </div>
                             
                             <!-- SMILES输入和优化表单 -->
-                            <div id="lead-optimization-form" style="display: none; padding: 10px 12px; background: rgba(0,212,255,0.05); border-radius: 8px; border: 1px solid rgba(0,212,255,0.15);">
-                                <div style="font-size: 0.75em; color: #00d4ff; margin-bottom: 8px; text-align: left; font-weight: 600;">⚗️ 先导化合物优化</div>
-                                <div class="form-group" style="margin-bottom: 8px;">
-                                    <label for="smiles-input" style="display: block; font-size: 0.7em; color: #a0c4e8; margin-bottom: 3px; text-align: left;">输入SMILES</label>
-                                    <input type="text" id="smiles-input" placeholder="例如: CC(C)Cc1ccc(cc1)C(C)C(=O)O..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0,212,255,0.3); background: rgba(15,23,42,0.8); color: #e0e8ff; font-size: 0.75em; outline: none; box-sizing: border-box;">
+                            <div id="lead-optimization-form" class="lead-opt-form" style="display: none;">
+                                <div class="form-title">⚗️ 先导化合物优化</div>
+                                <div class="form-group">
+                                    <label for="smiles-input" class="field-label">输入 SMILES</label>
+                                    <input type="text" id="smiles-input" value="N#CC1=C(OC=2C=3C=CC=CC3OC(=O)C2C1C4=CC=C(C=C4)C=5C=NC(F)=C(C5)C)N" placeholder="例如: N#CC1=C(OC=2C=3C=CC=CC3OC(=O)C2C1C4=CC=C(C=C4)C=5C=NC(F)=C(C5)C)N">
                                 </div>
-                                <button type="button" id="submit-optimization-btn" style="width: 100%; margin-top: 10px; padding: 8px 0; border-radius: 6px; border: none; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #0f172a; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,212,255,0.3);">✅ 提交优化</button>
+
+                                <!-- 分子生成块 -->
+                                <div class="form-group">
+                                    <label class="field-label">分子生成</label>
+                                    <div class="option-group">
+                                        <label class="option-chip">
+                                            <input type="checkbox" id="gen-scaffold-hop" checked>
+                                            骨架跃迁
+                                        </label>
+                                        <label class="option-chip">
+                                            <input type="checkbox" id="gen-side-chain" checked>
+                                            侧链修饰
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- 小分子数量 -->
+                                <div class="form-group">
+                                    <label for="molecule-count-input" class="field-label">小分子数量</label>
+                                    <input type="number" id="molecule-count-input" value="500" min="1" max="10000">
+                                </div>
+
+                                <!-- 评估方法 -->
+                                <div class="form-group">
+                                    <label class="field-label">评估方法</label>
+                                    <div class="option-group vertical">
+                                        <label class="option-chip">
+                                            <input type="checkbox" id="eval-structural-alerts" checked>
+                                            Structural Alerts (PAINS / BRENK)
+                                        </label>
+                                        <label class="option-chip">
+                                            <input type="checkbox" id="eval-vina" checked>
+                                            AutoDock Vina Non-Covalent Docking
+                                        </label>
+                                        <label class="option-chip">
+                                            <input type="checkbox" id="eval-gnina" checked>
+                                            GNINA Covalent Docking
+                                        </label>
+                                        <label class="option-chip">
+                                            <input type="checkbox" id="eval-admet" checked>
+                                            ADMET
+                                        </label>
+                                        <label class="option-chip">
+                                            <input type="checkbox" id="eval-boltzmol" checked>
+                                            BoltzMol-1 Structural Confidence
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <button type="button" id="submit-optimization-btn" class="submit-btn">✅ 提交优化</button>
                             </div>
                             
                             <!-- 优化结果表格 -->
@@ -1192,7 +1404,7 @@
             steps.forEach(step => {
                 step.addEventListener('click', function(e) {
                     // Prevent triggering when clicking on interactive elements inside step-bottom
-                    if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) {
+                    if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('label') || e.target.closest('.lead-opt-form')) {
                         return;
                     }
 
@@ -1300,10 +1512,10 @@
             const viewReportBtn = document.getElementById('view-report-btn');
             const downloadResultBtn = document.getElementById('download-result-btn');
 
-            // 查看报告按钮 - 跳转到报告页面
+            // 查看报告按钮 - 跳转到报告页面（可通过 showAnalysisSuccessModal(reportUrl) 动态指定）
             if (viewReportBtn) {
                 viewReportBtn.addEventListener('click', function() {
-                    window.location.href = 'TFF3_PAAD_analysis.html';
+                    window.location.href = window.__analysisReportUrl || 'TFF3_PAAD_analysis.html';
                 });
             }
 
@@ -1326,9 +1538,10 @@
                 });
             }
 
-            // 暴露显示弹窗的函数
-            window.showAnalysisSuccessModal = function() {
+            // 暴露显示弹窗的函数，可传入报告页面 URL
+            window.showAnalysisSuccessModal = function(reportUrl) {
                 if (modal) {
+                    window.__analysisReportUrl = reportUrl || 'TFF3_PAAD_analysis.html';
                     modal.style.display = 'flex';
                 }
             };
@@ -1344,9 +1557,6 @@
         // 先导化合物优化功能
         (function() {
             const leadOptStep = document.getElementById('lead-optimization-step');
-            const leadOptLinks = document.getElementById('lead-optimization-links');
-            const leadOptForm = document.getElementById('lead-optimization-form');
-            const submitOptBtn = document.getElementById('submit-optimization-btn');
             const resultTable = document.getElementById('optimization-result-table');
             const tableBody = document.getElementById('optimization-table-body');
 
@@ -1359,6 +1569,10 @@
                 const observer = new MutationObserver(function(mutations) {
                     mutations.forEach(function(mutation) {
                         if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                            // 每次从DOM重新获取元素，避免login unlock后innerHTML替换导致引用失效
+                            const leadOptLinks = document.getElementById('lead-optimization-links');
+                            const leadOptForm = document.getElementById('lead-optimization-form');
+
                             if (leadOptStep.classList.contains('expanded')) {
                                 // step展开时，隐藏链接，显示表单
                                 if (leadOptLinks) leadOptLinks.style.display = 'none';
@@ -1376,40 +1590,38 @@
                 observer.observe(leadOptStep, { attributes: true });
             }
 
-            // NPB的默认SMILES
-            const DEFAULT_NPB_SMILES = 'CN1CCN(CC1)C(C2=CC=CC=C2O)C3=CC=C(C=C3)Cl';
+            // AMPC 的默认SMILES
+            const DEFAULT_AMPC_SMILES = 'N#CC1=C(OC=2C=3C=CC=CC3OC(=O)C2C1C4=CC=C(C=C4)C=5C=NC(F)=C(C5)C)N';
 
-            // 提交优化按钮
-            if (submitOptBtn) {
-                submitOptBtn.addEventListener('click', function(e) {
+            // 使用事件委托绑定提交按钮，并阻止表单内 option-chip / input 点击冒泡导致 step 收起
+            if (leadOptStep) {
+                leadOptStep.addEventListener('click', function(e) {
+                    const target = e.target;
+
+                    // 点击 option chip 或其中的 checkbox 时，阻止事件继续冒泡到 step 的切换逻辑
+                    if (target && target.closest('.option-chip')) {
+                        e.stopPropagation();
+                        return;
+                    }
+
+                    if (!target || target.id !== 'submit-optimization-btn') return;
+
                     e.stopPropagation();
-                    
+
                     const smilesInput = document.getElementById('smiles-input');
                     let smiles = smilesInput ? smilesInput.value.trim() : '';
-                    
-                    // 如果没有填写SMILES，使用默认的NPB SMILES
+
+                    // 如果没有填写SMILES，使用默认的AMPC SMILES
                     if (!smiles) {
-                        smiles = DEFAULT_NPB_SMILES;
+                        smiles = DEFAULT_AMPC_SMILES;
                         if (smilesInput) {
                             smilesInput.value = smiles;
                         }
                     }
 
-                    // 显示结果表格
-                    if (resultTable && tableBody) {
-                        // 生成表格内容，使用真实图片
-                        let html = '';
-                        entries.forEach((entry, index) => {
-                            const imgNum = String(index + 1).padStart(3, '0');
-                            html += '<tr style="background: ' + (index % 2 === 0 ? 'rgba(0,212,255,0.03)' : 'transparent') + ';">' +
-                                '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center; color: #00d4ff; font-weight: 600;"><b>' + entry + '</b></td>' +
-                                '<td style="padding: 6px; border: 1px solid rgba(0,212,255,0.15); text-align: center;">' +
-                                    '<img src="images/structures/ijms-22-11002-i' + imgNum + '.png" alt="Structure ' + entry + '" style="max-width: 120px; max-height: 80px; object-fit: contain;">' +
-                                '</td>' +
-                            '</tr>';
-                        });
-                        tableBody.innerHTML = html;
-                        resultTable.style.display = 'block';
+                    // 弹出生成任务提交成功弹窗，查看报告跳转到 report/index.html
+                    if (typeof window.showAnalysisSuccessModal === 'function') {
+                        window.showAnalysisSuccessModal('report/index.html');
                     }
                 });
             }
